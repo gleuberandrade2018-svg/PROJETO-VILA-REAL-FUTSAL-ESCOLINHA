@@ -1,20 +1,21 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Vila Real Futsal - Gestão</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== TODOS OS ESTILOS EXISTENTES (mantidos) ===== */
+        /* ===== RESET E CONFIGURAÇÕES GLOBAIS ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -26,6 +27,7 @@
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --radius: 16px;
             --sidebar-width: 250px;
+            --sidebar-width-mobile: 0px;
             --login-bg: linear-gradient(135deg, #0f1b2d, #1a2d4a);
             --login-logo-size: 80px;
             --login-box-bg: #ffffff;
@@ -45,10 +47,18 @@
             --btn-border-radius: 10px;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background: #eef1f5;
             min-height: 100vh;
             display: flex;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* ===== SIDEBAR ===== */
@@ -66,6 +76,41 @@
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
+        }
+
+        /* ===== SIDEBAR MOBILE ===== */
+        .sidebar-mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 101;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-mobile-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         .sidebar-brand {
@@ -229,6 +274,8 @@
             flex: 1;
             padding: 24px 32px 32px 32px;
             min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
         }
 
         .top-header {
@@ -387,6 +434,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .btn-primary {
@@ -556,6 +606,7 @@
             font-weight: 600;
             font-size: 12px;
             color: var(--primary);
+            touch-action: manipulation;
         }
 
         .quick-action:hover {
@@ -752,6 +803,8 @@
             font-size: 14px;
             transition: all 0.3s;
             background: var(--white);
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .form-group input:focus,
@@ -1330,6 +1383,7 @@
             cursor: pointer;
             transition: all 0.3s;
             border: none;
+            touch-action: manipulation;
         }
 
         .whatsapp-float:hover {
@@ -1648,66 +1702,98 @@
             font-size: 12px;
         }
 
-        /* ===== RESPONSIVO ===== */
+        /* ===== SECURITY ===== */
+        .admin-only {
+            display: none;
+        }
+
+        .admin-only.visible {
+            display: block;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .security-badge i {
+            font-size: 14px;
+        }
+
+        /* ============================================================
+           RESPONSIVO - CORREÇÕES PARA CELULAR
+           ============================================================ */
+
+        /* Tablet e dispositivos menores */
         @media (max-width: 1024px) {
             .double-grid {
                 grid-template-columns: 1fr;
             }
+            .main-content {
+                padding: 20px 24px 24px 24px;
+            }
         }
 
+        /* Celular - até 768px */
         @media (max-width: 768px) {
+            /* Sidebar mobile */
             .sidebar {
-                width: 60px;
-                padding: 12px 0;
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
             }
-            .sidebar .sidebar-brand .brand-text,
-            .sidebar .sidebar-menu .menu-item span,
-            .sidebar .sidebar-menu .menu-label,
-            .sidebar .sidebar-footer .user-info .user-name,
-            .sidebar .sidebar-footer .user-info .user-role,
-            .sidebar .sidebar-footer .btn-logout span {
-                display: none;
+
+            .sidebar.open {
+                transform: translateX(0);
             }
-            .sidebar .sidebar-brand {
-                padding: 0 10px 16px 10px;
+
+            .sidebar-mobile-toggle {
+                display: flex;
+                align-items: center;
                 justify-content: center;
             }
-            .sidebar .sidebar-brand .logo {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
-            .sidebar .sidebar-menu .menu-item {
-                padding: 10px 12px;
-                justify-content: center;
-            }
-            .sidebar .sidebar-menu .menu-item i {
-                font-size: 18px;
-                margin: 0;
-            }
-            .sidebar .sidebar-footer {
-                padding: 12px 10px;
-            }
-            .sidebar .sidebar-footer .user-info .avatar {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
-            }
-            .sidebar .sidebar-footer .btn-logout {
-                padding: 6px;
-                font-size: 0;
-            }
-            .sidebar .sidebar-footer .btn-logout i {
-                font-size: 16px;
+
+            .sidebar-overlay.active {
+                display: block;
             }
 
             .main-content {
-                margin-left: 60px;
-                padding: 16px;
+                margin-left: 0;
+                width: 100%;
+                padding: 16px 16px 80px 16px;
+                padding-top: 70px;
+            }
+
+            .top-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
             }
 
             .top-header .page-title h1 {
                 font-size: 20px;
+            }
+
+            .top-header .header-actions {
+                flex-wrap: wrap;
+            }
+
+            .top-header .header-actions .search-box {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .top-header .header-actions .search-box input {
+                min-width: 80px;
+                width: 100%;
             }
 
             .stats-grid {
@@ -1730,9 +1816,9 @@
             }
 
             .whatsapp-float {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
+                width: 54px;
+                height: 54px;
+                font-size: 26px;
                 bottom: 20px;
                 right: 20px;
             }
@@ -1740,55 +1826,190 @@
             .permissoes-grid {
                 grid-template-columns: 1fr;
             }
+
+            .login-box {
+                padding: 28px 24px;
+                margin: 10px;
+            }
+
+            .alunos-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .aluno-card {
+                padding: 14px 16px;
+            }
+
+            .aluno-card .aluno-nome {
+                font-size: 15px;
+            }
+
+            .double-grid {
+                gap: 14px;
+            }
+
+            .card {
+                padding: 16px 18px;
+            }
+
+            .card-header h3 {
+                font-size: 14px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 8px;
+            }
+
+            .quick-action {
+                padding: 12px 6px;
+                font-size: 11px;
+            }
+
+            .quick-action i {
+                font-size: 18px;
+            }
+
+            .carteirinha-alunos-list {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-preview-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .modal {
+                padding: 20px;
+                margin: 10px;
+                max-height: 85vh;
+            }
+
+            .modal-header h2 {
+                font-size: 17px;
+            }
         }
 
+        /* Celular pequeno - até 480px */
         @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            .login-box {
-                padding: 24px;
-            }
+
             .alunos-grid {
                 grid-template-columns: 1fr;
             }
+
             .quick-actions {
                 grid-template-columns: 1fr 1fr;
             }
-            .top-header .header-actions .search-box {
-                width: 100%;
+
+            .login-box {
+                padding: 20px 16px;
             }
-            .top-header .header-actions .search-box input {
-                min-width: 100px;
-                width: 100%;
+
+            .whatsapp-float {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+                bottom: 16px;
+                right: 16px;
             }
-            .top-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .top-header .header-actions {
-                flex-wrap: wrap;
-            }
-            .top-header .header-actions .search-box {
-                flex: 1;
-            }
+
             .scanner-overlay {
                 width: 120px;
                 height: 120px;
             }
-            .whatsapp-float {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
+
+            .sidebar {
+                width: 260px;
             }
-            .carteirinha-alunos-list {
-                grid-template-columns: 1fr;
+
+            .top-header .header-actions .search-box input {
+                min-width: 60px;
             }
-            .btn-preview-grid {
-                grid-template-columns: 1fr 1fr;
+
+            .btn {
+                font-size: calc(var(--btn-font-size, 13px) - 1px);
+                padding: 8px 14px;
+            }
+
+            .btn-sm {
+                padding: 4px 10px;
+                font-size: calc(var(--btn-font-size, 13px) - 2px);
+            }
+
+            .btn-scan {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+
+            .carteirinha {
+                padding: 20px 18px;
+            }
+
+            .carteirinha .crt-body .crt-qr canvas {
+                width: 80px !important;
+                height: 80px !important;
+            }
+
+            .carteirinha .crt-header .crt-foto {
+                width: 48px;
+                height: 48px;
+            }
+
+            .carteirinha .crt-title {
+                font-size: 15px;
             }
         }
 
+        /* Ajustes para telas muito pequenas */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 12px 10px 80px 10px;
+                padding-top: 60px;
+            }
+
+            .sidebar {
+                width: 240px;
+            }
+
+            .top-header .page-title h1 {
+                font-size: 17px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .quick-action {
+                padding: 10px 4px;
+                font-size: 10px;
+            }
+
+            .quick-action i {
+                font-size: 16px;
+            }
+
+            .stats-grid {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 14px 16px;
+            }
+
+            .stat-card .stat-top .number {
+                font-size: 22px;
+            }
+
+            .card {
+                padding: 12px 14px;
+            }
+        }
+
+        /* ===== ANIMAÇÕES ===== */
         .page {
             display: none;
             animation: fadeIn 0.35s ease;
@@ -1829,38 +2050,39 @@
             font-weight: 700;
         }
 
-        /* ===== ACESSO RESTRITO ===== */
-        .admin-only {
-            display: none;
+        /* ===== ABA DE PERSONALIZAÇÃO ===== */
+        .aba-personalizacao {
+            animation: fadeIn 0.3s ease;
         }
 
-        .admin-only.visible {
-            display: block;
+        .config-item select {
+            padding: 6px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            background: var(--white);
+            min-width: 120px;
         }
 
-        .admin-only-flex {
-            display: none !important;
+        /* Correção para input color em mobile */
+        input[type="color"] {
+            -webkit-appearance: none;
+            appearance: none;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2px;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
         }
 
-        .admin-only-flex.visible {
-            display: flex !important;
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
         }
 
-        /* ===== AVISO DE SEGURANÇA ===== */
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #fef3c7;
-            color: #d97706;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .security-badge i {
-            font-size: 14px;
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -1878,6 +2100,14 @@
         <span class="badge" id="whatsappBadge">0</span>
         <span class="tooltip">Enviar WhatsApp</span>
     </button>
+
+    <!-- ===== MENU MOBILE TOGGLE ===== -->
+    <button class="sidebar-mobile-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- ===== SIDEBAR OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- ===== LOGIN ===== -->
     <div id="loginContainer" class="login-page">
@@ -2757,7 +2987,7 @@
                         <label class="perm-item"><input type="checkbox" id="permConfiguracoes"><span>Configurações</span></label>
                         <label class="perm-item"><input type="checkbox" id="permUsuarios"><span>Usuários</span></label>
                         <label class="perm-item"><input type="checkbox" id="permExcluirAlunos" checked><span>Excluir Alunos</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permPersonalizar" checked><span>Personalizar</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permPersonalizar"><span>Personalizar</span></label>
                     </div>
                     <small style="color:var(--gray-dark);font-size:12px;">Marque as áreas que este usuário poderá acessar</small>
                 </div>
@@ -2894,12 +3124,14 @@
         </div>
     </div>
 
-    <!-- ===== SCRIPT ===== -->
+    <!-- ============================================================
+    SCRIPT COMPLETO
+    ============================================================ -->
     <script>
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v24';
+        const STORAGE_KEY = 'vilaRealFutsalData_v25';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -2968,7 +3200,6 @@
                     loginTitle: 'VILA REAL',
                     loginSubtitle: 'Futsal · Gestão de Presenças',
                     emailjs: { serviceId: '', templateId: '', publicKey: '' },
-                    // Personalização de botões
                     botoes: {
                         primaryBg: '#0f1b2d',
                         primaryColor: '#ffffff',
@@ -2983,7 +3214,6 @@
                         paddingY: 10,
                         borderRadius: 10
                     },
-                    // Cores do sistema
                     cores: {
                         primaria: '#0f1b2d',
                         secundaria: '#d4a020',
@@ -3003,21 +3233,6 @@
         let mostrarSenhaFlag = false;
         let categoriaSelecionadaCarteirinha = 'todos';
         let abaAtualPersonalizacao = 'login';
-
-        // ============================================================
-        //  INICIALIZAR EMAILJS
-        // ============================================================
-        function initEmailJS() {
-            const config = data.config.emailjs || {};
-            if (config.publicKey && config.publicKey !== '') {
-                try {
-                    emailjs.init(config.publicKey);
-                    console.log('✅ EmailJS inicializado com sucesso!');
-                } catch (e) {
-                    console.warn('⚠️ EmailJS não inicializado:', e);
-                }
-            }
-        }
 
         // ============================================================
         //  CARREGAR DADOS
@@ -3130,12 +3345,29 @@
         }
 
         // ============================================================
+        //  SIDEBAR MOBILE
+        // ============================================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        // ============================================================
         //  FUNÇÕES DE LOGIN
         // ============================================================
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('recuperarSenhaContainer').style.display = 'none';
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
         }
 
         function showRecuperarSenha() {
@@ -3345,7 +3577,6 @@
             document.getElementById('whatsappFloat').style.display = 'flex';
             atualizarWhatsAppBadge();
 
-            // Mostrar badge de admin se for administrador
             const securityBadge = document.getElementById('securityBadge');
             if (isAdmin()) {
                 securityBadge.style.display = 'inline-flex';
@@ -3355,7 +3586,13 @@
 
             initEmailJS();
             initSystem();
+
+            // Aplicar personalização completa (global)
             aplicarPersonalizacaoCompleta();
+
+            // Fechar sidebar mobile se estiver aberta
+            closeSidebar();
+
             return false;
         }
 
@@ -3367,8 +3604,9 @@
             document.getElementById('whatsappFloat').style.display = 'none';
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('loginForm').reset();
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
             showToast('Desconectado');
+            closeSidebar();
         }
 
         // ============================================================
@@ -3441,7 +3679,7 @@
             reader.onload = function(e) {
                 data.config.loginLogo = e.target.result;
                 saveData();
-                aplicarPersonalizacao();
+                aplicarPersonalizacaoCompleta();
                 showToast('Logo atualizado!');
             };
             reader.readAsDataURL(file);
@@ -3450,7 +3688,7 @@
         function resetarLoginLogo() {
             data.config.loginLogo = '';
             saveData();
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
             showToast('Logo restaurado!');
         }
 
@@ -3464,7 +3702,7 @@
                 document.getElementById('loginBgPreview').textContent = '';
                 data.config.loginBg = dataUrl;
                 saveData();
-                aplicarPersonalizacao();
+                aplicarPersonalizacaoCompleta();
                 showToast('Fundo atualizado!');
             };
             reader.readAsDataURL(file);
@@ -3476,7 +3714,7 @@
             preview.textContent = 'Fundo padrão';
             data.config.loginBg = '';
             saveData();
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
             showToast('Fundo restaurado!');
         }
 
@@ -3485,13 +3723,13 @@
             data.config.loginTextColor = document.getElementById('loginTextColor').value;
             data.config.loginBoxBg = document.getElementById('loginBoxBgColor').value;
             data.config.loginLogoSize = parseInt(document.getElementById('loginLogoSize').value) || 80;
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
         }
 
         function atualizarLoginTextos() {
             data.config.loginTitle = document.getElementById('loginPageTitle').value.trim() || 'VILA REAL';
             data.config.loginSubtitle = document.getElementById('loginPageSubtitle').value.trim() || 'Futsal · Gestão de Presenças';
-            aplicarPersonalizacao();
+            aplicarPersonalizacaoCompleta();
         }
 
         // ============================================================
@@ -3551,6 +3789,7 @@
                 borderRadius: parseInt(document.getElementById('btnBorderRadius').value) || 10
             };
             saveData();
+            aplicarPersonalizacaoCompleta();
             showToast('✅ Personalização dos botões salva!');
         }
 
@@ -3582,6 +3821,7 @@
                 texto: document.getElementById('corTexto').value
             };
             saveData();
+            aplicarPersonalizacaoCompleta();
             showToast('✅ Cores do sistema salvas!');
         }
 
@@ -3595,7 +3835,7 @@
         }
 
         // ============================================================
-        //  PERSONALIZAÇÃO COMPLETA
+        //  PERSONALIZAÇÃO COMPLETA (GLOBAL)
         // ============================================================
         function aplicarPersonalizacaoCompleta() {
             // Aplicar cores do sistema
@@ -3627,10 +3867,11 @@
         }
 
         function salvarPersonalizacaoCompleta() {
-            // Salvar todas as personalizações
             salvarPersonalizacaoBotoes();
             salvarCoresSistema();
-            salvarPersonalizacao();
+            // Salvar login já é feito nas funções individuais
+            saveData();
+            aplicarPersonalizacaoCompleta();
             showToast('✅ Todas as personalizações foram salvas!');
         }
 
@@ -3691,8 +3932,11 @@
             document.getElementById('aba' + aba.charAt(0).toUpperCase() + aba.slice(1)).style.display = 'block';
             document.querySelectorAll('#tabLogin, #tabBotoes, #tabCores').forEach(el => {
                 el.classList.remove('active');
+                el.style.opacity = '0.7';
             });
-            document.getElementById('tab' + aba.charAt(0).toUpperCase() + aba.slice(1)).classList.add('active');
+            const tab = document.getElementById('tab' + aba.charAt(0).toUpperCase() + aba.slice(1));
+            tab.classList.add('active');
+            tab.style.opacity = '1';
         }
 
         // ============================================================
@@ -3727,7 +3971,6 @@
                     if (!permissoes[mapa[item.page]]) return;
                 }
 
-                // Item de personalização só aparece para quem tem permissão
                 if (item.page === 'personalizar' && !podePersonalizar() && !isAdmin) return;
 
                 html += `
@@ -3766,18 +4009,15 @@
             const targetPage = document.getElementById('page-' + page);
             if (targetPage) targetPage.classList.add('active');
 
-            // Verificar se é página de personalização e se o usuário tem permissão
             if (page === 'personalizar') {
                 if (!podePersonalizar() && !isAdmin()) {
                     showToast('❌ Você não tem permissão para personalizar o sistema', 'error');
                     mudarPagina('dashboard');
                     return;
                 }
-                // Carregar dados nas abas
                 carregarPersonalizacao();
                 carregarPersonalizacaoBotoes();
                 carregarCoresSistema();
-                // Mostrar a aba ativa
                 mostrarAbaPersonalizacao(abaAtualPersonalizacao || 'login');
             }
 
@@ -3806,12 +4046,8 @@
             if (page === 'notificacoes') renderNotificacoes();
             if (page === 'usuarios') renderUsuarios();
             if (page === 'configuracoes') renderConfiguracoes();
-            if (page === 'personalizar') {
-                carregarPersonalizacao();
-                carregarPersonalizacaoBotoes();
-                carregarCoresSistema();
-                mostrarAbaPersonalizacao(abaAtualPersonalizacao || 'login');
-            }
+
+            closeSidebar();
         }
 
         function carregarPersonalizacao() {
@@ -4340,13 +4576,12 @@
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
 
-            // Carregar personalização de botões e cores
+            // Carregar personalização
             carregarPersonalizacaoBotoes();
             carregarCoresSistema();
 
             document.getElementById('whatsappFloat').style.display = 'flex';
 
-            // Verificar permissão de personalização
             const pagePersonalizar = document.getElementById('page-personalizar');
             if (podePersonalizar() || isAdmin()) {
                 pagePersonalizar.classList.add('visible');
@@ -4965,8 +5200,8 @@
             `).join('');
 
             container.innerHTML += `
-                <div style="margin-top:12px;display:flex;gap:8px;">
-                    <input type="text" id="novaCatNome" placeholder="Nome" style="flex:1;padding:8px 12px;border:2px solid #e5e7eb;border-radius:6px;">
+                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <input type="text" id="novaCatNome" placeholder="Nome" style="flex:1;min-width:100px;padding:8px 12px;border:2px solid #e5e7eb;border-radius:6px;">
                     <input type="number" id="novaCatMin" placeholder="Min" style="width:60px;padding:8px 6px;border:2px solid #e5e7eb;border-radius:6px;">
                     <input type="number" id="novaCatMax" placeholder="Max" style="width:60px;padding:8px 6px;border:2px solid #e5e7eb;border-radius:6px;">
                     <button class="btn btn-secondary btn-sm" onclick="adicionarCategoria()"><i class="fas fa-plus"></i></button>
@@ -4979,7 +5214,7 @@
                 return `
                     <div class="config-item">
                         <span>${cat.nome}</span>
-                        <div style="display:flex;gap:6px;align-items:center;">
+                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                             <input type="time" id="horarioInicio_${index}" value="${horario.inicio || '08:00'}" style="width:80px;padding:4px 8px;border:2px solid #e5e7eb;border-radius:6px;">
                             <span style="color:var(--gray-dark);">às</span>
                             <input type="time" id="horarioFim_${index}" value="${horario.fim || '09:00'}" style="width:80px;padding:4px 8px;border:2px solid #e5e7eb;border-radius:6px;">
@@ -5029,7 +5264,6 @@
             data.config.mensagemPadrao = document.getElementById('mensagemPadrao').value.trim();
             data.config.notifAutomatica = document.getElementById('notifAutomatica').checked;
 
-            // Salvar horários
             data.config.categorias.forEach((cat, index) => {
                 const inicio = document.getElementById(`horarioInicio_${index}`)?.value;
                 const fim = document.getElementById(`horarioFim_${index}`)?.value;
@@ -5038,7 +5272,6 @@
                 }
             });
 
-            // Salvar EmailJS
             const serviceId = document.getElementById('emailjsServiceId').value.trim();
             const templateId = document.getElementById('emailjsTemplateId').value.trim();
             const publicKey = document.getElementById('emailjsPublicKey').value.trim();
@@ -5381,6 +5614,9 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
+            // Aplicar personalização antes do login
+            aplicarPersonalizacaoCompleta();
+
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
             showLogin();
@@ -5392,6 +5628,7 @@
             console.log('💡 Use o usuário: gleuber | Senha: Opala77@2056');
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
+            console.log('📱 Versão mobile otimizada!');
         });
     </script>
 
