@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== RESET E CONFIGURAÇÕES GLOBAIS ===== */
+        /* ===== TODOS OS ESTILOS (mantidos) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -27,13 +27,11 @@
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --radius: 16px;
             --sidebar-width: 250px;
-            --sidebar-width-mobile: 0px;
             --login-bg: linear-gradient(135deg, #0f1b2d, #1a2d4a);
             --login-logo-size: 80px;
             --login-box-bg: #ffffff;
             --login-text-color: #0f1b2d;
             --login-accent-color: #d4a020;
-            /* Variáveis para personalização de botões */
             --btn-primary-bg: #0f1b2d;
             --btn-primary-color: #ffffff;
             --btn-secondary-bg: #d4a020;
@@ -75,10 +73,9 @@
             z-index: 100;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
-        /* ===== SIDEBAR MOBILE ===== */
         .sidebar-mobile-toggle {
             display: none;
             position: fixed;
@@ -422,7 +419,7 @@
             color: #f5d060;
         }
 
-        /* ===== BOTÕES COM VARIÁVEIS CSS ===== */
+        /* ===== BOTÕES ===== */
         .btn {
             padding: var(--btn-padding, 10px 22px);
             border: none;
@@ -1728,10 +1725,8 @@
         }
 
         /* ============================================================
-           RESPONSIVO - CORREÇÕES PARA CELULAR
+           RESPONSIVO
            ============================================================ */
-
-        /* Tablet e dispositivos menores */
         @media (max-width: 1024px) {
             .double-grid {
                 grid-template-columns: 1fr;
@@ -1741,9 +1736,7 @@
             }
         }
 
-        /* Celular - até 768px */
         @media (max-width: 768px) {
-            /* Sidebar mobile */
             .sidebar {
                 width: 280px;
                 transform: translateX(-100%);
@@ -1890,24 +1883,19 @@
             }
         }
 
-        /* Celular pequeno - até 480px */
         @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-
             .alunos-grid {
                 grid-template-columns: 1fr;
             }
-
             .quick-actions {
                 grid-template-columns: 1fr 1fr;
             }
-
             .login-box {
                 padding: 20px 16px;
             }
-
             .whatsapp-float {
                 width: 48px;
                 height: 48px;
@@ -1915,101 +1903,80 @@
                 bottom: 16px;
                 right: 16px;
             }
-
             .scanner-overlay {
                 width: 120px;
                 height: 120px;
             }
-
             .sidebar {
                 width: 260px;
             }
-
             .top-header .header-actions .search-box input {
                 min-width: 60px;
             }
-
             .btn {
                 font-size: calc(var(--btn-font-size, 13px) - 1px);
                 padding: 8px 14px;
             }
-
             .btn-sm {
                 padding: 4px 10px;
                 font-size: calc(var(--btn-font-size, 13px) - 2px);
             }
-
             .btn-scan {
                 font-size: 14px;
                 padding: 12px 20px;
             }
-
             .carteirinha {
                 padding: 20px 18px;
             }
-
             .carteirinha .crt-body .crt-qr canvas {
                 width: 80px !important;
                 height: 80px !important;
             }
-
             .carteirinha .crt-header .crt-foto {
                 width: 48px;
                 height: 48px;
             }
-
             .carteirinha .crt-title {
                 font-size: 15px;
             }
         }
 
-        /* Ajustes para telas muito pequenas */
         @media (max-width: 360px) {
             .main-content {
                 padding: 12px 10px 80px 10px;
                 padding-top: 60px;
             }
-
             .sidebar {
                 width: 240px;
             }
-
             .top-header .page-title h1 {
                 font-size: 17px;
             }
-
             .quick-actions {
                 grid-template-columns: 1fr 1fr;
                 gap: 6px;
             }
-
             .quick-action {
                 padding: 10px 4px;
                 font-size: 10px;
             }
-
             .quick-action i {
                 font-size: 16px;
             }
-
             .stats-grid {
                 gap: 8px;
             }
-
             .stat-card {
                 padding: 14px 16px;
             }
-
             .stat-card .stat-top .number {
                 font-size: 22px;
             }
-
             .card {
                 padding: 12px 14px;
             }
         }
 
-        /* ===== ANIMAÇÕES ===== */
         .page {
             display: none;
             animation: fadeIn 0.35s ease;
@@ -2050,21 +2017,10 @@
             font-weight: 700;
         }
 
-        /* ===== ABA DE PERSONALIZAÇÃO ===== */
         .aba-personalizacao {
             animation: fadeIn 0.3s ease;
         }
 
-        .config-item select {
-            padding: 6px 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 13px;
-            background: var(--white);
-            min-width: 120px;
-        }
-
-        /* Correção para input color em mobile */
         input[type="color"] {
             -webkit-appearance: none;
             appearance: none;
@@ -2188,6 +2144,7 @@
 
         <div class="sidebar-menu" id="sidebarMenu">
             <!-- Menu renderizado por JavaScript -->
+            <div class="menu-label">Carregando...</div>
         </div>
 
         <div class="sidebar-footer">
@@ -2637,7 +2594,6 @@
                     </span>
                 </div>
 
-                <!-- Abas de Personalização -->
                 <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;border-bottom:2px solid #e5e7eb;padding-bottom:12px;">
                     <button class="btn btn-secondary btn-sm" onclick="mostrarAbaPersonalizacao('login')" id="tabLogin">
                         <i class="fas fa-sign-in-alt"></i> Login
@@ -2650,7 +2606,6 @@
                     </button>
                 </div>
 
-                <!-- ABA: LOGIN -->
                 <div id="abaLogin" class="aba-personalizacao">
                     <div class="form-row" style="margin-bottom:16px;">
                         <div class="form-group">
@@ -2730,7 +2685,6 @@
                     </div>
                 </div>
 
-                <!-- ABA: BOTÕES -->
                 <div id="abaBotoes" class="aba-personalizacao" style="display:none;">
                     <h4 style="margin-bottom:12px;color:var(--primary);">
                         <i class="fas fa-edit"></i> Personalização dos Botões
@@ -2806,7 +2760,6 @@
                     </button>
                 </div>
 
-                <!-- ABA: CORES -->
                 <div id="abaCores" class="aba-personalizacao" style="display:none;">
                     <h4 style="margin-bottom:12px;color:var(--primary);">
                         <i class="fas fa-palette"></i> Cores do Sistema
@@ -3131,7 +3084,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v25';
+        const STORAGE_KEY = 'vilaRealFutsalData_v26';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3246,15 +3199,9 @@
                     for (let key in defaults) {
                         if (!(key in parsed)) parsed[key] = defaults[key];
                     }
-                    if (!parsed.config.botoes) {
-                        parsed.config.botoes = defaults.config.botoes;
-                    }
-                    if (!parsed.config.cores) {
-                        parsed.config.cores = defaults.config.cores;
-                    }
-                    if (!parsed.config.emailjs) {
-                        parsed.config.emailjs = { serviceId: '', templateId: '', publicKey: '' };
-                    }
+                    if (!parsed.config.botoes) parsed.config.botoes = defaults.config.botoes;
+                    if (!parsed.config.cores) parsed.config.cores = defaults.config.cores;
+                    if (!parsed.config.emailjs) parsed.config.emailjs = { serviceId: '', templateId: '', publicKey: '' };
                     const adminExists = parsed.usuarios.some(u => u.id === 'admin');
                     if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
                     if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
@@ -3382,7 +3329,6 @@
             const email = document.getElementById('recuperarEmail').value.trim();
             const errorDiv = document.getElementById('recuperarError');
             const successDiv = document.getElementById('recuperarSuccess');
-            const btn = document.getElementById('btnRecuperar');
 
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
@@ -3403,52 +3349,32 @@
             const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
                 .toUpperCase();
             user.senha = novaSenha;
-            if (user.id === 'admin') {
-                data.config.senhaMaster = novaSenha;
-            }
+            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
             saveData();
 
             const config = data.config.emailjs || {};
             const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
 
             if (emailEnviado) {
-                successDiv.innerHTML = `
-                    ✅ <strong>Nova senha enviada para o e-mail!</strong><br>
-                    <span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span>
-                    <br><br>
-                    <small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>
-                `;
+                successDiv.innerHTML =
+                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
                 successDiv.style.display = 'block';
                 showToast('✅ Nova senha enviada para o e-mail!');
                 document.getElementById('recuperarEmail').value = '';
             } else {
-                successDiv.innerHTML = `
-                    ⚠️ <strong>Não foi possível enviar o e-mail.</strong><br>
-                    <span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span>
-                    <br><br>
-                    <div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">
-                        ${novaSenha}
-                    </div>
-                    <br>
-                    <small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>
-                `;
+                successDiv.innerHTML =
+                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
                 successDiv.style.display = 'block';
                 showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
             }
-
             return false;
         }
 
         async function enviarEmailRecuperacao(email, nome, novaSenha) {
             const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) {
-                console.warn('⚠️ EmailJS não configurado.');
-                return false;
-            }
+            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
             try {
-                if (emailjs && typeof emailjs.init === 'function') {
-                    emailjs.init(config.publicKey);
-                }
+                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
                 const templateParams = {
                     to_email: email,
                     to_name: nome || 'Usuário',
@@ -3456,8 +3382,7 @@
                     sistema: 'Vila Real Futsal',
                     mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
                 };
-                const response = await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                console.log('✅ E-mail enviado com sucesso!', response);
+                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
                 return true;
             } catch (error) {
                 console.error('❌ Erro ao enviar e-mail:', error);
@@ -3504,10 +3429,7 @@
             const nomeTeste = currentUser ? currentUser.nome : 'Usuário Teste';
 
             try {
-                if (typeof emailjs !== 'undefined' && emailjs.init) {
-                    emailjs.init(config.publicKey);
-                }
-
+                if (typeof emailjs !== 'undefined' && emailjs.init) emailjs.init(config.publicKey);
                 const templateParams = {
                     to_email: emailTeste,
                     to_name: nomeTeste,
@@ -3515,8 +3437,7 @@
                     sistema: 'Vila Real Futsal - Teste',
                     mensagem: 'Este é um e-mail de teste para verificar a configuração do EmailJS.'
                 };
-
-                const response = await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
+                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
                 showToast(`✅ E-mail de teste enviado para ${emailTeste}!`);
             } catch (error) {
                 console.error('Erro no teste:', error);
@@ -3578,21 +3499,12 @@
             atualizarWhatsAppBadge();
 
             const securityBadge = document.getElementById('securityBadge');
-            if (isAdmin()) {
-                securityBadge.style.display = 'inline-flex';
-            } else {
-                securityBadge.style.display = 'none';
-            }
+            securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
 
             initEmailJS();
             initSystem();
-
-            // Aplicar personalização completa (global)
             aplicarPersonalizacaoCompleta();
-
-            // Fechar sidebar mobile se estiver aberta
             closeSidebar();
-
             return false;
         }
 
@@ -3838,7 +3750,6 @@
         //  PERSONALIZAÇÃO COMPLETA (GLOBAL)
         // ============================================================
         function aplicarPersonalizacaoCompleta() {
-            // Aplicar cores do sistema
             const c = data.config.cores || {};
             const root = document.documentElement;
             if (c.primaria) root.style.setProperty('--primary', c.primaria);
@@ -3846,7 +3757,6 @@
             if (c.fundo) document.body.style.background = c.fundo;
             if (c.texto) root.style.setProperty('--gray-dark', c.texto);
 
-            // Aplicar personalização de botões
             const b = data.config.botoes || {};
             if (b.primaryBg) root.style.setProperty('--btn-primary-bg', b.primaryBg);
             if (b.primaryColor) root.style.setProperty('--btn-primary-color', b.primaryColor);
@@ -3857,19 +3767,15 @@
             if (b.dangerBg) root.style.setProperty('--btn-danger-bg', b.dangerBg);
             if (b.dangerColor) root.style.setProperty('--btn-danger-color', b.dangerColor);
             if (b.fontSize) root.style.setProperty('--btn-font-size', b.fontSize + 'px');
-            if (b.paddingX && b.paddingY) {
-                root.style.setProperty('--btn-padding', b.paddingY + 'px ' + b.paddingX + 'px');
-            }
+            if (b.paddingX && b.paddingY) root.style.setProperty('--btn-padding', b.paddingY + 'px ' + b.paddingX + 'px');
             if (b.borderRadius) root.style.setProperty('--btn-border-radius', b.borderRadius + 'px');
 
-            // Aplicar personalização do login
             aplicarPersonalizacao();
         }
 
         function salvarPersonalizacaoCompleta() {
             salvarPersonalizacaoBotoes();
             salvarCoresSistema();
-            // Salvar login já é feito nas funções individuais
             saveData();
             aplicarPersonalizacaoCompleta();
             showToast('✅ Todas as personalizações foram salvas!');
@@ -3878,14 +3784,12 @@
         function resetarPersonalizacaoCompleta() {
             if (!confirm('Restaurar todas as personalizações para o padrão?')) return;
 
-            // Resetar cores do sistema
             document.getElementById('corPrimaria').value = '#0f1b2d';
             document.getElementById('corSecundaria').value = '#d4a020';
             document.getElementById('corFundo').value = '#eef1f5';
             document.getElementById('corTexto').value = '#0f1b2d';
             data.config.cores = { primaria: '#0f1b2d', secundaria: '#d4a020', fundo: '#eef1f5', texto: '#0f1b2d' };
 
-            // Resetar botões
             document.getElementById('btnPrimaryBg').value = '#0f1b2d';
             document.getElementById('btnPrimaryColor').value = '#ffffff';
             document.getElementById('btnSecondaryBg').value = '#d4a020';
@@ -3902,7 +3806,6 @@
                 secondaryColor: '#0f1b2d', successBg: '#22c55e', successColor: '#ffffff', dangerBg: '#ef4444',
                 dangerColor: '#ffffff', fontSize: 13, paddingX: 22, paddingY: 10, borderRadius: 10 };
 
-            // Resetar login
             resetarLoginLogo();
             resetarLoginBg();
             document.getElementById('loginPrimaryColor').value = '#d4a020';
@@ -3940,11 +3843,14 @@
         }
 
         // ============================================================
-        //  RENDERIZAR MENU
+        //  RENDERIZAR MENU - CORREÇÃO PRINCIPAL
         // ============================================================
         function renderizarMenu() {
             const container = document.getElementById('sidebarMenu');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ sidebarMenu não encontrado!');
+                return;
+            }
 
             const isAdmin = currentUser && currentUser.perfil === 'Administrador';
             const permissoes = currentUser ? currentUser.permissoes || {} : {};
@@ -3956,6 +3862,7 @@
                     return;
                 }
 
+                // Verificar permissões para usuários não-admin
                 if (!isAdmin && item.page !== 'dashboard') {
                     const mapa = {
                         'alunos': 'alunos',
@@ -3971,29 +3878,37 @@
                     if (!permissoes[mapa[item.page]]) return;
                 }
 
+                // Personalizar só aparece para quem tem permissão
                 if (item.page === 'personalizar' && !podePersonalizar() && !isAdmin) return;
+
+                const badgeId = item.page !== 'dashboard' && item.page !== 'separator' ? `badge_${item.page}` : '';
+                const badgeHtml = badgeId ? `<span class="badge" id="${badgeId}"></span>` : '';
 
                 html += `
                     <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
                         <i class="${item.icon}"></i>
                         <span>${item.label}</span>
-                        <span class="badge" id="badge_${item.page}"></span>
+                        ${badgeHtml}
                     </button>
                 `;
             });
 
             container.innerHTML = html;
 
+            // Atualizar badges
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) badgeAlunos.textContent = data.alunos.length || '';
 
             const badgeNotif = document.getElementById('badge_notificacoes');
             if (badgeNotif) badgeNotif.textContent = data.notificacoes.length || '';
 
+            // Marcar item ativo
             const currentPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
             document.querySelectorAll('.menu-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === currentPage);
             });
+
+            console.log('✅ Menu renderizado com sucesso!');
         }
 
         // ============================================================
@@ -4576,7 +4491,6 @@
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
 
-            // Carregar personalização
             carregarPersonalizacaoBotoes();
             carregarCoresSistema();
 
@@ -5614,7 +5528,6 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
-            // Aplicar personalização antes do login
             aplicarPersonalizacaoCompleta();
 
             document.getElementById('sidebar').style.display = 'none';
@@ -5629,6 +5542,13 @@
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
             console.log('📱 Versão mobile otimizada!');
+
+            // Forçar renderização do menu após carregar
+            setTimeout(() => {
+                if (currentUser) {
+                    renderizarMenu();
+                }
+            }, 100);
         });
     </script>
 
