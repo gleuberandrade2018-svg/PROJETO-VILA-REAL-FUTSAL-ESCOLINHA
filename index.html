@@ -2041,18 +2041,18 @@
             border-radius: 6px;
         }
 
-        /* Carregando... */
         .menu-loading {
             color: rgba(255, 255, 255, 0.5);
             text-align: center;
-            padding: 20px;
-            font-size: 13px;
+            padding: 30px 20px;
+            font-size: 14px;
         }
 
         .menu-loading i {
             display: block;
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--secondary);
         }
     </style>
 </head>
@@ -2317,7 +2317,7 @@
 
             <div style="text-align:center;padding:20px 0 10px 0;color:var(--gray-dark);font-size:12px;">
                 <p><strong>Nosso objetivo é formar campeões</strong> — dentro e fora das quadras!</p>
-                <p style="margin-top:4px;opacity:0.5;">© 2025 Vila Real Futsal</p>
+                <p style="margin-top:4px;opacity:0.5;">© 2026 Vila Real Futsal</p>
             </div>
         </div>
 
@@ -3101,7 +3101,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v27';
+        const STORAGE_KEY = 'vilaRealFutsalData_v28';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3124,20 +3124,6 @@
                 personalizar: true
             }
         };
-
-        const MENU_ITEMS = [
-            { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', page: 'dashboard' },
-            { id: 'alunos', label: 'Alunos', icon: 'fas fa-users', page: 'alunos' },
-            { id: 'carteirinhas', label: 'Carteirinhas', icon: 'fas fa-id-card', page: 'carteirinhas' },
-            { id: 'presencas', label: 'Presenças', icon: 'fas fa-qrcode', page: 'presencas' },
-            { id: 'notificacoes', label: 'Notificações', icon: 'fas fa-bell', page: 'notificacoes' },
-            { id: 'relatorios', label: 'Relatórios', icon: 'fas fa-chart-bar', page: 'relatorios' },
-            { id: 'backup', label: 'Backup', icon: 'fas fa-database', page: 'backup' },
-            { id: 'separator', label: 'Administração', isSeparator: true },
-            { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios' },
-            { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes' },
-            { id: 'personalizar', label: 'Personalizar', icon: 'fas fa-paint-brush', page: 'personalizar' }
-        ];
 
         function getDefaultData() {
             return {
@@ -3463,7 +3449,7 @@
         }
 
         // ============================================================
-        //  HANDLE LOGIN
+        //  HANDLE LOGIN - CORRIGIDO
         // ============================================================
         function handleLogin(e) {
             e.preventDefault();
@@ -3504,25 +3490,56 @@
                 saveData();
             }
 
+            // Mostrar interface
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
 
+            // Atualizar informações do usuário
             document.getElementById('userName').textContent = user.nome;
             document.getElementById('userRole').textContent = user.perfil;
             document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
 
+            // Mostrar WhatsApp
             document.getElementById('whatsappFloat').style.display = 'flex';
             atualizarWhatsAppBadge();
 
+            // Badge de admin
             const securityBadge = document.getElementById('securityBadge');
             securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
 
+            // Inicializar EmailJS
             initEmailJS();
+
+            // CARREGAR O MENU IMEDIATAMENTE
+            renderizarMenu();
+
+            // Inicializar o resto do sistema
             initSystem();
+
+            // Aplicar personalização
             aplicarPersonalizacaoCompleta();
+
+            // Fechar sidebar mobile
             closeSidebar();
+
+            showToast(`✅ Bem-vindo, ${user.nome}!`);
             return false;
+        }
+
+        // ============================================================
+        //  INICIALIZAR EMAILJS
+        // ============================================================
+        function initEmailJS() {
+            const config = data.config.emailjs || {};
+            if (config.publicKey && config.publicKey !== '') {
+                try {
+                    emailjs.init(config.publicKey);
+                    console.log('✅ EmailJS inicializado com sucesso!');
+                } catch (e) {
+                    console.warn('⚠️ EmailJS não inicializado:', e);
+                }
+            }
         }
 
         function logout() {
@@ -3906,7 +3923,6 @@
 
             // Renderizar itens principais
             mainItems.forEach((item) => {
-                // Verificar permissão para itens principais
                 if (!isAdmin && item.page !== 'dashboard') {
                     const mapa = {
                         'alunos': 'alunos',
@@ -3939,7 +3955,6 @@
                     return;
                 }
 
-                // Verificar permissão
                 if (!isAdmin && !permissoes[item.permissao]) return;
 
                 hasAdminItems = true;
@@ -3951,7 +3966,6 @@
                 `;
             });
 
-            // Se não tiver itens admin, remover o separador
             if (!hasAdminItems) {
                 html = html.replace('<div class="menu-label">Administração</div>', '');
             }
@@ -4518,6 +4532,7 @@
         function initSystem() {
             console.log('🚀 Inicializando sistema...');
 
+            // O menu já foi renderizado no handleLogin, mas vamos garantir
             renderizarMenu();
 
             renderDashboard();
@@ -5591,10 +5606,8 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
-            // Aplicar personalização antes do login
             aplicarPersonalizacaoCompleta();
 
-            // Ocultar sidebar e main até login
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
             showLogin();
