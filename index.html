@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- EmailJS para envio de e-mail real -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
+        /* ===== TODOS OS ESTILOS EXISTENTES (mantidos) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -24,6 +27,11 @@
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --radius: 16px;
             --sidebar-width: 250px;
+            --login-bg: linear-gradient(135deg, #0f1b2d, #1a2d4a);
+            --login-logo-size: 80px;
+            --login-box-bg: #ffffff;
+            --login-text-color: #0f1b2d;
+            --login-accent-color: #d4a020;
         }
 
         body {
@@ -149,10 +157,6 @@
             border-radius: 12px;
             font-size: 10px;
             font-weight: 700;
-        }
-
-        .sidebar-menu .menu-item.active .badge {
-            background: rgba(15, 27, 45, 0.2);
         }
 
         .sidebar-footer {
@@ -429,6 +433,24 @@
             transform: scale(1.02);
         }
 
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-whatsapp:hover {
+            background: #1da851;
+        }
+
+        .btn-permissoes {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-permissoes:hover {
+            background: #7c3aed;
+        }
+
         /* ===== LISTAS ===== */
         .list-item {
             display: flex;
@@ -459,6 +481,13 @@
             font-weight: 700;
             font-size: 14px;
             color: var(--primary);
+            overflow: hidden;
+        }
+
+        .list-item .item-info .item-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .list-item .item-info .item-text .name {
@@ -562,6 +591,16 @@
             font-weight: 700;
         }
 
+        .aluno-card .aluno-foto {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+            margin-bottom: 8px;
+            background: var(--gray);
+        }
+
         .aluno-card .aluno-nome {
             font-size: 17px;
             font-weight: 700;
@@ -587,187 +626,27 @@
             flex-wrap: wrap;
         }
 
-        /* ===== CARTEIRINHA ===== */
-        .carteirinha-wrapper {
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
+        /* ===== PERMISSÕES ===== */
+        .permissoes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
         }
 
-        .carteirinha {
-            background: linear-gradient(135deg, #0f1b2d 0%, #1a2d4a 100%);
-            border-radius: var(--radius);
-            padding: 28px 30px;
-            color: var(--white);
-            max-width: 480px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid var(--secondary);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .carteirinha .crt-header {
+        .permissoes-grid .perm-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 16px;
-        }
-
-        .carteirinha .crt-header .crt-foto {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid #f5d060;
-            flex-shrink: 0;
-            background: var(--white);
-        }
-
-        .carteirinha .crt-header .crt-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .carteirinha .crt-header .crt-title {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            line-height: 1.2;
-        }
-
-        .carteirinha .crt-header .crt-title span {
-            color: var(--secondary);
-        }
-
-        .carteirinha .crt-header .crt-title small {
-            display: block;
-            font-size: 10px;
-            opacity: 0.6;
-            font-weight: 400;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .carteirinha .crt-body {
-            display: flex;
-            gap: 20px;
-        }
-
-        .carteirinha .crt-body .crt-info {
-            flex: 1;
-        }
-
-        .carteirinha .crt-body .crt-info .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
+            gap: 8px;
             font-size: 13px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--primary);
         }
 
-        .carteirinha .crt-body .crt-info .info-row .label {
-            opacity: 0.5;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .carteirinha .crt-body .crt-info .info-row .value {
-            font-weight: 600;
-        }
-
-        .carteirinha .crt-body .crt-qr {
-            flex-shrink: 0;
-            background: var(--white);
-            padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .carteirinha .crt-body .crt-qr canvas {
-            width: 110px !important;
-            height: 110px !important;
-        }
-
-        .carteirinha .crt-footer {
-            text-align: center;
-            font-size: 9px;
-            opacity: 0.4;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 12px;
-            margin-top: 14px;
-            letter-spacing: 1px;
-        }
-
-        /* ===== SCANNER ===== */
-        .scanner-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            border-radius: var(--radius);
-            overflow: hidden;
-            background: #000;
-        }
-
-        .scanner-container video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .scanner-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border: 3px solid var(--secondary);
-            border-radius: 12px;
-            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-        }
-
-        .scanner-overlay .corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-color: var(--secondary);
-            border-style: solid;
-            border-width: 0;
-        }
-
-        .scanner-overlay .corner.tl {
-            top: -3px;
-            left: -3px;
-            border-top-width: 4px;
-            border-left-width: 4px;
-        }
-
-        .scanner-overlay .corner.tr {
-            top: -3px;
-            right: -3px;
-            border-top-width: 4px;
-            border-right-width: 4px;
-        }
-
-        .scanner-overlay .corner.bl {
-            bottom: -3px;
-            left: -3px;
-            border-bottom-width: 4px;
-            border-left-width: 4px;
-        }
-
-        .scanner-overlay .corner.br {
-            bottom: -3px;
-            right: -3px;
-            border-bottom-width: 4px;
-            border-right-width: 4px;
+        .permissoes-grid .perm-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--secondary);
+            cursor: pointer;
         }
 
         /* ===== MODAL ===== */
@@ -790,7 +669,7 @@
         .modal {
             background: var(--white);
             border-radius: var(--radius);
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -914,47 +793,42 @@
             }
         }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--gray-dark);
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            color: var(--secondary);
-            opacity: 0.4;
-            margin-bottom: 16px;
-        }
-
-        .empty-state h3 {
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-
         /* ===== LOGIN ===== */
         .login-page {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f1b2d, #1a2d4a);
+            background: var(--login-bg);
             padding: 20px;
             width: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.5s ease;
+            position: relative;
+        }
+
+        .login-page::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        .login-page>* {
+            position: relative;
+            z-index: 1;
         }
 
         .login-box {
-            background: var(--white);
+            background: var(--login-box-bg);
             border-radius: var(--radius);
             padding: 40px 44px;
             max-width: 420px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
 
         .login-box .login-brand {
@@ -963,8 +837,8 @@
         }
 
         .login-box .login-brand .logo-big {
-            width: 80px;
-            height: 80px;
+            width: var(--login-logo-size);
+            height: var(--login-logo-size);
             border-radius: 50%;
             background: var(--secondary);
             display: flex;
@@ -974,17 +848,25 @@
             font-size: 28px;
             color: var(--primary);
             margin: 0 auto 12px;
-            border: 3px solid #f5d060;
+            border: 4px solid var(--login-accent-color);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .login-box .login-brand .logo-big img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .login-box .login-brand h2 {
-            color: var(--primary);
+            color: var(--login-text-color);
             font-size: 22px;
             font-weight: 800;
         }
 
         .login-box .login-brand h2 span {
-            color: var(--secondary);
+            color: var(--login-accent-color);
         }
 
         .login-box .login-brand p {
@@ -998,7 +880,7 @@
         }
 
         .login-box .form-group label {
-            color: var(--primary);
+            color: var(--login-text-color);
             font-weight: 600;
             font-size: 13px;
         }
@@ -1010,14 +892,17 @@
         }
 
         .login-box .form-group input:focus {
-            border-color: var(--secondary);
+            border-color: var(--login-accent-color);
         }
 
-        .login-box .btn {
-            width: 100%;
-            justify-content: center;
-            padding: 14px;
-            font-size: 16px;
+        .login-box .btn-primary {
+            background: var(--login-accent-color);
+            color: var(--login-text-color);
+        }
+
+        .login-box .btn-primary:hover {
+            background: #f5d060;
+            transform: translateY(-2px);
         }
 
         .login-box .register-link {
@@ -1028,14 +913,14 @@
         }
 
         .login-box .register-link a {
-            color: var(--primary);
+            color: var(--login-accent-color);
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
         }
 
         .login-box .register-link a:hover {
-            color: var(--secondary);
+            color: #f5d060;
         }
 
         .login-box .forgot-password {
@@ -1051,7 +936,7 @@
         }
 
         .login-box .forgot-password a:hover {
-            color: var(--secondary);
+            color: var(--login-accent-color);
         }
 
         /* ===== PASSWORD WRAPPER ===== */
@@ -1080,6 +965,533 @@
 
         .password-wrapper .toggle-password:hover {
             color: var(--secondary);
+        }
+
+        /* ===== CARTEIRINHA ===== */
+        .carteirinha-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .carteirinha {
+            background: linear-gradient(135deg, #0f1b2d 0%, #1a2d4a 100%);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            color: var(--white);
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--secondary);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .carteirinha::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(212, 160, 32, 0.08), transparent);
+            border-radius: 50%;
+        }
+
+        .carteirinha .crt-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .carteirinha .crt-header .crt-foto {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #f5d060;
+            flex-shrink: 0;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .carteirinha .crt-header .crt-foto:hover {
+            opacity: 0.8;
+        }
+
+        .carteirinha .crt-header .crt-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carteirinha .crt-header .crt-foto .edit-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+        }
+
+        .carteirinha .crt-header .crt-foto:hover .edit-overlay {
+            opacity: 1;
+        }
+
+        .carteirinha .crt-header .crt-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .carteirinha .crt-header .crt-title span {
+            color: var(--secondary);
+        }
+
+        .carteirinha .crt-header .crt-title small {
+            display: block;
+            font-size: 10px;
+            opacity: 0.6;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .carteirinha .crt-body {
+            display: flex;
+            gap: 20px;
+        }
+
+        .carteirinha .crt-body .crt-info {
+            flex: 1;
+        }
+
+        .carteirinha .crt-body .crt-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .carteirinha .crt-body .crt-info .info-row .label {
+            opacity: 0.5;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .carteirinha .crt-body .crt-info .info-row .value {
+            font-weight: 600;
+        }
+
+        .carteirinha .crt-body .crt-qr {
+            flex-shrink: 0;
+            background: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carteirinha .crt-body .crt-qr canvas {
+            width: 110px !important;
+            height: 110px !important;
+        }
+
+        .carteirinha .crt-footer {
+            text-align: center;
+            font-size: 9px;
+            opacity: 0.4;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 12px;
+            margin-top: 14px;
+            letter-spacing: 1px;
+        }
+
+        .carteirinha-alunos-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .carteirinha-aluno-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: var(--gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .carteirinha-aluno-item:hover {
+            background: #f5d060;
+            transform: translateX(4px);
+        }
+
+        .carteirinha-aluno-item.selected {
+            border-color: var(--secondary);
+            background: #f5d060;
+        }
+
+        .carteirinha-aluno-item .aluno-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .carteirinha-aluno-item .aluno-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carteirinha-aluno-item .aluno-nome {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary);
+            flex: 1;
+        }
+
+        .carteirinha-aluno-item .aluno-numero {
+            font-size: 11px;
+            color: var(--gray-dark);
+        }
+
+        .carteirinha-aluno-item .aluno-categoria-badge {
+            font-size: 9px;
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .carteirinha-categoria-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .carteirinha-categoria-filter .cat-filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            background: var(--white);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--gray-dark);
+        }
+
+        .carteirinha-categoria-filter .cat-filter-btn:hover {
+            border-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .carteirinha-categoria-filter .cat-filter-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .carteirinha-voltar {
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        /* ===== SCANNER ===== */
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .scanner-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+
+        .scanner-overlay .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--secondary);
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .scanner-overlay .corner.tl {
+            top: -3px;
+            left: -3px;
+            border-top-width: 4px;
+            border-left-width: 4px;
+        }
+
+        .scanner-overlay .corner.tr {
+            top: -3px;
+            right: -3px;
+            border-top-width: 4px;
+            border-right-width: 4px;
+        }
+
+        .scanner-overlay .corner.bl {
+            bottom: -3px;
+            left: -3px;
+            border-bottom-width: 4px;
+            border-left-width: 4px;
+        }
+
+        .scanner-overlay .corner.br {
+            bottom: -3px;
+            right: -3px;
+            border-bottom-width: 4px;
+            border-right-width: 4px;
+        }
+
+        /* ===== WHATSAPP FLOATING ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #25D366;
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .whatsapp-float .tooltip {
+            position: absolute;
+            right: 70px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .whatsapp-float:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* ===== WHATSAPP MODAL ===== */
+        .whatsapp-modal .modal {
+            max-width: 500px;
+        }
+
+        .whatsapp-message-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 12px 0;
+        }
+
+        .whatsapp-msg-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .whatsapp-msg-item:last-child {
+            border-bottom: none;
+        }
+
+        .whatsapp-msg-item .msg-status {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .whatsapp-msg-item .msg-status.enviado {
+            color: #25D366;
+        }
+
+        .whatsapp-msg-item .msg-status.pendente {
+            color: #f59e0b;
+        }
+
+        .whatsapp-msg-item .msg-status.erro {
+            color: #ef4444;
+        }
+
+        /* ===== USUÁRIO ITEM ===== */
+        .usuario-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .usuario-item:last-child {
+            border-bottom: none;
+        }
+
+        .usuario-item .usuario-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .usuario-item .usuario-info .usuario-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+        }
+
+        .usuario-item .usuario-info .usuario-dados .nome {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .usuario-item .usuario-info .usuario-dados .email {
+            font-size: 12px;
+            color: var(--gray-dark);
+        }
+
+        .usuario-item .usuario-perfil {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 12px;
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .usuario-item .usuario-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .usuario-item .usuario-status {
+            font-size: 11px;
+            padding: 3px 12px;
+            border-radius: 12px;
+        }
+
+        .usuario-item .usuario-status.ativo {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .usuario-item .usuario-status.pendente {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-dark);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--secondary);
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
         }
 
         /* ===== RESPONSIVO ===== */
@@ -1162,6 +1574,18 @@
                 width: 150px;
                 height: 150px;
             }
+
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .permissoes-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1198,9 +1622,16 @@
                 width: 120px;
                 height: 120px;
             }
+            .whatsapp-float {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            .carteirinha-alunos-list {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* ===== PÁGINAS ===== */
         .page {
             display: none;
             animation: fadeIn 0.35s ease;
@@ -1221,24 +1652,27 @@
             }
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 11px;
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--gray);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        .badge-whatsapp {
+            background: #25D366;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
         }
 
-        .status-badge.presente {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-badge.ausente {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
+        /* ===== CONFIGURAÇÕES ===== */
         .config-item {
             display: flex;
             justify-content: space-between;
@@ -1251,63 +1685,101 @@
             border-bottom: none;
         }
 
-        .notificacao-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f2f5;
+        .config-item .config-label {
+            font-weight: 500;
+            font-size: 14px;
         }
 
-        .notificacao-item:last-child {
-            border-bottom: none;
-        }
-
-        .notificacao-item .notif-time {
-            font-size: 11px;
+        .config-item .config-label small {
+            display: block;
+            font-weight: 400;
             color: var(--gray-dark);
+            font-size: 12px;
         }
 
-        .notificacao-item .notif-msg {
-            font-size: 13px;
-        }
-
-        .notificacao-item .notif-msg i {
-            color: var(--secondary);
-            margin-right: 6px;
-        }
-
-        .file-upload-area {
-            border: 2px dashed #e5e7eb;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
+        .config-item input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
+            padding: 2px;
         }
 
-        .file-upload-area:hover {
-            border-color: var(--secondary);
-            background: var(--gray);
-        }
-
-        .file-upload-area i {
-            font-size: 32px;
-            color: var(--secondary);
-            margin-bottom: 8px;
-        }
-
-        .file-upload-area p {
-            color: var(--gray-dark);
+        .config-item input[type="number"] {
+            width: 70px;
+            padding: 4px 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
             font-size: 13px;
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
+        .config-item input[type="time"] {
+            padding: 4px 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
         }
-        ::-webkit-scrollbar-track {
+
+        .foto-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .login-preview {
+            margin-top: 20px;
+            padding: 20px;
             background: var(--gray);
+            border-radius: var(--radius);
         }
-        ::-webkit-scrollbar-thumb {
+
+        .preview-box {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #0f1b2d, #1a2d4a);
+            transition: all 0.5s ease;
+        }
+
+        .preview-box .preview-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             background: var(--secondary);
-            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid var(--secondary);
+        }
+
+        .preview-box .preview-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-box .preview-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .preview-box .preview-title span {
+            color: var(--secondary);
+        }
+
+        .preview-box .preview-sub {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
         }
     </style>
 </head>
@@ -1319,19 +1791,26 @@
         <span id="toastMessage">Mensagem</span>
     </div>
 
+    <!-- ===== WHATSAPP FLOATING BUTTON ===== -->
+    <button class="whatsapp-float" id="whatsappFloat" onclick="abrirWhatsAppModal()" style="display:none;">
+        <i class="fab fa-whatsapp"></i>
+        <span class="badge" id="whatsappBadge">0</span>
+        <span class="tooltip">Enviar WhatsApp</span>
+    </button>
+
     <!-- ===== LOGIN ===== -->
     <div id="loginContainer" class="login-page">
         <div class="login-box">
             <div class="login-brand">
-                <div class="logo-big">⚽</div>
-                <h2>VILA <span>REAL</span></h2>
-                <p>Futsal · Gestão de Presenças</p>
+                <div class="logo-big" id="loginLogoBig">⚽</div>
+                <h2 id="loginTitle">VILA <span>REAL</span></h2>
+                <p id="loginSubtitle">Futsal · Gestão de Presenças</p>
             </div>
 
             <form id="loginForm" onsubmit="return handleLogin(event)">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Usuário</label>
-                    <input type="text" id="loginUser" placeholder="Digite seu usuário" required>
+                    <label><i class="fas fa-user"></i> Usuário ou E-mail</label>
+                    <input type="text" id="loginUser" placeholder="Digite seu usuário ou e-mail" required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Senha</label>
@@ -1341,9 +1820,10 @@
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
+                    <small style="color:var(--gray-dark);font-size:11px;">Mínimo 6 caracteres, com letra, número e caractere especial</small>
                 </div>
                 <div id="loginError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="loginButton">
                     <i class="fas fa-sign-in-alt"></i> Entrar
                 </button>
             </form>
@@ -1374,8 +1854,8 @@
                 </div>
                 <div id="recuperarError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
                 <div id="recuperarSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
-                <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;">
-                    <i class="fas fa-paper-plane"></i> Enviar Código
+                <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;" id="btnRecuperar">
+                    <i class="fas fa-paper-plane"></i> Enviar Nova Senha
                 </button>
             </form>
 
@@ -1532,6 +2012,9 @@
                         <button class="quick-action" onclick="mudarPagina('carteirinhas')">
                             <i class="fas fa-id-card"></i> Carteirinhas
                         </button>
+                        <button class="quick-action" onclick="abrirWhatsAppModal()" style="background:#25D366;color:white;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
                     </div>
                 </div>
 
@@ -1570,15 +2053,26 @@
                     <h3><i class="fas fa-id-card"></i> Carteirinha Digital</h3>
                 </div>
                 <div id="carteirinhaContainer">
-                    <div class="empty-state">
+                    <div class="empty-state" id="carteirinhaEmpty">
                         <i class="fas fa-id-card"></i>
-                        <h3>Selecione um aluno</h3>
-                        <p>Escolha um aluno para gerar a carteirinha.</p>
-                        <select id="carteirinhaSelect" onchange="gerarCarteirinha(this.value)" style="max-width:300px;margin:12px auto;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
-                            <option value="">-- Selecione --</option>
+                        <h3>Selecione uma categoria</h3>
+                        <p>Escolha uma categoria para ver os alunos.</p>
+                        <select id="carteirinhaSelect" onchange="filtrarCarteirinhas(this.value)" style="max-width:300px;margin:12px auto;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
+                            <option value="">-- Selecione uma categoria --</option>
                         </select>
                     </div>
-                    <div id="carteirinhaContent" style="display:none;"></div>
+                    <div id="carteirinhaAlunos" style="display:none;">
+                        <div class="carteirinha-categoria-filter" id="carteirinhaFiltros">
+                            <button class="cat-filter-btn active" data-cat="todos" onclick="filtrarCarteirinhas('todos')">Todos</button>
+                        </div>
+                        <div id="carteirinhaAlunosList" class="carteirinha-alunos-list"></div>
+                        <div class="carteirinha-voltar">
+                            <button class="btn btn-secondary btn-sm" onclick="voltarCarteirinhas()">
+                                <i class="fas fa-arrow-left"></i> Voltar para categorias
+                            </button>
+                        </div>
+                    </div>
+                    <div id="carteirinhaContent" style="display:none;margin-top:16px;"></div>
                 </div>
             </div>
         </div>
@@ -1629,6 +2123,9 @@
                         <input type="text" id="qrCodeManual" placeholder="Ou digite o código do aluno" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
                         <button class="btn btn-success" onclick="confirmarPresencaManual()">
                             <i class="fas fa-check"></i> Confirmar
+                        </button>
+                        <button class="btn btn-whatsapp" onclick="enviarPresencaWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
                         </button>
                     </div>
                     <div style="font-size:13px;color:var(--gray-dark);">
@@ -1748,10 +2245,17 @@
                     </div>
                     <div>
                         <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
-                            <i class="fas fa-clock"></i> Dias de Treino
+                            <i class="fas fa-calendar-alt"></i> Horários por Categoria
                         </h4>
-                        <div class="config-item">
-                            <input type="text" id="diasTreino" value="Segunda, Terça, Quarta, Quinta, Sexta" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;width:100%;">
+                        <div id="configHorariosCategoria"></div>
+
+                        <div style="margin-top:16px;">
+                            <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
+                                <i class="fas fa-clock"></i> Dias de Treino
+                            </h4>
+                            <div class="config-item">
+                                <input type="text" id="diasTreino" value="Segunda, Terça, Quarta, Quinta, Sexta" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;width:100%;">
+                            </div>
                         </div>
 
                         <div style="margin-top:16px;">
@@ -1770,9 +2274,132 @@
                             </label>
                         </div>
 
-                        <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;">
-                            <i class="fas fa-save"></i> Salvar
+                        <!-- CONFIGURAÇÃO DE E-MAIL PARA RECUPERAÇÃO -->
+                        <div style="margin-top:16px;border-top:1px solid #e5e7eb;padding-top:16px;">
+                            <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
+                                <i class="fas fa-envelope"></i> E-mail para Recuperação
+                            </h4>
+                            <p style="font-size:12px;color:var(--gray-dark);margin-bottom:8px;">
+                                Configure o serviço de e-mail para enviar senhas automaticamente.
+                                <br>Cadastre-se gratuitamente em <a href="https://www.emailjs.com" target="_blank" style="color:var(--secondary);">EmailJS</a>
+                            </p>
+                            <div class="config-item">
+                                <span class="config-label">Service ID</span>
+                                <input type="text" id="emailjsServiceId" placeholder="service_xxxx" style="width:200px;padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;">
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Template ID</span>
+                                <input type="text" id="emailjsTemplateId" placeholder="template_xxxx" style="width:200px;padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;">
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Public Key</span>
+                                <input type="text" id="emailjsPublicKey" placeholder="public_xxxx" style="width:200px;padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;">
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="salvarConfigEmailJS()" style="margin-top:8px;">
+                                <i class="fas fa-save"></i> Salvar Configurações
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="testarEmailJS()" style="margin-top:8px;margin-left:8px;">
+                                <i class="fas fa-paper-plane"></i> Testar Envio
+                            </button>
+                        </div>
+
+                        <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;width:100%;">
+                            <i class="fas fa-save"></i> Salvar Configurações Gerais
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PERSONALIZAR ===== -->
+        <div class="page" id="page-personalizar">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-paint-brush"></i> Personalização</h3>
+                </div>
+                <div class="form-row" style="margin-bottom:16px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Logo</label>
+                        <div class="foto-upload-container">
+                            <div id="loginLogoPreview" style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:3px solid var(--secondary);background:white;display:flex;align-items:center;justify-content:center;">
+                                <span style="font-size:40px;">⚽</span>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('loginLogoInput').click()">
+                                <i class="fas fa-upload"></i> Alterar Logo
+                            </button>
+                            <input type="file" id="loginLogoInput" accept="image/*" style="display:none;" onchange="alterarLoginLogo(event)">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="resetarLoginLogo()">
+                                <i class="fas fa-undo"></i> Restaurar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Fundo</label>
+                        <div class="foto-upload-container">
+                            <div id="loginBgPreview" style="width:100%;height:100px;border-radius:10px;border:2px solid #e5e7eb;background:linear-gradient(135deg,#0f1b2d,#1a2d4a);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;opacity:0.7;">
+                                Fundo atual
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('loginBgInput').click()">
+                                <i class="fas fa-upload"></i> Alterar Fundo
+                            </button>
+                            <input type="file" id="loginBgInput" accept="image/*" style="display:none;" onchange="alterarLoginBg(event)">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="resetarLoginBg()">
+                                <i class="fas fa-undo"></i> Restaurar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-palette"></i> Cor Principal</label>
+                        <input type="color" id="loginPrimaryColor" value="#d4a020" onchange="aplicarCoresLogin()">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-palette"></i> Cor do Texto</label>
+                        <input type="color" id="loginTextColor" value="#0f1b2d" onchange="aplicarCoresLogin()">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-palette"></i> Cor do Fundo do Box</label>
+                        <input type="color" id="loginBoxBgColor" value="#ffffff" onchange="aplicarCoresLogin()">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-palette"></i> Tamanho do Logo</label>
+                        <input type="number" id="loginLogoSize" value="80" min="60" max="150" onchange="aplicarCoresLogin()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-font"></i> Título</label>
+                    <input type="text" id="loginPageTitle" value="VILA REAL" onchange="atualizarLoginTextos()">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-font"></i> Subtítulo</label>
+                    <input type="text" id="loginPageSubtitle" value="Futsal · Gestão de Presenças" onchange="atualizarLoginTextos()">
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                    <button class="btn btn-success" onclick="salvarPersonalizacao()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button class="btn btn-danger" onclick="resetarPersonalizacao()">
+                        <i class="fas fa-undo"></i> Restaurar
+                    </button>
+                </div>
+
+                <div class="login-preview">
+                    <h4 style="margin-bottom:8px;color:var(--primary);">Pré-visualização</h4>
+                    <div class="preview-box" id="previewBox">
+                        <div class="preview-logo" id="previewLogo">
+                            <span style="font-size:30px;">⚽</span>
+                        </div>
+                        <div class="preview-title" id="previewTitle">VILA <span>REAL</span></div>
+                        <div class="preview-sub" id="previewSub">Futsal · Gestão de Presenças</div>
                     </div>
                 </div>
             </div>
@@ -1856,6 +2483,18 @@
                     <label>Categoria</label>
                     <input type="text" id="alunoCategoria" readonly style="background:#f0f2f5;">
                 </div>
+                <div class="form-group">
+                    <label><i class="fas fa-camera"></i> Foto do Aluno</label>
+                    <div class="foto-upload-container">
+                        <img id="alunoFotoPreview" src="" alt="Foto do aluno" class="foto-perfil" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--secondary);background:var(--gray);">
+                        <img id="alunoFotoPlaceholder" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='40' fill='%236b7280' font-family='Arial'%3E📷%3C/text%3E%3C/svg%3E" alt="Sem foto" class="foto-perfil" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--secondary);background:var(--gray);">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('alunoFotoInput').click()">
+                            <i class="fas fa-upload"></i> Selecionar Foto
+                        </button>
+                        <input type="file" id="alunoFotoInput" accept="image/*" style="display:none;" onchange="previewFotoAluno(event)">
+                        <input type="hidden" id="alunoFotoData" value="">
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
                     <i class="fas fa-save"></i> Salvar
                 </button>
@@ -1889,6 +2528,21 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Permissões de Acesso</label>
+                    <div class="permissoes-grid">
+                        <label class="perm-item"><input type="checkbox" id="permAlunos" checked><span>Alunos</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permPresencas" checked><span>Presenças</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permCarteirinhas" checked><span>Carteirinhas</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permRelatorios" checked><span>Relatórios</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permNotificacoes" checked><span>Notificações</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permBackup" checked><span>Backup</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permConfiguracoes"><span>Configurações</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permUsuarios"><span>Usuários</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permExcluirAlunos" checked><span>Excluir Alunos</span></label>
+                    </div>
+                    <small style="color:var(--gray-dark);font-size:12px;">Marque as áreas que este usuário poderá acessar</small>
+                </div>
+                <div class="form-group">
                     <label>Senha</label>
                     <div class="password-wrapper">
                         <input type="password" id="usuarioSenha" placeholder="Deixe em branco para gerar">
@@ -1896,6 +2550,7 @@
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
+                    <small style="color:var(--gray-dark);font-size:11px;">Mínimo 6 caracteres, com letra, número e caractere especial</small>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
                     <i class="fas fa-save"></i> Salvar
@@ -1904,12 +2559,127 @@
         </div>
     </div>
 
+    <!-- ===== MODAL ALTERAR SENHA USUÁRIO ===== -->
+    <div class="modal-overlay" id="modalAlterarSenhaUsuario">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-key"></i> Alterar Senha</h2>
+                <button class="modal-close" onclick="closeModal('modalAlterarSenhaUsuario')">&times;</button>
+            </div>
+            <form id="alterarSenhaUsuarioForm" onsubmit="return alterarSenhaUsuarioAdmin(event)">
+                <input type="hidden" id="alterarSenhaUserId">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="alterarSenhaUserNome" readonly style="background:#f0f2f5;">
+                </div>
+                <div class="form-group">
+                    <label>Nova Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="novaSenhaUsuario" placeholder="Digite a nova senha" required minlength="6">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('novaSenhaUsuario', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small style="color:var(--gray-dark);font-size:11px;">Mínimo 6 caracteres, com letra, número e caractere especial</small>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmarSenhaUsuario" placeholder="Confirme a nova senha" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmarSenhaUsuario', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> Alterar Senha
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PERMISSÕES USUÁRIO ===== -->
+    <div class="modal-overlay" id="modalPermissoesUsuario">
+        <div class="modal" style="max-width:550px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-lock"></i> <span id="permissoesUsuarioTitle">Permissões</span></h2>
+                <button class="modal-close" onclick="closeModal('modalPermissoesUsuario')">&times;</button>
+            </div>
+            <form id="permissoesUsuarioForm" onsubmit="return salvarPermissoesUsuario(event)">
+                <input type="hidden" id="permissoesUsuarioId">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="permissoesUsuarioNome" readonly style="background:#f0f2f5;">
+                </div>
+                <div class="form-group">
+                    <label>Perfil</label>
+                    <input type="text" id="permissoesUsuarioPerfil" readonly style="background:#f0f2f5;">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Permissões de Acesso</label>
+                    <div class="permissoes-grid">
+                        <label class="perm-item"><input type="checkbox" id="permEditAlunos"><span>Alunos</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditPresencas"><span>Presenças</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditCarteirinhas"><span>Carteirinhas</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditRelatorios"><span>Relatórios</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditNotificacoes"><span>Notificações</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditBackup"><span>Backup</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditConfiguracoes"><span>Configurações</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditUsuarios"><span>Usuários</span></label>
+                        <label class="perm-item"><input type="checkbox" id="permEditExcluirAlunos"><span>Excluir Alunos</span></label>
+                    </div>
+                    <small style="color:var(--gray-dark);font-size:12px;">Desmarque para remover o acesso do usuário</small>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> Salvar Permissões
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL WHATSAPP ===== -->
+    <div class="modal-overlay whatsapp-modal" id="modalWhatsApp">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <h2><i class="fab fa-whatsapp" style="color:#25D366;"></i> Enviar WhatsApp</h2>
+                <button class="modal-close" onclick="closeModal('modalWhatsApp')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Selecionar Aluno</label>
+                <select id="whatsappAlunoSelect" style="width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
+                    <option value="">-- Selecione um aluno --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Mensagem</label>
+                <textarea id="whatsappMensagem" rows="4" style="width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;resize:vertical;">Prezado(a) responsável, informamos que seu filho(a) esteve presente no treino do Vila Real Futsal hoje! Parabéns pela dedicação! 🏆⚽</textarea>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-whatsapp" onclick="enviarWhatsAppSelecionado()">
+                    <i class="fab fa-whatsapp"></i> Enviar WhatsApp
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal('modalWhatsApp')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+            <div id="whatsappStatus" style="margin-top:12px;display:none;padding:12px;border-radius:8px;"></div>
+            <div class="whatsapp-message-list" id="whatsappMessageList">
+                <h4 style="margin-top:16px;font-size:14px;color:var(--gray-dark);">Últimas mensagens</h4>
+                <div id="whatsappMessagesContainer">
+                    <div class="empty-state" style="padding:20px;">
+                        <p>Nenhuma mensagem enviada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== SCRIPT ===== -->
     <script>
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v19';
+        const STORAGE_KEY = 'vilaRealFutsalData_v23';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -1918,7 +2688,18 @@
             perfil: 'Administrador',
             usuario: 'gleuber',
             senha: 'Opala77@2056',
-            primeiroAcesso: false
+            primeiroAcesso: false,
+            permissoes: {
+                alunos: true,
+                presencas: true,
+                carteirinhas: true,
+                relatorios: true,
+                notificacoes: true,
+                backup: true,
+                configuracoes: true,
+                usuarios: true,
+                excluirAlunos: true
+            }
         };
 
         const MENU_ITEMS = [
@@ -1931,7 +2712,8 @@
             { id: 'backup', label: 'Backup', icon: 'fas fa-database', page: 'backup' },
             { id: 'separator', label: 'Administração', isSeparator: true },
             { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios' },
-            { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes' }
+            { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes' },
+            { id: 'personalizar', label: 'Personalizar', icon: 'fas fa-paint-brush', page: 'personalizar' }
         ];
 
         function getDefaultData() {
@@ -1940,6 +2722,7 @@
                 alunos: [],
                 presencas: [],
                 notificacoes: [],
+                whatsappMessages: [],
                 config: {
                     categorias: [
                         { nome: 'Sub-8', idadeMin: 6, idadeMax: 7 },
@@ -1949,11 +2732,26 @@
                         { nome: 'Sub-16', idadeMin: 14, idadeMax: 15 },
                         { nome: 'Sub-18', idadeMin: 16, idadeMax: 17 }
                     ],
+                    horariosCategoria: {},
                     diasTreino: 'Segunda, Terça, Quarta, Quinta, Sexta',
                     notifAutomatica: true,
                     mensagemPadrao: 'Prezado(a) responsável, seu filho(a) esteve presente no treino do Vila Real Futsal hoje!',
                     senhaMaster: 'Opala77@2056',
-                    whatsappNumero: '111946359524'
+                    whatsappNumero: '111946359524',
+                    loginLogo: '',
+                    loginBg: '',
+                    loginPrimaryColor: '#d4a020',
+                    loginTextColor: '#0f1b2d',
+                    loginBoxBg: '#ffffff',
+                    loginLogoSize: 80,
+                    loginTitle: 'VILA REAL',
+                    loginSubtitle: 'Futsal · Gestão de Presenças',
+                    // Configurações do EmailJS
+                    emailjs: {
+                        serviceId: '',
+                        templateId: '',
+                        publicKey: ''
+                    }
                 },
                 proximoNumeroAluno: 1,
                 proximoNumeroUsuario: 2
@@ -1965,7 +2763,26 @@
         let html5QrCode = null;
         let scannerAtivo = false;
         let mostrarSenhaFlag = false;
+        let categoriaSelecionadaCarteirinha = 'todos';
 
+        // ============================================================
+        //  INICIALIZAR EMAILJS
+        // ============================================================
+        function initEmailJS() {
+            const config = data.config.emailjs || {};
+            if (config.publicKey && config.publicKey !== '') {
+                try {
+                    emailjs.init(config.publicKey);
+                    console.log('✅ EmailJS inicializado com sucesso!');
+                } catch (e) {
+                    console.warn('⚠️ EmailJS não inicializado:', e);
+                }
+            }
+        }
+
+        // ============================================================
+        //  CARREGAR DADOS
+        // ============================================================
         function loadData() {
             try {
                 const stored = localStorage.getItem(STORAGE_KEY);
@@ -1975,8 +2792,23 @@
                     for (let key in defaults) {
                         if (!(key in parsed)) parsed[key] = defaults[key];
                     }
+                    if (!parsed.config.emailjs) {
+                        parsed.config.emailjs = { serviceId: '', templateId: '', publicKey: '' };
+                    }
                     const adminExists = parsed.usuarios.some(u => u.id === 'admin');
                     if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
+                    if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
+                    if (!parsed.whatsappMessages) parsed.whatsappMessages = [];
+                    parsed.usuarios.forEach(u => {
+                        if (!u.permissoes) {
+                            u.permissoes = { alunos: true, presencas: true, carteirinhas: true, relatorios: true,
+                                notificacoes: true, backup: true, configuracoes: false, usuarios: false,
+                                excluirAlunos: true };
+                        }
+                        if (u.permissoes && !('excluirAlunos' in u.permissoes)) {
+                            u.permissoes.excluirAlunos = true;
+                        }
+                    });
                     return parsed;
                 }
             } catch (e) { console.error('Erro ao carregar dados', e); }
@@ -1992,6 +2824,28 @@
         }
 
         // ============================================================
+        //  VALIDAR SENHA
+        // ============================================================
+        function validarSenha(senha) {
+            const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+            return regex.test(senha);
+        }
+
+        // ============================================================
+        //  VERIFICAR PERMISSÃO
+        // ============================================================
+        function temPermissao(permissao) {
+            if (!currentUser) return false;
+            if (currentUser.perfil === 'Administrador') return true;
+            const p = currentUser.permissoes || {};
+            return p[permissao] === true;
+        }
+
+        function podeExcluirAlunos() {
+            return temPermissao('excluirAlunos');
+        }
+
+        // ============================================================
         //  TOAST
         // ============================================================
         function showToast(msg, type = 'success') {
@@ -2002,7 +2856,7 @@
             const icon = toast.querySelector('i');
             icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 5000);
         }
 
         // ============================================================
@@ -2029,39 +2883,196 @@
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('recuperarSenhaContainer').style.display = 'none';
+            aplicarPersonalizacao();
         }
 
         function showRecuperarSenha() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('recuperarSenhaContainer').style.display = 'flex';
+            document.getElementById('recuperarError').style.display = 'none';
+            document.getElementById('recuperarSuccess').style.display = 'none';
         }
 
-        function handleRecuperarSenha(e) {
+        async function handleRecuperarSenha(e) {
             e.preventDefault();
             const email = document.getElementById('recuperarEmail').value.trim();
             const errorDiv = document.getElementById('recuperarError');
             const successDiv = document.getElementById('recuperarSuccess');
+            const btn = document.getElementById('btnRecuperar');
+
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
-            const admin = data.usuarios.find(u => u.perfil === 'Administrador' && u.email === email);
-            if (!admin) {
-                errorDiv.textContent = 'E-mail não encontrado';
+            if (!email) {
+                errorDiv.textContent = 'Digite seu e-mail';
                 errorDiv.style.display = 'block';
                 return false;
             }
 
-            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase();
-            admin.senha = novaSenha;
-            data.config.senhaMaster = novaSenha;
+            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!user) {
+                errorDiv.textContent = 'E-mail não encontrado no sistema';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            // Gerar nova senha
+            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
+                .toUpperCase();
+            user.senha = novaSenha;
+            if (user.id === 'admin') {
+                data.config.senhaMaster = novaSenha;
+            }
             saveData();
 
-            successDiv.innerHTML = `✅ Nova senha gerada!<br><strong style="font-size:18px;color:var(--secondary);">${novaSenha}</strong>`;
-            successDiv.style.display = 'block';
-            showToast('Nova senha gerada com sucesso!');
+            // Tenta enviar por e-mail usando EmailJS
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            const config = data.config.emailjs || {};
+            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Nova Senha';
+
+            if (emailEnviado) {
+                successDiv.innerHTML = `
+                    ✅ <strong>Nova senha enviada para o e-mail!</strong><br>
+                    <span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span>
+                    <br><br>
+                    <small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>
+                `;
+                successDiv.style.display = 'block';
+                showToast('✅ Nova senha enviada para o e-mail!');
+                document.getElementById('recuperarEmail').value = '';
+            } else {
+                // Fallback: exibir a senha na tela se o e-mail falhar
+                successDiv.innerHTML = `
+                    ⚠️ <strong>Não foi possível enviar o e-mail.</strong><br>
+                    <span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span>
+                    <br><br>
+                    <div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">
+                        ${novaSenha}
+                    </div>
+                    <br>
+                    <small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>
+                `;
+                successDiv.style.display = 'block';
+                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
+            }
+
             return false;
         }
 
+        // ============================================================
+        //  ENVIAR E-MAIL DE RECUPERAÇÃO COM EMAILJS
+        // ============================================================
+        async function enviarEmailRecuperacao(email, nome, novaSenha) {
+            const config = data.config.emailjs || {};
+
+            if (!config.serviceId || !config.templateId || !config.publicKey) {
+                console.warn('⚠️ EmailJS não configurado. Configure nas Configurações.');
+                return false;
+            }
+
+            try {
+                // Inicializar EmailJS se necessário
+                if (emailjs && typeof emailjs.init === 'function') {
+                    emailjs.init(config.publicKey);
+                }
+
+                const templateParams = {
+                    to_email: email,
+                    to_name: nome || 'Usuário',
+                    nova_senha: novaSenha,
+                    sistema: 'Vila Real Futsal',
+                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
+                };
+
+                const response = await emailjs.send(
+                    config.serviceId,
+                    config.templateId,
+                    templateParams,
+                    config.publicKey
+                );
+
+                console.log('✅ E-mail enviado com sucesso!', response);
+                return true;
+            } catch (error) {
+                console.error('❌ Erro ao enviar e-mail:', error);
+                return false;
+            }
+        }
+
+        // ============================================================
+        //  CONFIGURAÇÕES DO EMAILJS
+        // ============================================================
+        function salvarConfigEmailJS() {
+            const serviceId = document.getElementById('emailjsServiceId').value.trim();
+            const templateId = document.getElementById('emailjsTemplateId').value.trim();
+            const publicKey = document.getElementById('emailjsPublicKey').value.trim();
+
+            if (!serviceId || !templateId || !publicKey) {
+                showToast('Preencha todos os campos do EmailJS', 'error');
+                return;
+            }
+
+            data.config.emailjs = { serviceId, templateId, publicKey };
+            saveData();
+
+            // Inicializar EmailJS
+            try {
+                if (typeof emailjs !== 'undefined' && emailjs.init) {
+                    emailjs.init(publicKey);
+                    showToast('✅ Configurações do EmailJS salvas e inicializadas!');
+                } else {
+                    showToast('⚠️ EmailJS não carregado. Atualize a página.', 'error');
+                }
+            } catch (e) {
+                showToast('Erro ao inicializar EmailJS: ' + e.message, 'error');
+            }
+        }
+
+        async function testarEmailJS() {
+            const config = data.config.emailjs || {};
+            if (!config.serviceId || !config.templateId || !config.publicKey) {
+                showToast('Configure o EmailJS primeiro!', 'error');
+                return;
+            }
+
+            const emailTeste = currentUser ? currentUser.email : 'teste@email.com';
+            const nomeTeste = currentUser ? currentUser.nome : 'Usuário Teste';
+
+            try {
+                if (typeof emailjs !== 'undefined' && emailjs.init) {
+                    emailjs.init(config.publicKey);
+                }
+
+                const templateParams = {
+                    to_email: emailTeste,
+                    to_name: nomeTeste,
+                    nova_senha: 'SenhaTeste@123',
+                    sistema: 'Vila Real Futsal - Teste',
+                    mensagem: 'Este é um e-mail de teste para verificar a configuração do EmailJS.'
+                };
+
+                const response = await emailjs.send(
+                    config.serviceId,
+                    config.templateId,
+                    templateParams,
+                    config.publicKey
+                );
+
+                showToast(`✅ E-mail de teste enviado para ${emailTeste}! Verifique sua caixa de entrada.`);
+            } catch (error) {
+                console.error('Erro no teste:', error);
+                showToast('❌ Erro ao enviar e-mail de teste: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  HANDLE LOGIN
+        // ============================================================
         function handleLogin(e) {
             e.preventDefault();
 
@@ -2078,7 +3089,8 @@
             }
 
             const user = data.usuarios.find(u =>
-                u.usuario === loginUser || u.email === loginUser
+                u.usuario.toLowerCase() === loginUser.toLowerCase() ||
+                u.email.toLowerCase() === loginUser.toLowerCase()
             );
 
             if (!user) {
@@ -2108,6 +3120,12 @@
             document.getElementById('userRole').textContent = user.perfil;
             document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
 
+            document.getElementById('whatsappFloat').style.display = 'flex';
+            atualizarWhatsAppBadge();
+
+            // Inicializar EmailJS
+            initEmailJS();
+
             initSystem();
             return false;
         }
@@ -2117,28 +3135,198 @@
             fecharScanner();
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('whatsappFloat').style.display = 'none';
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('loginForm').reset();
+            aplicarPersonalizacao();
             showToast('Desconectado');
         }
 
         // ============================================================
-        //  RENDERIZAR MENU - FUNÇÃO PRINCIPAL
+        //  PERSONALIZAÇÃO DA PÁGINA DE LOGIN
+        // ============================================================
+        function aplicarPersonalizacao() {
+            const config = data.config;
+
+            const loginPage = document.getElementById('loginContainer');
+            if (config.loginBg) {
+                loginPage.style.background = `url(${config.loginBg}) center/cover no-repeat`;
+            } else {
+                loginPage.style.background = 'linear-gradient(135deg, #0f1b2d, #1a2d4a)';
+            }
+
+            const logoBig = document.getElementById('loginLogoBig');
+            if (config.loginLogo) {
+                logoBig.innerHTML = `<img src="${config.loginLogo}" alt="Logo">`;
+            } else {
+                logoBig.innerHTML = '⚽';
+            }
+
+            const root = document.documentElement;
+            root.style.setProperty('--login-accent-color', config.loginPrimaryColor || '#d4a020');
+            root.style.setProperty('--login-text-color', config.loginTextColor || '#0f1b2d');
+            root.style.setProperty('--login-box-bg', config.loginBoxBg || '#ffffff');
+            root.style.setProperty('--login-logo-size', (config.loginLogoSize || 80) + 'px');
+
+            const titleEl = document.getElementById('loginTitle');
+            const subtitleEl = document.getElementById('loginSubtitle');
+            if (titleEl) {
+                titleEl.innerHTML = (config.loginTitle || 'VILA REAL').replace(/ /g, ' <span>') + '</span>';
+            }
+            if (subtitleEl) {
+                subtitleEl.textContent = config.loginSubtitle || 'Futsal · Gestão de Presenças';
+            }
+
+            atualizarPreview();
+        }
+
+        function atualizarPreview() {
+            const config = data.config;
+            const previewBox = document.getElementById('previewBox');
+            const previewLogo = document.getElementById('previewLogo');
+            const previewTitle = document.getElementById('previewTitle');
+            const previewSub = document.getElementById('previewSub');
+
+            if (config.loginBg) {
+                previewBox.style.background = `url(${config.loginBg}) center/cover no-repeat`;
+                previewBox.style.backgroundColor = 'transparent';
+            } else {
+                previewBox.style.background = 'linear-gradient(135deg, #0f1b2d, #1a2d4a)';
+            }
+
+            if (config.loginLogo) {
+                previewLogo.innerHTML = `<img src="${config.loginLogo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;">`;
+            } else {
+                previewLogo.innerHTML = '<span style="font-size:30px;">⚽</span>';
+            }
+
+            const titleText = config.loginTitle || 'VILA REAL';
+            previewTitle.innerHTML = titleText.replace(/ /g, ' <span>') + '</span>';
+            previewSub.textContent = config.loginSubtitle || 'Futsal · Gestão de Presenças';
+        }
+
+        function alterarLoginLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                data.config.loginLogo = e.target.result;
+                aplicarPersonalizacao();
+                showToast('Logo atualizado!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetarLoginLogo() {
+            data.config.loginLogo = '';
+            aplicarPersonalizacao();
+            showToast('Logo restaurado!');
+        }
+
+        function alterarLoginBg(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                document.getElementById('loginBgPreview').style.background = `url(${dataUrl}) center/cover no-repeat`;
+                document.getElementById('loginBgPreview').textContent = '';
+                data.config.loginBg = dataUrl;
+                aplicarPersonalizacao();
+                showToast('Fundo atualizado!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetarLoginBg() {
+            const preview = document.getElementById('loginBgPreview');
+            preview.style.background = 'linear-gradient(135deg, #0f1b2d, #1a2d4a)';
+            preview.textContent = 'Fundo padrão';
+            data.config.loginBg = '';
+            aplicarPersonalizacao();
+            showToast('Fundo restaurado!');
+        }
+
+        function aplicarCoresLogin() {
+            data.config.loginPrimaryColor = document.getElementById('loginPrimaryColor').value;
+            data.config.loginTextColor = document.getElementById('loginTextColor').value;
+            data.config.loginBoxBg = document.getElementById('loginBoxBgColor').value;
+            data.config.loginLogoSize = parseInt(document.getElementById('loginLogoSize').value) || 80;
+            aplicarPersonalizacao();
+        }
+
+        function atualizarLoginTextos() {
+            data.config.loginTitle = document.getElementById('loginPageTitle').value.trim() || 'VILA REAL';
+            data.config.loginSubtitle = document.getElementById('loginPageSubtitle').value.trim() || 'Futsal · Gestão de Presenças';
+            aplicarPersonalizacao();
+        }
+
+        function salvarPersonalizacao() {
+            data.config.loginPrimaryColor = document.getElementById('loginPrimaryColor').value;
+            data.config.loginTextColor = document.getElementById('loginTextColor').value;
+            data.config.loginBoxBg = document.getElementById('loginBoxBgColor').value;
+            data.config.loginLogoSize = parseInt(document.getElementById('loginLogoSize').value) || 80;
+            data.config.loginTitle = document.getElementById('loginPageTitle').value.trim() || 'VILA REAL';
+            data.config.loginSubtitle = document.getElementById('loginPageSubtitle').value.trim() || 'Futsal · Gestão de Presenças';
+            saveData();
+            aplicarPersonalizacao();
+            showToast('✅ Personalização salva!');
+        }
+
+        function resetarPersonalizacao() {
+            if (!confirm('Restaurar personalização para o padrão?')) return;
+            data.config.loginLogo = '';
+            data.config.loginBg = '';
+            data.config.loginPrimaryColor = '#d4a020';
+            data.config.loginTextColor = '#0f1b2d';
+            data.config.loginBoxBg = '#ffffff';
+            data.config.loginLogoSize = 80;
+            data.config.loginTitle = 'VILA REAL';
+            data.config.loginSubtitle = 'Futsal · Gestão de Presenças';
+
+            document.getElementById('loginPrimaryColor').value = '#d4a020';
+            document.getElementById('loginTextColor').value = '#0f1b2d';
+            document.getElementById('loginBoxBgColor').value = '#ffffff';
+            document.getElementById('loginLogoSize').value = 80;
+            document.getElementById('loginPageTitle').value = 'VILA REAL';
+            document.getElementById('loginPageSubtitle').value = 'Futsal · Gestão de Presenças';
+
+            resetarLoginLogo();
+            resetarLoginBg();
+            saveData();
+            aplicarPersonalizacao();
+            showToast('✅ Personalização restaurada!');
+        }
+
+        // ============================================================
+        //  RENDERIZAR MENU
         // ============================================================
         function renderizarMenu() {
             const container = document.getElementById('sidebarMenu');
+            if (!container) return;
 
-            if (!container) {
-                console.error('Container do menu não encontrado!');
-                return;
-            }
+            const isAdmin = currentUser && currentUser.perfil === 'Administrador';
+            const permissoes = currentUser ? currentUser.permissoes || {} : {};
 
             let html = '';
-
             MENU_ITEMS.forEach((item) => {
                 if (item.isSeparator) {
                     html += `<div class="menu-label">${item.label}</div>`;
                     return;
+                }
+
+                if (!isAdmin && item.page !== 'dashboard') {
+                    const mapa = {
+                        'alunos': 'alunos',
+                        'carteirinhas': 'carteirinhas',
+                        'presencas': 'presencas',
+                        'notificacoes': 'notificacoes',
+                        'relatorios': 'relatorios',
+                        'backup': 'backup',
+                        'configuracoes': 'configuracoes',
+                        'usuarios': 'usuarios'
+                    };
+                    if (!permissoes[mapa[item.page]]) return;
                 }
 
                 html += `
@@ -2152,21 +3340,16 @@
 
             container.innerHTML = html;
 
-            // Atualizar badges
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) badgeAlunos.textContent = data.alunos.length || '';
 
             const badgeNotif = document.getElementById('badge_notificacoes');
             if (badgeNotif) badgeNotif.textContent = data.notificacoes.length || '';
 
-            // Ativar item atual
             const currentPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
             document.querySelectorAll('.menu-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === currentPage);
             });
-
-            console.log('✅ Menu renderizado com sucesso!');
-            console.log('📋 Itens do menu:', document.querySelectorAll('.menu-item').length);
         }
 
         // ============================================================
@@ -2190,6 +3373,7 @@
                 relatorios: ['Relatórios', 'Análise de frequência'],
                 backup: ['Backup', 'Exportar e importar dados'],
                 configuracoes: ['Configurações', 'Ajustes do sistema'],
+                personalizar: ['Personalizar', 'Personalize a página de login'],
                 usuarios: ['Usuários', 'Gerenciamento de usuários']
             };
 
@@ -2197,7 +3381,6 @@
             document.getElementById('pageTitle').textContent = title;
             document.getElementById('pageSubtitle').textContent = subtitle;
 
-            // Carregar conteúdo da página
             if (page === 'relatorios') renderRelatorio();
             if (page === 'presencas') carregarPresencasHoje();
             if (page === 'alunos') renderAlunos();
@@ -2206,7 +3389,492 @@
             if (page === 'notificacoes') renderNotificacoes();
             if (page === 'usuarios') renderUsuarios();
             if (page === 'configuracoes') renderConfiguracoes();
+            if (page === 'personalizar') carregarPersonalizacao();
         }
+
+        function carregarPersonalizacao() {
+            document.getElementById('loginPrimaryColor').value = data.config.loginPrimaryColor || '#d4a020';
+            document.getElementById('loginTextColor').value = data.config.loginTextColor || '#0f1b2d';
+            document.getElementById('loginBoxBgColor').value = data.config.loginBoxBg || '#ffffff';
+            document.getElementById('loginLogoSize').value = data.config.loginLogoSize || 80;
+            document.getElementById('loginPageTitle').value = data.config.loginTitle || 'VILA REAL';
+            document.getElementById('loginPageSubtitle').value = data.config.loginSubtitle || 'Futsal · Gestão de Presenças';
+
+            if (data.config.loginLogo) {
+                document.getElementById('loginLogoPreview').innerHTML =
+                    `<img src="${data.config.loginLogo}" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+            if (data.config.loginBg) {
+                document.getElementById('loginBgPreview').style.background =
+                    `url(${data.config.loginBg}) center/cover no-repeat`;
+                document.getElementById('loginBgPreview').textContent = '';
+            }
+            aplicarPersonalizacao();
+        }
+
+        // ============================================================
+        //  CARTEIRINHA
+        // ============================================================
+        function carregarCarteirinhas() {
+            const select = document.getElementById('carteirinhaSelect');
+            const categorias = [...new Set(data.alunos.map(a => a.categoria))];
+
+            select.innerHTML = '<option value="">-- Selecione uma categoria --</option>';
+            categorias.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+
+            if (categoriaSelecionadaCarteirinha && categoriaSelecionadaCarteirinha !== 'todos') {
+                select.value = categoriaSelecionadaCarteirinha;
+                filtrarCarteirinhas(categoriaSelecionadaCarteirinha);
+            }
+        }
+
+        function filtrarCarteirinhas(categoria) {
+            categoriaSelecionadaCarteirinha = categoria;
+
+            const empty = document.getElementById('carteirinhaEmpty');
+            const alunosDiv = document.getElementById('carteirinhaAlunos');
+            const content = document.getElementById('carteirinhaContent');
+
+            content.style.display = 'none';
+
+            if (!categoria || categoria === '') {
+                empty.style.display = 'block';
+                alunosDiv.style.display = 'none';
+                return;
+            }
+
+            empty.style.display = 'none';
+            alunosDiv.style.display = 'block';
+
+            let alunosFiltrados = data.alunos;
+            if (categoria !== 'todos') {
+                alunosFiltrados = data.alunos.filter(a => a.categoria === categoria);
+            }
+
+            const listContainer = document.getElementById('carteirinhaAlunosList');
+
+            if (alunosFiltrados.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;padding:20px;">
+                        <i class="fas fa-users"></i>
+                        <h3>Nenhum aluno nesta categoria</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = alunosFiltrados.map(aluno => {
+                const fotoHtml = aluno.foto ?
+                    `<img src="${aluno.foto}" alt="${aluno.nome}">` :
+                    `<span style="font-size:14px;font-weight:700;">${aluno.nome.charAt(0).toUpperCase()}</span>`;
+
+                return `
+                    <div class="carteirinha-aluno-item" data-id="${aluno.id}" onclick="selecionarAlunoCarteirinha('${aluno.id}')">
+                        <div class="aluno-avatar">${fotoHtml}</div>
+                        <div class="aluno-nome">${aluno.nome}</div>
+                        <div class="aluno-numero">${aluno.numero}</div>
+                        <span class="aluno-categoria-badge">${aluno.categoria}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const firstItem = listContainer.querySelector('.carteirinha-aluno-item');
+            if (firstItem) {
+                firstItem.click();
+            }
+        }
+
+        function selecionarAlunoCarteirinha(alunoId) {
+            document.querySelectorAll('.carteirinha-aluno-item').forEach(item => {
+                item.classList.toggle('selected', item.dataset.id === alunoId);
+            });
+
+            const aluno = data.alunos.find(a => a.id === alunoId);
+            if (aluno) {
+                gerarCarteirinhaAluno(aluno);
+            }
+        }
+
+        function voltarCarteirinhas() {
+            document.getElementById('carteirinhaContent').style.display = 'none';
+            document.getElementById('carteirinhaAlunos').style.display = 'none';
+            document.getElementById('carteirinhaEmpty').style.display = 'block';
+            document.getElementById('carteirinhaSelect').value = '';
+            categoriaSelecionadaCarteirinha = 'todos';
+        }
+
+        function gerarCarteirinhaAluno(aluno) {
+            const container = document.getElementById('carteirinhaContent');
+            container.style.display = 'block';
+
+            const fotoHtml = aluno.foto ?
+                `<img src="${aluno.foto}" alt="${aluno.nome}">` :
+                `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>`;
+
+            container.innerHTML = `
+                <div class="carteirinha-wrapper">
+                    <div class="carteirinha" id="carteirinhaImpressao">
+                        <div class="crt-header">
+                            <div class="crt-foto" id="carteirinhaFoto" onclick="editarFotoCarteirinha('${aluno.id}')">
+                                ${fotoHtml}
+                                <div class="edit-overlay">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                            </div>
+                            <div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div>
+                        </div>
+                        <div class="crt-body">
+                            <div class="crt-info">
+                                <div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div>
+                                <div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div>
+                                <div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div>
+                                <div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div>
+                                <div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div>
+                                <div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div>
+                            </div>
+                            <div class="crt-qr" id="qrCodeContainerCrt"></div>
+                        </div>
+                        <div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:14px;">
+                    <button class="btn btn-secondary btn-sm" onclick="imprimirCarteirinha()"><i class="fas fa-print"></i> Imprimir</button>
+                    <button class="btn btn-primary btn-sm" onclick="verCarteirinha('${aluno.id}')"><i class="fas fa-expand"></i> Ampliar</button>
+                    <button class="btn btn-whatsapp btn-sm" onclick="enviarWhatsAppAluno('${aluno.id}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const containerQR = document.getElementById('qrCodeContainerCrt');
+                containerQR.innerHTML = '';
+                try {
+                    new QRCode(containerQR, {
+                        text: JSON.stringify({ id: aluno.id, numero: aluno.numero }),
+                        width: 110,
+                        height: 110,
+                        colorDark: '#0f1b2d',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch (e) {
+                    containerQR.innerHTML = `<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>`;
+                }
+            }, 100);
+        }
+
+        function editarFotoCarteirinha(alunoId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const dataUrl = ev.target.result;
+                    const aluno = data.alunos.find(a => a.id === alunoId);
+                    if (aluno) {
+                        aluno.foto = dataUrl;
+                        saveData();
+                        const fotoElement = document.querySelector('#carteirinhaImpressao .crt-foto');
+                        if (fotoElement) {
+                            fotoElement.innerHTML = `
+                                <img src="${dataUrl}" alt="${aluno.nome}">
+                                <div class="edit-overlay" onclick="event.stopPropagation();editarFotoCarteirinha('${aluno.id}')">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                            `;
+                        }
+                        renderAlunos();
+                        showToast('Foto da carteirinha atualizada!');
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+
+        function verCarteirinha(id) {
+            const aluno = data.alunos.find(a => a.id === id);
+            if (!aluno) return;
+            const win = window.open('', '_blank');
+            const fotoHtml = aluno.foto ?
+                `<img src="${aluno.foto}" alt="${aluno.nome}">` :
+                `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>`;
+
+            win.document.write(`<html><head><title>Carteirinha - ${aluno.nome}</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#0f1b2d;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.5);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-title small{display:block;font-size:10px;opacity:0.6;font-weight:400;letter-spacing:2px;text-transform:uppercase;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}.btn-print{margin-top:16px;padding:10px 30px;background:#d4a020;border:none;border-radius:10px;font-weight:700;color:#0f1b2d;cursor:pointer;font-size:14px;}.btn-print:hover{background:#f5d060;}@media print{body{background:white;}.carteirinha{box-shadow:none;border-color:#ccc;}.btn-print{display:none;}}</style></head><body><div style="display:flex;flex-direction:column;align-items:center;"><div class="carteirinha" id="carteirinhaPrint"><div class="crt-header"><div class="crt-foto">${fotoHtml}</div><div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div></div><div class="crt-body"><div class="crt-info"><div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div><div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div><div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div><div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div><div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div><div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div></div><div class="crt-qr" id="qrPrintContainer"></div></div><div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div></div><button class="btn-print" onclick="window.print()">🖨️ Imprimir Carteirinha</button></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{const c=document.getElementById('qrPrintContainer');c.innerHTML='';try{new QRCode(c,{text:JSON.stringify({id:'${aluno.id}',numero:'${aluno.numero}'}),width:110,height:110,colorDark:'#0f1b2d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});}catch(e){c.innerHTML='<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>';}},200);<\/script></body></html>`);
+            win.document.close();
+        }
+
+        function imprimirCarteirinha() {
+            const conteudo = document.getElementById('carteirinhaImpressao');
+            if (!conteudo) return;
+            const win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Carteirinha - Vila Real Futsal</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f2f5;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.3);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}@media print{body{background:white;}.carteirinha{box-shadow:none;}}</style></head><body>${conteudo.outerHTML}<script>window.onload=function(){window.print();setTimeout(()=>window.close(),1500);};<\/script></body></html>`);
+            win.document.close();
+        }
+
+        // ============================================================
+        //  WHATSAPP - FUNÇÕES
+        // ============================================================
+        function abrirWhatsAppModal() {
+            if (!currentUser) return;
+
+            const select = document.getElementById('whatsappAlunoSelect');
+            select.innerHTML = '<option value="">-- Selecione um aluno --</option>';
+            data.alunos.forEach(aluno => {
+                if (aluno.whatsapp) {
+                    select.innerHTML += `<option value="${aluno.id}">${aluno.nome} (${aluno.whatsapp})</option>`;
+                }
+            });
+
+            document.getElementById('whatsappMensagem').value = data.config.mensagemPadrao ||
+                'Prezado(a) responsável, informamos que seu filho(a) esteve presente no treino do Vila Real Futsal hoje! Parabéns pela dedicação! 🏆⚽';
+
+            document.getElementById('whatsappStatus').style.display = 'none';
+            carregarMensagensWhatsApp();
+            document.getElementById('modalWhatsApp').classList.add('active');
+        }
+
+        function carregarMensagensWhatsApp() {
+            const container = document.getElementById('whatsappMessagesContainer');
+            if (!data.whatsappMessages || data.whatsappMessages.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="padding:20px;"><p>Nenhuma mensagem enviada</p></div>`;
+                return;
+            }
+
+            const msgs = [...data.whatsappMessages].reverse().slice(0, 20);
+            container.innerHTML = msgs.map(msg => `
+                <div class="whatsapp-msg-item">
+                    <div>
+                        <strong>${msg.alunoNome}</strong>
+                        <span style="font-size:12px;color:var(--gray-dark);margin-left:8px;">${msg.destino}</span>
+                        <div style="font-size:12px;color:var(--gray-dark);">${msg.mensagem.substring(0, 60)}${msg.mensagem.length > 60 ? '...' : ''}</div>
+                    </div>
+                    <div>
+                        <span class="msg-status ${msg.status}">${msg.status === 'enviado' ? '✅' : msg.status === 'pendente' ? '⏳' : '❌'}</span>
+                        <span style="font-size:11px;color:var(--gray-dark);display:block;text-align:right;">${new Date(msg.data).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function atualizarWhatsAppBadge() {
+            const badge = document.getElementById('whatsappBadge');
+            if (data.whatsappMessages && data.whatsappMessages.length > 0) {
+                const pendentes = data.whatsappMessages.filter(m => m.status === 'pendente').length;
+                badge.textContent = pendentes || data.whatsappMessages.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function enviarWhatsAppSelecionado() {
+            const select = document.getElementById('whatsappAlunoSelect');
+            const alunoId = select.value;
+            const mensagem = document.getElementById('whatsappMensagem').value.trim();
+
+            if (!alunoId) {
+                showToast('Selecione um aluno', 'error');
+                return;
+            }
+
+            if (!mensagem) {
+                showToast('Digite uma mensagem', 'error');
+                return;
+            }
+
+            const aluno = data.alunos.find(a => a.id === alunoId);
+            if (!aluno || !aluno.whatsapp) {
+                showToast('Aluno sem WhatsApp cadastrado', 'error');
+                return;
+            }
+
+            enviarWhatsApp(aluno, mensagem);
+        }
+
+        function enviarWhatsAppAluno(alunoId) {
+            const aluno = data.alunos.find(a => a.id === alunoId);
+            if (!aluno || !aluno.whatsapp) {
+                showToast('Aluno sem WhatsApp cadastrado', 'error');
+                return;
+            }
+
+            const mensagem = data.config.mensagemPadrao ||
+                `Prezado(a) ${aluno.pai}, informamos que ${aluno.nome} esteve presente no treino do Vila Real Futsal hoje! Parabéns pela dedicação! 🏆⚽`;
+
+            enviarWhatsApp(aluno, mensagem);
+        }
+
+        function enviarWhatsApp(aluno, mensagem) {
+            const numero = aluno.whatsapp.replace(/\D/g, '');
+            const msgEncoded = encodeURIComponent(mensagem);
+
+            window.open(`https://wa.me/55${numero}?text=${msgEncoded}`, '_blank');
+
+            const registro = {
+                id: 'wa_' + Date.now(),
+                alunoId: aluno.id,
+                alunoNome: aluno.nome,
+                destino: aluno.whatsapp,
+                mensagem: mensagem,
+                data: new Date().toISOString(),
+                status: 'enviado'
+            };
+
+            if (!data.whatsappMessages) data.whatsappMessages = [];
+            data.whatsappMessages.push(registro);
+            saveData();
+
+            data.notificacoes.push({
+                id: 'notif_' + Date.now(),
+                alunoId: aluno.id,
+                alunoNome: aluno.nome,
+                destinatario: aluno.pai,
+                mensagem: mensagem,
+                canal: 'whatsapp',
+                destino: aluno.whatsapp,
+                data: new Date().toISOString(),
+                status: 'enviado',
+                enviadoPor: currentUser ? currentUser.nome : 'Sistema'
+            });
+            saveData();
+
+            renderNotificacoes();
+            carregarMensagensWhatsApp();
+            atualizarWhatsAppBadge();
+
+            const badgeNotif = document.getElementById('badge_notificacoes');
+            if (badgeNotif) badgeNotif.textContent = data.notificacoes.length;
+
+            showToast(`📱 WhatsApp enviado para ${aluno.pai} (${aluno.whatsapp})`);
+            document.getElementById('whatsappStatus').style.display = 'block';
+            document.getElementById('whatsappStatus').innerHTML =
+                `<span style="color:#22c55e;">✅ Mensagem enviada para ${aluno.pai} (${aluno.whatsapp})</span>`;
+            document.getElementById('whatsappStatus').style.color = '#22c55e';
+
+            setTimeout(() => {
+                closeModal('modalWhatsApp');
+            }, 2000);
+        }
+
+        function enviarPresencaWhatsApp() {
+            const input = document.getElementById('qrCodeManual');
+            const code = input.value.trim();
+
+            if (!code) {
+                showToast('Digite o código do aluno primeiro', 'error');
+                return;
+            }
+
+            let aluno = data.alunos.find(a => a.numero === code || a.id === code);
+            if (!aluno) {
+                aluno = data.alunos.find(a => a.nome.toLowerCase().includes(code.toLowerCase()));
+            }
+            if (!aluno) {
+                showToast('Aluno não encontrado', 'error');
+                return;
+            }
+
+            if (!aluno.whatsapp) {
+                showToast('Aluno não possui WhatsApp cadastrado', 'error');
+                return;
+            }
+
+            const mensagem = data.config.mensagemPadrao ||
+                `Prezado(a) ${aluno.pai}, informamos que ${aluno.nome} esteve presente no treino do Vila Real Futsal hoje! Parabéns pela dedicação! 🏆⚽`;
+
+            enviarWhatsApp(aluno, mensagem);
+            input.value = '';
+        }
+
+        // ============================================================
+        //  SCANNER QR CODE
+        // ============================================================
+        function abrirScanner() {
+            const container = document.getElementById('scannerContainer');
+            const status = document.getElementById('scannerStatus');
+            container.style.display = 'block';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inicializando câmera...';
+
+            if (typeof Html5Qrcode === 'undefined') {
+                status.innerHTML = '<span style="color:#ef4444;">Biblioteca não carregada.</span>';
+                return;
+            }
+
+            try {
+                if (html5QrCode) { html5QrCode.clear();
+                    html5QrCode = null; }
+                html5QrCode = new Html5Qrcode('qr-reader');
+                const config = { fps: 15, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
+                html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
+                scannerAtivo = true;
+            } catch (err) {
+                status.innerHTML = `<span style="color:#ef4444;">Erro: ${err.message}</span>`;
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            const status = document.getElementById('scannerStatus');
+            status.innerHTML = `<span style="color:#22c55e;">QR Code identificado!</span>`;
+
+            try {
+                const data = JSON.parse(decodedText);
+                const alunoId = data.id;
+                if (alunoId) {
+                    const aluno = window.data.alunos.find(a => a.id === alunoId);
+                    if (aluno) {
+                        confirmarPresenca(alunoId);
+                        setTimeout(() => { fecharScanner();
+                            mudarPagina('presencas'); }, 1500);
+                    } else {
+                        status.innerHTML = `<span style="color:#ef4444;">Aluno não encontrado!</span>`;
+                    }
+                } else {
+                    const aluno = window.data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
+                    if (aluno) {
+                        confirmarPresenca(aluno.id);
+                        setTimeout(() => { fecharScanner();
+                            mudarPagina('presencas'); }, 1500);
+                    } else {
+                        status.innerHTML = `<span style="color:#ef4444;">Código inválido!</span>`;
+                    }
+                }
+            } catch (e) {
+                const aluno = window.data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
+                if (aluno) {
+                    confirmarPresenca(aluno.id);
+                    setTimeout(() => { fecharScanner();
+                        mudarPagina('presencas'); }, 1500);
+                } else {
+                    status.innerHTML = `<span style="color:#ef4444;">Código não reconhecido!</span>`;
+                }
+            }
+        }
+
+        function onScanError(err) {}
+
+        function fecharScanner() {
+            if (html5QrCode && scannerAtivo) {
+                try {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        scannerAtivo = false;
+                        document.getElementById('scannerContainer').style.display = 'none';
+                    }).catch(() => { scannerAtivo = false;
+                        document.getElementById('scannerContainer').style.display = 'none'; });
+                } catch (e) { scannerAtivo = false;
+                    document.getElementById('scannerContainer').style.display = 'none'; }
+            } else {
+                document.getElementById('scannerContainer').style.display = 'none';
+            }
+        }
+
+        function reiniciarScanner() { fecharScanner();
+            setTimeout(() => abrirScanner(), 500); }
 
         // ============================================================
         //  INICIALIZAÇÃO DO SISTEMA
@@ -2214,20 +3882,19 @@
         function initSystem() {
             console.log('🚀 Inicializando sistema...');
 
-            // Renderizar menu
             renderizarMenu();
 
-            // Renderizar todas as páginas
             renderDashboard();
             renderAlunos();
-            renderCategoriasSelects();
+            carregarCarteirinhas();
             renderConfiguracoes();
             renderUsuarios();
             renderRelatorio();
             carregarPresencasHoje();
             renderNotificacoes();
+            carregarMensagensWhatsApp();
+            atualizarWhatsAppBadge();
 
-            // Atualizar informações
             document.getElementById('dataHoje').textContent = new Date().toLocaleDateString('pt-BR', {
                 weekday: 'long',
                 day: '2-digit',
@@ -2237,7 +3904,6 @@
 
             document.getElementById('senhaMasterDisplay').textContent = '••••••••';
 
-            // Carregar configurações
             if (data.config.whatsappNumero) {
                 document.getElementById('whatsappNumero').value = data.config.whatsappNumero;
             }
@@ -2247,9 +3913,20 @@
             document.getElementById('notifAutomatica').checked = data.config.notifAutomatica !== false;
             document.getElementById('diasTreino').value = data.config.diasTreino || 'Segunda, Terça, Quarta, Quinta, Sexta';
 
+            // Carregar configurações do EmailJS
+            const emailjsConfig = data.config.emailjs || {};
+            document.getElementById('emailjsServiceId').value = emailjsConfig.serviceId || '';
+            document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
+            document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
+
+            carregarPersonalizacao();
+
+            document.getElementById('whatsappFloat').style.display = 'flex';
+
             console.log('✅ Sistema inicializado!');
             console.log('📊 Alunos:', data.alunos.length);
             console.log('👥 Usuários:', data.usuarios.length);
+            console.log('📱 WhatsApp:', data.whatsappMessages ? data.whatsappMessages.length : 0, 'mensagens');
         }
 
         // ============================================================
@@ -2267,7 +3944,6 @@
             document.getElementById('frequenciaMedia').textContent = data.alunos.length > 0 ?
                 Math.round((totalPresencas / (data.alunos.length * 30)) * 100) + '%' : '0%';
 
-            // Últimas presenças
             const ultimas = data.presencas.slice(-5).reverse();
             const container = document.getElementById('ultimasPresencas');
             if (ultimas.length === 0) {
@@ -2287,7 +3963,6 @@
                 `).join('');
             }
 
-            // Gráfico de categorias
             const containerChart = document.getElementById('categoriaChartContainer');
             if (data.alunos.length === 0) {
                 containerChart.innerHTML = '<div class="empty-state" style="padding:20px;"><p>Nenhum dado</p></div>';
@@ -2332,9 +4007,14 @@
                 return;
             }
 
-            container.innerHTML = data.alunos.map(aluno => `
+            const podeExcluir = podeExcluirAlunos();
+
+            container.innerHTML = data.alunos.map(aluno => {
+                const foto = aluno.foto || '';
+                return `
                 <div class="aluno-card">
                     <span class="badge-categoria">${aluno.categoria}</span>
+                    ${foto ? `<img src="${foto}" alt="${aluno.nome}" class="aluno-foto">` : `<div class="aluno-foto" style="display:flex;align-items:center;justify-content:center;background:var(--gray);font-size:24px;border-radius:50%;border:2px solid var(--secondary);">📷</div>`}
                     <div class="aluno-nome">${aluno.nome}</div>
                     <div class="aluno-info"><i class="fas fa-hashtag"></i> ${aluno.numero}</div>
                     <div class="aluno-info"><i class="fas fa-calendar-alt"></i> ${aluno.idade} anos</div>
@@ -2348,15 +4028,18 @@
                         <button class="btn btn-primary btn-sm" onclick="editarAluno('${aluno.id}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
+                        ${podeExcluir ? `<button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
                             <i class="fas fa-trash"></i>
-                        </button>
+                        </button>` : `<button class="btn btn-danger btn-sm" disabled title="Sem permissão para excluir" style="opacity:0.5;cursor:not-allowed;">
+                            <i class="fas fa-lock"></i>
+                        </button>`}
                         <button class="btn btn-success btn-sm" onclick="confirmarPresenca('${aluno.id}')">
                             <i class="fas fa-check"></i> Presença
                         </button>
+                        ${aluno.whatsapp ? `<button class="btn btn-whatsapp btn-sm" onclick="enviarWhatsAppAluno('${aluno.id}')"><i class="fab fa-whatsapp"></i></button>` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function openModal(id) {
@@ -2365,6 +4048,9 @@
                 document.getElementById('modalAlunoTitle').textContent = 'Novo Aluno';
                 document.getElementById('alunoEditId').value = '';
                 document.getElementById('alunoForm').reset();
+                document.getElementById('alunoFotoPreview').style.display = 'none';
+                document.getElementById('alunoFotoPlaceholder').style.display = 'block';
+                document.getElementById('alunoFotoData').value = '';
                 const proximo = String(data.proximoNumeroAluno).padStart(6, '0');
                 document.getElementById('alunoNumero').value = 'VRF-' + proximo;
                 document.getElementById('alunoIdade').value = '';
@@ -2403,10 +4089,17 @@
             const nascimento = document.getElementById('alunoNascimento').value;
             const idade = parseInt(document.getElementById('alunoIdade').value) || 0;
             const categoria = document.getElementById('alunoCategoria').value;
+            const foto = document.getElementById('alunoFotoData').value;
 
             if (!nome || !pai || !telefone || !nascimento) {
                 showToast('Preencha todos os campos obrigatórios', 'error');
                 return false;
+            }
+
+            let categoriaFinal = categoria;
+            if (!categoriaFinal || categoriaFinal === 'Sem categoria') {
+                const cat = data.config.categorias.find(c => idade >= c.idadeMin && idade <= c.idadeMax);
+                categoriaFinal = cat ? cat.nome : 'Sem categoria';
             }
 
             const aluno = {
@@ -2419,7 +4112,8 @@
                 email: email || '',
                 nascimento,
                 idade,
-                categoria,
+                categoria: categoriaFinal,
+                foto: foto || '',
                 criadoEm: new Date().toISOString()
             };
 
@@ -2435,10 +4129,8 @@
             closeModal('modalAluno');
             renderAlunos();
             renderDashboard();
-            renderCategoriasSelects();
-            renderRelatorio();
             carregarCarteirinhas();
-            // Atualizar badge
+            renderRelatorio();
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
             showToast(id ? 'Aluno atualizado!' : 'Aluno cadastrado!');
@@ -2460,20 +4152,33 @@
             document.getElementById('alunoNascimento').value = aluno.nascimento;
             document.getElementById('alunoIdade').value = aluno.idade + ' anos';
             document.getElementById('alunoCategoria').value = aluno.categoria;
+
+            if (aluno.foto) {
+                document.getElementById('alunoFotoPreview').src = aluno.foto;
+                document.getElementById('alunoFotoPreview').style.display = 'block';
+                document.getElementById('alunoFotoPlaceholder').style.display = 'none';
+                document.getElementById('alunoFotoData').value = aluno.foto;
+            }
         }
 
         function excluirAluno(id) {
-            if (!confirm('Tem certeza que deseja excluir este aluno?')) return;
+            if (!podeExcluirAlunos()) {
+                showToast('❌ Você não tem permissão para excluir alunos', 'error');
+                return;
+            }
+
+            if (!confirm('⚠️ Tem certeza que deseja excluir este aluno? Esta ação não pode ser desfeita.')) return;
+
+            const aluno = data.alunos.find(a => a.id === id);
             data.alunos = data.alunos.filter(a => a.id !== id);
             saveData();
             renderAlunos();
             renderDashboard();
-            renderCategoriasSelects();
-            renderRelatorio();
             carregarCarteirinhas();
+            renderRelatorio();
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
-            showToast('Aluno excluído');
+            showToast(`🗑️ Aluno ${aluno ? aluno.nome : ''} excluído`);
         }
 
         function buscarAluno(texto) {
@@ -2485,197 +4190,19 @@
             });
         }
 
-        // ============================================================
-        //  CARTEIRINHA
-        // ============================================================
-        function renderCategoriasSelects() {
-            const select = document.getElementById('carteirinhaSelect');
-            const filtro = document.getElementById('filtroCategoria');
-            const categorias = [...new Set(data.alunos.map(a => a.categoria))];
-
-            [select, filtro].forEach(sel => {
-                if (!sel) return;
-                const current = sel.value;
-                sel.innerHTML = '<option value="">-- Selecione --</option>';
-                categorias.forEach(cat => {
-                    sel.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
-                sel.value = current;
-            });
+        function previewFotoAluno(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                document.getElementById('alunoFotoPreview').src = dataUrl;
+                document.getElementById('alunoFotoPreview').style.display = 'block';
+                document.getElementById('alunoFotoPlaceholder').style.display = 'none';
+                document.getElementById('alunoFotoData').value = dataUrl;
+            };
+            reader.readAsDataURL(file);
         }
-
-        function carregarCarteirinhas() {
-            const select = document.getElementById('carteirinhaSelect');
-            const content = document.getElementById('carteirinhaContent');
-            const container = document.getElementById('carteirinhaContainer');
-
-            if (!select.value) {
-                content.style.display = 'none';
-                container.querySelector('.empty-state').style.display = 'block';
-                return;
-            }
-
-            const aluno = data.alunos.find(a => a.categoria === select.value);
-            if (!aluno) {
-                content.style.display = 'none';
-                container.querySelector('.empty-state').style.display = 'block';
-                return;
-            }
-
-            container.querySelector('.empty-state').style.display = 'none';
-            content.style.display = 'block';
-
-            content.innerHTML = `
-                <div class="carteirinha-wrapper">
-                    <div class="carteirinha" id="carteirinhaImpressao">
-                        <div class="crt-header">
-                            <div class="crt-foto">
-                                <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>
-                            </div>
-                            <div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div>
-                        </div>
-                        <div class="crt-body">
-                            <div class="crt-info">
-                                <div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div>
-                                <div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div>
-                                <div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div>
-                                <div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div>
-                                <div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div>
-                                <div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div>
-                            </div>
-                            <div class="crt-qr" id="qrCodeContainerCrt"></div>
-                        </div>
-                        <div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div>
-                    </div>
-                </div>
-                <div style="text-align:center;margin-top:14px;">
-                    <button class="btn btn-secondary btn-sm" onclick="imprimirCarteirinha()"><i class="fas fa-print"></i> Imprimir</button>
-                    <button class="btn btn-primary btn-sm" onclick="verCarteirinha('${aluno.id}')"><i class="fas fa-expand"></i> Ampliar</button>
-                </div>
-            `;
-
-            setTimeout(() => {
-                const containerQR = document.getElementById('qrCodeContainerCrt');
-                containerQR.innerHTML = '';
-                try {
-                    new QRCode(containerQR, {
-                        text: JSON.stringify({ id: aluno.id, numero: aluno.numero }),
-                        width: 110,
-                        height: 110,
-                        colorDark: '#0f1b2d',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                } catch (e) {
-                    containerQR.innerHTML = `<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>`;
-                }
-            }, 100);
-        }
-
-        function gerarCarteirinha(value) {
-            carregarCarteirinhas();
-        }
-
-        function verCarteirinha(id) {
-            const aluno = data.alunos.find(a => a.id === id);
-            if (!aluno) return;
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Carteirinha - ${aluno.nome}</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#0f1b2d;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.5);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-title small{display:block;font-size:10px;opacity:0.6;font-weight:400;letter-spacing:2px;text-transform:uppercase;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}.btn-print{margin-top:16px;padding:10px 30px;background:#d4a020;border:none;border-radius:10px;font-weight:700;color:#0f1b2d;cursor:pointer;font-size:14px;}.btn-print:hover{background:#f5d060;}@media print{body{background:white;}.carteirinha{box-shadow:none;border-color:#ccc;}.btn-print{display:none;}}</style></head><body><div style="display:flex;flex-direction:column;align-items:center;"><div class="carteirinha" id="carteirinhaPrint"><div class="crt-header"><div class="crt-foto"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div></div><div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div></div><div class="crt-body"><div class="crt-info"><div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div><div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div><div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div><div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div><div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div><div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div></div><div class="crt-qr" id="qrPrintContainer"></div></div><div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div></div><button class="btn-print" onclick="window.print()">🖨️ Imprimir Carteirinha</button></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{const c=document.getElementById('qrPrintContainer');c.innerHTML='';try{new QRCode(c,{text:JSON.stringify({id:'${aluno.id}',numero:'${aluno.numero}'}),width:110,height:110,colorDark:'#0f1b2d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});}catch(e){c.innerHTML='<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>';}},200);<\/script></body></html>`);
-            win.document.close();
-        }
-
-        function imprimirCarteirinha() {
-            const conteudo = document.getElementById('carteirinhaImpressao');
-            if (!conteudo) return;
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Carteirinha - Vila Real Futsal</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f2f5;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.3);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}@media print{body{background:white;}.carteirinha{box-shadow:none;}}</style></head><body>${conteudo.outerHTML}<script>window.onload=function(){window.print();setTimeout(()=>window.close(),1500);};<\/script></body></html>`);
-            win.document.close();
-        }
-
-        // ============================================================
-        //  SCANNER QR CODE
-        // ============================================================
-        function abrirScanner() {
-            const container = document.getElementById('scannerContainer');
-            const status = document.getElementById('scannerStatus');
-            container.style.display = 'block';
-            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inicializando câmera...';
-
-            if (typeof Html5Qrcode === 'undefined') {
-                status.innerHTML = '<span style="color:#ef4444;">Biblioteca não carregada.</span>';
-                return;
-            }
-
-            try {
-                if (html5QrCode) { html5QrCode.clear();
-                    html5QrCode = null; }
-                html5QrCode = new Html5Qrcode('qr-reader');
-                const config = { fps: 15, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
-                html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
-                scannerAtivo = true;
-            } catch (err) {
-                status.innerHTML = `<span style="color:#ef4444;">Erro: ${err.message}</span>`;
-            }
-        }
-
-        function onScanSuccess(decodedText) {
-            const status = document.getElementById('scannerStatus');
-            status.innerHTML = `<span style="color:#22c55e;">QR Code identificado!</span>`;
-
-            try {
-                const data = JSON.parse(decodedText);
-                const alunoId = data.id;
-                if (alunoId) {
-                    const aluno = data.alunos.find(a => a.id === alunoId);
-                    if (aluno) {
-                        confirmarPresenca(alunoId);
-                        setTimeout(() => { fecharScanner();
-                            mudarPagina('presencas'); }, 1500);
-                    } else {
-                        status.innerHTML = `<span style="color:#ef4444;">Aluno não encontrado!</span>`;
-                    }
-                } else {
-                    const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
-                    if (aluno) {
-                        confirmarPresenca(aluno.id);
-                        setTimeout(() => { fecharScanner();
-                            mudarPagina('presencas'); }, 1500);
-                    } else {
-                        status.innerHTML = `<span style="color:#ef4444;">Código inválido!</span>`;
-                    }
-                }
-            } catch (e) {
-                const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
-                if (aluno) {
-                    confirmarPresenca(aluno.id);
-                    setTimeout(() => { fecharScanner();
-                        mudarPagina('presencas'); }, 1500);
-                } else {
-                    status.innerHTML = `<span style="color:#ef4444;">Código não reconhecido!</span>`;
-                }
-            }
-        }
-
-        function onScanError(err) {}
-
-        function fecharScanner() {
-            if (html5QrCode && scannerAtivo) {
-                try {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        scannerAtivo = false;
-                        document.getElementById('scannerContainer').style.display = 'none';
-                    }).catch(() => { scannerAtivo = false;
-                        document.getElementById('scannerContainer').style.display = 'none'; });
-                } catch (e) { scannerAtivo = false;
-                    document.getElementById('scannerContainer').style.display = 'none'; }
-            } else {
-                document.getElementById('scannerContainer').style.display = 'none';
-            }
-        }
-
-        function reiniciarScanner() { fecharScanner();
-            setTimeout(() => abrirScanner(), 500); }
 
         // ============================================================
         //  PRESENÇAS
@@ -2708,7 +4235,7 @@
             showToast(`✅ Presença confirmada: ${aluno.nome}`);
 
             if (enviarNotif && data.config.notifAutomatica && data.config.whatsappNumero && aluno.whatsapp) {
-                enviarNotificacaoWhatsApp(aluno);
+                enviarWhatsAppAluno(aluno.id);
             }
             return true;
         }
@@ -2726,38 +4253,9 @@
             if (confirmado) input.value = '';
         }
 
-        function enviarNotificacaoWhatsApp(aluno) {
-            const mensagem = data.config.mensagemPadrao ||
-                `Prezado(a) ${aluno.pai}, ${aluno.nome} esteve presente no treino hoje! 🏆⚽`;
-            const numeroDestino = aluno.whatsapp.replace(/\D/g, '');
-            window.open(`https://wa.me/55${numeroDestino}?text=${encodeURIComponent(mensagem)}`, '_blank');
-
-            const notificacao = {
-                id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                alunoId: aluno.id,
-                alunoNome: aluno.nome,
-                destinatario: aluno.pai,
-                mensagem: mensagem,
-                canal: 'whatsapp',
-                destino: aluno.whatsapp,
-                data: new Date().toISOString(),
-                status: 'enviado',
-                enviadoPor: currentUser ? currentUser.nome : 'Sistema'
-            };
-            data.notificacoes.push(notificacao);
-            saveData();
-
-            const presenca = data.presencas.find(p => p.alunoId === aluno.id && new Date(p.data).toDateString() === new Date()
-                .toDateString());
-            if (presenca) { presenca.notificacaoEnviada = true;
-                saveData(); }
-
-            renderNotificacoes();
-            const badgeNotif = document.getElementById('badge_notificacoes');
-            if (badgeNotif) badgeNotif.textContent = data.notificacoes.length;
-            showToast(`📱 WhatsApp enviado para ${aluno.pai}`);
-        }
-
+        // ============================================================
+        //  NOTIFICAÇÕES
+        // ============================================================
         function renderNotificacoes() {
             const container = document.getElementById('listaNotificacoes');
             if (data.notificacoes.length === 0) {
@@ -2767,7 +4265,7 @@
             }
             const notifs = [...data.notificacoes].reverse();
             container.innerHTML = notifs.slice(0, 50).map(n =>
-                `<div class="notificacao-item"><div style="display:flex;justify-content:space-between;"><div class="notif-msg"><i class="${n.canal === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-envelope'}" style="color:${n.canal === 'whatsapp' ? '#25D366' : '#ea4335'};"></i> <strong>${n.alunoNome}</strong> - ${n.destinatario}</div><span class="notif-time">${new Date(n.data).toLocaleString('pt-BR')}</span></div><div style="font-size:13px;color:var(--gray-dark);margin-top:4px;padding-left:24px;">${n.mensagem.length > 100 ? n.mensagem.substring(0,100)+'...' : n.mensagem}</div></div>`
+                `<div class="notificacao-item" style="padding:8px 0;border-bottom:1px solid #f0f2f5;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;"><div class="notif-msg"><i class="${n.canal === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-envelope'}" style="color:${n.canal === 'whatsapp' ? '#25D366' : '#ea4335'};"></i> <strong>${n.alunoNome}</strong> - ${n.destinatario}</div><span class="notif-time" style="font-size:12px;color:var(--gray-dark);">${new Date(n.data).toLocaleString('pt-BR')}</span></div><div style="font-size:13px;color:var(--gray-dark);margin-top:4px;padding-left:24px;">${n.mensagem.length > 100 ? n.mensagem.substring(0,100)+'...' : n.mensagem}</div></div>`
                 ).join('');
         }
 
@@ -2876,8 +4374,9 @@
         // ============================================================
         function exportarBackup() {
             const dados = { usuarios: data.usuarios, alunos: data.alunos, presencas: data.presencas,
-                notificacoes: data.notificacoes, config: data.config, proximoNumeroAluno: data.proximoNumeroAluno,
-                proximoNumeroUsuario: data.proximoNumeroUsuario, exportadoEm: new Date().toISOString() };
+                notificacoes: data.notificacoes, whatsappMessages: data.whatsappMessages, config: data.config,
+                proximoNumeroAluno: data.proximoNumeroAluno, proximoNumeroUsuario: data.proximoNumeroUsuario,
+                exportadoEm: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -2921,6 +4420,7 @@
                     data.alunos = importedData.alunos || [];
                     data.presencas = importedData.presencas || [];
                     data.notificacoes = importedData.notificacoes || [];
+                    data.whatsappMessages = importedData.whatsappMessages || [];
                     data.config = importedData.config || data.config;
                     data.proximoNumeroAluno = importedData.proximoNumeroAluno || 1;
                     data.proximoNumeroUsuario = importedData.proximoNumeroUsuario || 2;
@@ -3006,9 +4506,8 @@
                     saveData();
                     renderAlunos();
                     renderDashboard();
-                    renderCategoriasSelects();
-                    renderRelatorio();
                     carregarCarteirinhas();
+                    renderRelatorio();
                     const badgeAlunos = document.getElementById('badge_alunos');
                     if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
                     showToast(`✅ ${importados} alunos importados!`);
@@ -3044,10 +4543,31 @@
                 </div>
             `;
 
+            const horarioContainer = document.getElementById('configHorariosCategoria');
+            horarioContainer.innerHTML = data.config.categorias.map((cat, index) => {
+                const horario = data.config.horariosCategoria[cat.nome] || { inicio: '08:00', fim: '09:00' };
+                return `
+                    <div class="config-item">
+                        <span>${cat.nome}</span>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="time" id="horarioInicio_${index}" value="${horario.inicio || '08:00'}" style="width:80px;padding:4px 8px;border:2px solid #e5e7eb;border-radius:6px;">
+                            <span style="color:var(--gray-dark);">às</span>
+                            <input type="time" id="horarioFim_${index}" value="${horario.fim || '09:00'}" style="width:80px;padding:4px 8px;border:2px solid #e5e7eb;border-radius:6px;">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
             document.getElementById('diasTreino').value = data.config.diasTreino || 'Segunda, Terça, Quarta, Quinta, Sexta';
             document.getElementById('whatsappNumero').value = data.config.whatsappNumero || '111946359524';
             document.getElementById('mensagemPadrao').value = data.config.mensagemPadrao || '';
             document.getElementById('notifAutomatica').checked = data.config.notifAutomatica !== false;
+
+            // Configurações do EmailJS
+            const emailjsConfig = data.config.emailjs || {};
+            document.getElementById('emailjsServiceId').value = emailjsConfig.serviceId || '';
+            document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
+            document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
         }
 
         function adicionarCategoria() {
@@ -3060,7 +4580,7 @@
             data.config.categorias.push({ nome, idadeMin: min, idadeMax: max });
             saveData();
             renderConfiguracoes();
-            renderCategoriasSelects();
+            carregarCarteirinhas();
             showToast('Categoria adicionada!');
         }
 
@@ -3070,22 +4590,46 @@
             data.config.categorias.splice(index, 1);
             saveData();
             renderConfiguracoes();
-            renderCategoriasSelects();
+            carregarCarteirinhas();
             showToast('Categoria removida');
         }
 
         function salvarConfiguracoes() {
             data.config.categorias.forEach((cat, index) => {
-                const min = parseInt(document.getElementById(`catMin_${index}`)?.value);
-                const max = parseInt(document.getElementById(`catMax_${index}`)?.value);
-                if (!isNaN(min) && !isNaN(max) && min <= max) { cat.idadeMin = min;
-                    cat.idadeMax = max; }
+                const min = document.getElementById(`catMin_${index}`)?.value;
+                const max = document.getElementById(`catMax_${index}`)?.value;
+                if (min && max) { cat.idadeMin = parseInt(min);
+                    cat.idadeMax = parseInt(max); }
+            });
+
+            data.config.categorias.forEach((cat, index) => {
+                const inicio = document.getElementById(`horarioInicio_${index}`)?.value;
+                const fim = document.getElementById(`horarioFim_${index}`)?.value;
+                if (inicio && fim) {
+                    data.config.horariosCategoria[cat.nome] = { inicio, fim };
+                }
             });
 
             data.config.diasTreino = document.getElementById('diasTreino').value.trim();
             data.config.whatsappNumero = document.getElementById('whatsappNumero').value.trim();
             data.config.mensagemPadrao = document.getElementById('mensagemPadrao').value.trim();
             data.config.notifAutomatica = document.getElementById('notifAutomatica').checked;
+
+            // Salvar EmailJS
+            const serviceId = document.getElementById('emailjsServiceId').value.trim();
+            const templateId = document.getElementById('emailjsTemplateId').value.trim();
+            const publicKey = document.getElementById('emailjsPublicKey').value.trim();
+
+            if (serviceId && templateId && publicKey) {
+                data.config.emailjs = { serviceId, templateId, publicKey };
+                try {
+                    if (typeof emailjs !== 'undefined' && emailjs.init) {
+                        emailjs.init(publicKey);
+                    }
+                } catch (e) {
+                    console.warn('Erro ao inicializar EmailJS:', e);
+                }
+            }
 
             saveData();
             showToast('Configurações salvas!');
@@ -3102,38 +4646,43 @@
                 return;
             }
 
-            container.innerHTML = `
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                        <thead><tr style="background:var(--gray);">
-                            <th style="padding:8px 12px;">Usuário</th>
-                            <th style="padding:8px 12px;">Nome</th>
-                            <th style="padding:8px 12px;">Perfil</th>
-                            <th style="padding:8px 12px;">E-mail</th>
-                            <th style="padding:8px 12px;text-align:center;">Status</th>
-                            <th style="padding:8px 12px;">Ações</th>
-                        </tr></thead>
-                        <tbody>
-                            ${data.usuarios.map(u => `
-                                <tr style="border-bottom:1px solid #e5e7eb;">
-                                    <td style="padding:8px 12px;font-weight:600;">${u.usuario || u.email}</td>
-                                    <td style="padding:8px 12px;">${u.nome} ${u.id === 'admin' ? '👑' : ''}</td>
-                                    <td style="padding:8px 12px;"><span class="badge-categoria">${u.perfil}</span></td>
-                                    <td style="padding:8px 12px;color:var(--gray-dark);">${u.email}</td>
-                                    <td style="padding:8px 12px;text-align:center;">
-                                        ${u.primeiroAcesso ? '<span style="background:#fef3c7;color:#d97706;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;">Pendente</span>' : '<span style="background:#dcfce7;color:#16a34a;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;">Ativo</span>'}
-                                    </td>
-                                    <td style="padding:8px 12px;text-align:center;">
-                                        ${u.id !== 'admin' ? `
-                                            <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')"><i class="fas fa-trash"></i></button>
-                                        ` : `<span style="font-size:12px;color:var(--secondary);font-weight:600;">Admin</span>`}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            const isAdmin = currentUser && currentUser.perfil === 'Administrador';
+
+            container.innerHTML = data.usuarios.map(u => {
+                const podeEditar = isAdmin || u.id === currentUser?.id;
+                return `
+                    <div class="usuario-item">
+                        <div class="usuario-info">
+                            <div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}</div>
+                            <div class="usuario-dados">
+                                <div class="nome">${u.nome} ${u.id === 'admin' ? '👑' : ''}</div>
+                                <div class="email">${u.email} • ${u.usuario || u.email}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span class="usuario-perfil">${u.perfil}</span>
+                            <span class="usuario-status ${u.primeiroAcesso ? 'pendente' : 'ativo'}">
+                                ${u.primeiroAcesso ? '⏳ Pendente' : '✅ Ativo'}
+                            </span>
+                        </div>
+                        <div class="usuario-actions">
+                            ${u.id !== 'admin' ? `
+                                <button class="btn btn-permissoes btn-sm" onclick="abrirPermissoesUsuario('${u.id}')" title="Gerenciar Permissões">
+                                    <i class="fas fa-user-lock"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="abrirAlterarSenhaUsuario('${u.id}')" title="Alterar Senha">
+                                    <i class="fas fa-key"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : `
+                                <span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function openModalUsuario() {
@@ -3146,6 +4695,16 @@
             document.getElementById('usuarioEditId').value = '';
             document.getElementById('usuarioForm').reset();
             document.getElementById('usuarioSenha').placeholder = 'Deixe em branco para gerar';
+
+            document.getElementById('permAlunos').checked = true;
+            document.getElementById('permPresencas').checked = true;
+            document.getElementById('permCarteirinhas').checked = true;
+            document.getElementById('permRelatorios').checked = true;
+            document.getElementById('permNotificacoes').checked = true;
+            document.getElementById('permBackup').checked = true;
+            document.getElementById('permConfiguracoes').checked = false;
+            document.getElementById('permUsuarios').checked = false;
+            document.getElementById('permExcluirAlunos').checked = true;
         }
 
         function salvarUsuario(e) {
@@ -3160,14 +4719,32 @@
             const perfil = document.getElementById('usuarioPerfil').value;
             const senhaInput = document.getElementById('usuarioSenha').value.trim();
 
+            const permissoes = {
+                alunos: document.getElementById('permAlunos').checked,
+                presencas: document.getElementById('permPresencas').checked,
+                carteirinhas: document.getElementById('permCarteirinhas').checked,
+                relatorios: document.getElementById('permRelatorios').checked,
+                notificacoes: document.getElementById('permNotificacoes').checked,
+                backup: document.getElementById('permBackup').checked,
+                configuracoes: document.getElementById('permConfiguracoes').checked,
+                usuarios: document.getElementById('permUsuarios').checked,
+                excluirAlunos: document.getElementById('permExcluirAlunos').checked
+            };
+
             if (!nome || !email) { showToast('Nome e e-mail obrigatórios', 'error'); return false; }
 
-            const emailExists = data.usuarios.some(u => u.email === email);
+            const emailExists = data.usuarios.some(u => u.email.toLowerCase() === email.toLowerCase());
             if (emailExists) { showToast('E-mail já cadastrado', 'error'); return false; }
+
+            if (senhaInput && !validarSenha(senhaInput)) {
+                showToast('Senha deve ter mínimo 6 caracteres, com letra, número e caractere especial', 'error');
+                return false;
+            }
 
             const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
             const usuarioGerado = 'user' + numero;
-            const senha = senhaInput || Math.random().toString(36).slice(-8).toUpperCase();
+            const senha = senhaInput || Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36)
+                .slice(-4).toUpperCase();
 
             data.usuarios.push({
                 id: 'user_' + Date.now(),
@@ -3176,6 +4753,7 @@
                 perfil: perfil,
                 usuario: usuarioGerado,
                 senha: senha,
+                permissoes: permissoes,
                 criadoEm: new Date().toISOString(),
                 primeiroAcesso: true
             });
@@ -3193,12 +4771,113 @@
                 return;
             }
             if (id === 'admin') { showToast('Não é possível excluir o admin', 'error'); return; }
-            if (!confirm('Tem certeza?')) return;
+            if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
 
             data.usuarios = data.usuarios.filter(u => u.id !== id);
             saveData();
             renderUsuarios();
             showToast('Usuário excluído');
+        }
+
+        function abrirAlterarSenhaUsuario(userId) {
+            if (!currentUser || currentUser.perfil !== 'Administrador') {
+                showToast('Apenas administradores podem alterar senhas', 'error');
+                return;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+
+            document.getElementById('alterarSenhaUserId').value = userId;
+            document.getElementById('alterarSenhaUserNome').value = user.nome;
+            document.getElementById('novaSenhaUsuario').value = '';
+            document.getElementById('confirmarSenhaUsuario').value = '';
+            document.getElementById('modalAlterarSenhaUsuario').classList.add('active');
+        }
+
+        function alterarSenhaUsuarioAdmin(e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('alterarSenhaUserId').value;
+            const novaSenha = document.getElementById('novaSenhaUsuario').value;
+            const confirmar = document.getElementById('confirmarSenhaUsuario').value;
+
+            if (!validarSenha(novaSenha)) {
+                showToast('Senha deve ter mínimo 6 caracteres, com letra, número e caractere especial', 'error');
+                return false;
+            }
+
+            if (novaSenha !== confirmar) {
+                showToast('As senhas não coincidem', 'error');
+                return false;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return false; }
+
+            user.senha = novaSenha;
+            user.primeiroAcesso = false;
+            saveData();
+            renderUsuarios();
+            closeModal('modalAlterarSenhaUsuario');
+            showToast(`✅ Senha de ${user.nome} alterada com sucesso!`);
+            return false;
+        }
+
+        // ============================================================
+        //  PERMISSÕES DO USUÁRIO (NOVO)
+        // ============================================================
+        function abrirPermissoesUsuario(userId) {
+            if (!currentUser || currentUser.perfil !== 'Administrador') {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+
+            document.getElementById('permissoesUsuarioId').value = userId;
+            document.getElementById('permissoesUsuarioNome').value = user.nome;
+            document.getElementById('permissoesUsuarioPerfil').value = user.perfil;
+
+            const p = user.permissoes || {};
+            document.getElementById('permEditAlunos').checked = p.alunos !== false;
+            document.getElementById('permEditPresencas').checked = p.presencas !== false;
+            document.getElementById('permEditCarteirinhas').checked = p.carteirinhas !== false;
+            document.getElementById('permEditRelatorios').checked = p.relatorios !== false;
+            document.getElementById('permEditNotificacoes').checked = p.notificacoes !== false;
+            document.getElementById('permEditBackup').checked = p.backup !== false;
+            document.getElementById('permEditConfiguracoes').checked = p.configuracoes === true;
+            document.getElementById('permEditUsuarios').checked = p.usuarios === true;
+            document.getElementById('permEditExcluirAlunos').checked = p.excluirAlunos !== false;
+
+            document.getElementById('modalPermissoesUsuario').classList.add('active');
+        }
+
+        function salvarPermissoesUsuario(e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('permissoesUsuarioId').value;
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return false; }
+
+            user.permissoes = {
+                alunos: document.getElementById('permEditAlunos').checked,
+                presencas: document.getElementById('permEditPresencas').checked,
+                carteirinhas: document.getElementById('permEditCarteirinhas').checked,
+                relatorios: document.getElementById('permEditRelatorios').checked,
+                notificacoes: document.getElementById('permEditNotificacoes').checked,
+                backup: document.getElementById('permEditBackup').checked,
+                configuracoes: document.getElementById('permEditConfiguracoes').checked,
+                usuarios: document.getElementById('permEditUsuarios').checked,
+                excluirAlunos: document.getElementById('permEditExcluirAlunos').checked
+            };
+
+            saveData();
+            closeModal('modalPermissoesUsuario');
+            renderUsuarios();
+            showToast(`✅ Permissões de ${user.nome} atualizadas!`);
+            return false;
         }
 
         // ============================================================
@@ -3229,7 +4908,6 @@
                 saveData();
             }
 
-            // Se não houver alunos, adicionar exemplos
             if (data.alunos.length === 0) {
                 const exemplos = [
                     { nome: 'João Pedro Silva', pai: 'Carlos Silva', telefone: '(11) 99999-1111',
@@ -3257,7 +4935,6 @@
                 saveData();
             }
 
-            // Adicionar algumas presenças
             if (data.presencas.length === 0 && data.alunos.length > 0) {
                 const hoje = new Date().toISOString();
                 data.alunos.slice(0, 3).forEach((aluno, i) => {
@@ -3275,7 +4952,8 @@
                 saveData();
             }
 
-            // Mostrar login
+            if (!data.whatsappMessages) data.whatsappMessages = [];
+
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
             showLogin();
@@ -3285,6 +4963,8 @@
             console.log('📊 Alunos:', data.alunos.length);
             console.log('📋 Sistema pronto!');
             console.log('💡 Use o usuário: gleuber | Senha: Opala77@2056');
+            console.log('📱 WhatsApp integrado com botão flutuante!');
+            console.log('📧 Recuperação de senha por e-mail via EmailJS configurável!');
         });
     </script>
 
