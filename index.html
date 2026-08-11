@@ -1,0 +1,3292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vila Real Futsal - Gestão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #0f1b2d;
+            --secondary: #d4a020;
+            --white: #ffffff;
+            --gray: #f0f2f5;
+            --gray-dark: #6b7280;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background: #eef1f5;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            min-height: 100vh;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 0 20px 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-brand .logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            color: var(--white);
+        }
+
+        .sidebar-brand .brand-text h2 {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-brand .brand-text h2 span {
+            color: var(--secondary);
+        }
+
+        .sidebar-brand .brand-text small {
+            font-size: 10px;
+            opacity: 0.6;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .sidebar-menu .menu-label {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 12px 12px 6px 12px;
+            font-weight: 700;
+        }
+
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+        }
+
+        .sidebar-menu .menu-item.active {
+            background: var(--secondary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .sidebar-menu .menu-item.active .badge {
+            background: rgba(15, 27, 45, 0.2);
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--white);
+        }
+
+        .sidebar-footer .user-info .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .sidebar-footer .user-info .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer .user-info .user-role {
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        .sidebar-footer .btn-logout {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .sidebar-footer .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* ===== MAIN ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 24px 32px 32px 32px;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .top-header .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .top-header .page-title p {
+            color: var(--gray-dark);
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .top-header .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-header .header-actions .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            border-radius: 10px;
+            padding: 8px 16px;
+            box-shadow: var(--shadow);
+            gap: 8px;
+        }
+
+        .top-header .header-actions .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            background: transparent;
+            min-width: 180px;
+        }
+
+        .top-header .header-actions .search-box i {
+            color: var(--gray-dark);
+        }
+
+        /* ===== CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--secondary);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .stat-card .stat-top .number {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-card .stat-top .icon {
+            font-size: 28px;
+            color: var(--secondary);
+            opacity: 0.6;
+        }
+
+        .stat-card .label {
+            color: var(--gray-dark);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .double-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card-header h3 i {
+            color: var(--secondary);
+            margin-right: 8px;
+        }
+
+        .card-header .card-action {
+            font-size: 12px;
+            color: var(--secondary);
+            cursor: pointer;
+            font-weight: 600;
+            background: none;
+            border: none;
+        }
+
+        .card-header .card-action:hover {
+            color: #f5d060;
+        }
+
+        /* ===== BOTÕES ===== */
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #1a2d4a;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: #f5d060;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+
+        .btn-scan {
+            background: #1a73e8;
+            color: white;
+            font-size: 16px;
+            padding: 14px 28px;
+        }
+
+        .btn-scan:hover {
+            background: #1557b0;
+            transform: scale(1.02);
+        }
+
+        /* ===== LISTAS ===== */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .list-item .item-info .item-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .list-item .item-info .item-text .name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .list-item .item-info .item-text .sub {
+            font-size: 12px;
+            color: var(--gray-dark);
+        }
+
+        .list-item .item-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 12px;
+        }
+
+        .list-item .item-badge.cat {
+            background: #e8f0fe;
+            color: #1a2d4a;
+        }
+
+        .list-item .item-badge.presente {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            background: var(--gray);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        .quick-action:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .quick-action i {
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .quick-action:hover i {
+            color: var(--primary);
+        }
+
+        /* ===== ALUNOS GRID ===== */
+        .alunos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .aluno-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .aluno-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .aluno-card .badge-categoria {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .aluno-card .aluno-nome {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .aluno-card .aluno-info {
+            font-size: 13px;
+            color: var(--gray-dark);
+            margin: 3px 0;
+        }
+
+        .aluno-card .aluno-info i {
+            width: 18px;
+            color: var(--secondary);
+        }
+
+        .aluno-card .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== CARTEIRINHA ===== */
+        .carteirinha-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .carteirinha {
+            background: linear-gradient(135deg, #0f1b2d 0%, #1a2d4a 100%);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            color: var(--white);
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--secondary);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .carteirinha .crt-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .carteirinha .crt-header .crt-foto {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #f5d060;
+            flex-shrink: 0;
+            background: var(--white);
+        }
+
+        .carteirinha .crt-header .crt-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carteirinha .crt-header .crt-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .carteirinha .crt-header .crt-title span {
+            color: var(--secondary);
+        }
+
+        .carteirinha .crt-header .crt-title small {
+            display: block;
+            font-size: 10px;
+            opacity: 0.6;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .carteirinha .crt-body {
+            display: flex;
+            gap: 20px;
+        }
+
+        .carteirinha .crt-body .crt-info {
+            flex: 1;
+        }
+
+        .carteirinha .crt-body .crt-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .carteirinha .crt-body .crt-info .info-row .label {
+            opacity: 0.5;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .carteirinha .crt-body .crt-info .info-row .value {
+            font-weight: 600;
+        }
+
+        .carteirinha .crt-body .crt-qr {
+            flex-shrink: 0;
+            background: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carteirinha .crt-body .crt-qr canvas {
+            width: 110px !important;
+            height: 110px !important;
+        }
+
+        .carteirinha .crt-footer {
+            text-align: center;
+            font-size: 9px;
+            opacity: 0.4;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 12px;
+            margin-top: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== SCANNER ===== */
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .scanner-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+
+        .scanner-overlay .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--secondary);
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .scanner-overlay .corner.tl {
+            top: -3px;
+            left: -3px;
+            border-top-width: 4px;
+            border-left-width: 4px;
+        }
+
+        .scanner-overlay .corner.tr {
+            top: -3px;
+            right: -3px;
+            border-top-width: 4px;
+            border-right-width: 4px;
+        }
+
+        .scanner-overlay .corner.bl {
+            bottom: -3px;
+            left: -3px;
+            border-bottom-width: 4px;
+            border-left-width: 4px;
+        }
+
+        .scanner-overlay .corner.br {
+            bottom: -3px;
+            right: -3px;
+            border-bottom-width: 4px;
+            border-right-width: 4px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(0.92) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray-dark);
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        /* ===== FORMULÁRIOS ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(212, 160, 32, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideUp 0.3s ease;
+            border-left: 4px solid var(--secondary);
+            max-width: 400px;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success {
+            border-left-color: #22c55e;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-dark);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--secondary);
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ===== LOGIN ===== */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f1b2d, #1a2d4a);
+            padding: 20px;
+            width: 100%;
+        }
+
+        .login-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px 44px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-box .login-brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-box .login-brand .logo-big {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 28px;
+            color: var(--primary);
+            margin: 0 auto 12px;
+            border: 3px solid #f5d060;
+        }
+
+        .login-box .login-brand h2 {
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .login-box .login-brand h2 span {
+            color: var(--secondary);
+        }
+
+        .login-box .login-brand p {
+            color: var(--gray-dark);
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 18px;
+        }
+
+        .login-box .form-group label {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .login-box .form-group input {
+            border: 2px solid #e5e7eb;
+            padding: 12px 16px;
+            font-size: 15px;
+        }
+
+        .login-box .form-group input:focus {
+            border-color: var(--secondary);
+        }
+
+        .login-box .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 14px;
+            font-size: 16px;
+        }
+
+        .login-box .register-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--gray-dark);
+        }
+
+        .login-box .register-link a {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .login-box .register-link a:hover {
+            color: var(--secondary);
+        }
+
+        .login-box .forgot-password {
+            text-align: right;
+            margin-top: 4px;
+            font-size: 13px;
+        }
+
+        .login-box .forgot-password a {
+            color: var(--gray-dark);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .login-box .forgot-password a:hover {
+            color: var(--secondary);
+        }
+
+        /* ===== PASSWORD WRAPPER ===== */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
+        .password-wrapper .toggle-password {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: var(--gray-dark);
+            transition: all 0.3s;
+            font-size: 18px;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .password-wrapper .toggle-password:hover {
+            color: var(--secondary);
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 1024px) {
+            .double-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                padding: 12px 0;
+            }
+            .sidebar .sidebar-brand .brand-text,
+            .sidebar .sidebar-menu .menu-item span,
+            .sidebar .sidebar-menu .menu-label,
+            .sidebar .sidebar-footer .user-info .user-name,
+            .sidebar .sidebar-footer .user-info .user-role,
+            .sidebar .sidebar-footer .btn-logout span {
+                display: none;
+            }
+            .sidebar .sidebar-brand {
+                padding: 0 10px 16px 10px;
+                justify-content: center;
+            }
+            .sidebar .sidebar-brand .logo {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            .sidebar .sidebar-menu .menu-item {
+                padding: 10px 12px;
+                justify-content: center;
+            }
+            .sidebar .sidebar-menu .menu-item i {
+                font-size: 18px;
+                margin: 0;
+            }
+            .sidebar .sidebar-footer {
+                padding: 12px 10px;
+            }
+            .sidebar .sidebar-footer .user-info .avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            .sidebar .sidebar-footer .btn-logout {
+                padding: 6px;
+                font-size: 0;
+            }
+            .sidebar .sidebar-footer .btn-logout i {
+                font-size: 16px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                padding: 16px;
+            }
+
+            .top-header .page-title h1 {
+                font-size: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .carteirinha .crt-body {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .scanner-overlay {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .login-box {
+                padding: 24px;
+            }
+            .alunos-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+            .top-header .header-actions .search-box {
+                width: 100%;
+            }
+            .top-header .header-actions .search-box input {
+                min-width: 100px;
+                width: 100%;
+            }
+            .top-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-header .header-actions {
+                flex-wrap: wrap;
+            }
+            .top-header .header-actions .search-box {
+                flex: 1;
+            }
+            .scanner-overlay {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* ===== PÁGINAS ===== */
+        .page {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-badge.presente {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.ausente {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .notificacao-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .notificacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .notificacao-item .notif-time {
+            font-size: 11px;
+            color: var(--gray-dark);
+        }
+
+        .notificacao-item .notif-msg {
+            font-size: 13px;
+        }
+
+        .notificacao-item .notif-msg i {
+            color: var(--secondary);
+            margin-right: 6px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--secondary);
+            background: var(--gray);
+        }
+
+        .file-upload-area i {
+            font-size: 32px;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+
+        .file-upload-area p {
+            color: var(--gray-dark);
+            font-size: 13px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--gray);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Mensagem</span>
+    </div>
+
+    <!-- ===== LOGIN ===== -->
+    <div id="loginContainer" class="login-page">
+        <div class="login-box">
+            <div class="login-brand">
+                <div class="logo-big">⚽</div>
+                <h2>VILA <span>REAL</span></h2>
+                <p>Futsal · Gestão de Presenças</p>
+            </div>
+
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Usuário</label>
+                    <input type="text" id="loginUser" placeholder="Digite seu usuário" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="loginError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+
+            <div class="forgot-password">
+                <a onclick="showRecuperarSenha()"><i class="fas fa-key"></i> Esqueceu a senha?</a>
+            </div>
+
+            <div class="register-link" style="margin-top:8px;font-size:12px;color:#6b7280;">
+                <i class="fas fa-shield-alt"></i> Sistema seguro
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RECUPERAR SENHA ===== -->
+    <div id="recuperarSenhaContainer" class="login-page" style="display:none;">
+        <div class="login-box">
+            <div class="login-brand">
+                <div class="logo-big">⚽</div>
+                <h2>VILA <span>REAL</span></h2>
+                <p>Recuperar Senha</p>
+            </div>
+
+            <form id="recuperarSenhaForm" onsubmit="return handleRecuperarSenha(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> E-mail</label>
+                    <input type="email" id="recuperarEmail" placeholder="Digite seu e-mail" required>
+                </div>
+                <div id="recuperarError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <div id="recuperarSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-paper-plane"></i> Enviar Código
+                </button>
+            </form>
+
+            <div class="register-link">
+                <a onclick="showLogin()"><i class="fas fa-arrow-left"></i> Voltar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">⚽</div>
+            <div class="brand-text">
+                <h2>VILA <span>REAL</span></h2>
+                <small>Futsal</small>
+            </div>
+        </div>
+
+        <div class="sidebar-menu" id="sidebarMenu">
+            <!-- Menu renderizado por JavaScript -->
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">G</div>
+                <div>
+                    <div class="user-name" id="userName">Gleuber Andrade</div>
+                    <div class="user-role" id="userRole">Administrador</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content" id="mainContent">
+
+        <div class="top-header">
+            <div class="page-title">
+                <h1 id="pageTitle">Dashboard</h1>
+                <p id="pageSubtitle">Visão geral do sistema</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar aluno..." id="searchInput" oninput="buscarAluno(this.value)">
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')">
+                    <i class="fas fa-plus"></i> Novo Aluno
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== DASHBOARD ===== -->
+        <div class="page active" id="page-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card" onclick="mudarPagina('alunos')">
+                    <div class="stat-top">
+                        <div class="number" id="totalAlunos">0</div>
+                        <div class="icon"><i class="fas fa-user-graduate"></i></div>
+                    </div>
+                    <div class="label">Alunos Ativos</div>
+                </div>
+                <div class="stat-card" onclick="mudarPagina('alunos')">
+                    <div class="stat-top">
+                        <div class="number" id="totalCategorias">0</div>
+                        <div class="icon"><i class="fas fa-tags"></i></div>
+                    </div>
+                    <div class="label">Categorias</div>
+                </div>
+                <div class="stat-card" onclick="mudarPagina('presencas')">
+                    <div class="stat-top">
+                        <div class="number" id="presencasHoje">0</div>
+                        <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                    </div>
+                    <div class="label">Presenças Hoje</div>
+                </div>
+                <div class="stat-card" onclick="mudarPagina('relatorios')">
+                    <div class="stat-top">
+                        <div class="number" id="frequenciaMedia">0%</div>
+                        <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="label">Frequência Média</div>
+                </div>
+            </div>
+
+            <div class="double-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Alunos por Categoria</h3>
+                        <button class="card-action" onclick="mudarPagina('alunos')">Ver todas</button>
+                    </div>
+                    <div style="height:160px;" id="categoriaChartContainer"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Próximos Treinos</h3>
+                        <button class="card-action" onclick="mudarPagina('configuracoes')">Ver todos</button>
+                    </div>
+                    <div id="proximosTreinos">
+                        <div class="list-item">
+                            <div class="item-info">
+                                <div><i class="fas fa-futbol" style="color:var(--secondary);"></i></div>
+                                <div class="item-text">
+                                    <div class="name">Treino Sub-10</div>
+                                    <div class="sub">10/05/2025 (Sáb) - 09:00</div>
+                                </div>
+                            </div>
+                            <span class="item-badge cat">Ginásio</span>
+                        </div>
+                        <div class="list-item">
+                            <div class="item-info">
+                                <div><i class="fas fa-futbol" style="color:var(--secondary);"></i></div>
+                                <div class="item-text">
+                                    <div class="name">Treino Sub-12</div>
+                                    <div class="sub">10/05/2025 (Sáb) - 10:30</div>
+                                </div>
+                            </div>
+                            <span class="item-badge cat">Ginásio</span>
+                        </div>
+                        <div class="list-item">
+                            <div class="item-info">
+                                <div><i class="fas fa-futbol" style="color:var(--secondary);"></i></div>
+                                <div class="item-text">
+                                    <div class="name">Treino Sub-14</div>
+                                    <div class="sub">11/05/2025 (Dom) - 09:00</div>
+                                </div>
+                            </div>
+                            <span class="item-badge cat">Ginásio</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="double-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt"></i> Acessos Rápidos</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-action" onclick="openModal('modalAluno')">
+                            <i class="fas fa-user-plus"></i> Novo Aluno
+                        </button>
+                        <button class="quick-action" onclick="mudarPagina('presencas')">
+                            <i class="fas fa-qrcode"></i> Presença QR
+                        </button>
+                        <button class="quick-action" onclick="abrirScanner()">
+                            <i class="fas fa-camera"></i> Escanear QR
+                        </button>
+                        <button class="quick-action" onclick="mudarPagina('carteirinhas')">
+                            <i class="fas fa-id-card"></i> Carteirinhas
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> Últimas Presenças</h3>
+                        <button class="card-action" onclick="mudarPagina('presencas')">Ver todas</button>
+                    </div>
+                    <div id="ultimasPresencas"></div>
+                </div>
+            </div>
+
+            <div style="text-align:center;padding:20px 0 10px 0;color:var(--gray-dark);font-size:12px;">
+                <p><strong>Nosso objetivo é formar campeões</strong> — dentro e fora das quadras!</p>
+                <p style="margin-top:4px;opacity:0.5;">© 2025 Vila Real Futsal</p>
+            </div>
+        </div>
+
+        <!-- ===== ALUNOS ===== -->
+        <div class="page" id="page-alunos">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> Alunos Cadastrados</h3>
+                    <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')">
+                        <i class="fas fa-plus"></i> Novo Aluno
+                    </button>
+                </div>
+                <div id="alunosList" class="alunos-grid"></div>
+            </div>
+        </div>
+
+        <!-- ===== CARTEIRINHAS ===== -->
+        <div class="page" id="page-carteirinhas">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-id-card"></i> Carteirinha Digital</h3>
+                </div>
+                <div id="carteirinhaContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-id-card"></i>
+                        <h3>Selecione um aluno</h3>
+                        <p>Escolha um aluno para gerar a carteirinha.</p>
+                        <select id="carteirinhaSelect" onchange="gerarCarteirinha(this.value)" style="max-width:300px;margin:12px auto;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
+                    <div id="carteirinhaContent" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PRESENÇAS ===== -->
+        <div class="page" id="page-presencas">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-qrcode"></i> Confirmação de Presença</h3>
+                </div>
+
+                <div style="text-align:center;margin-bottom:16px;">
+                    <button class="btn btn-scan" onclick="abrirScanner()">
+                        <i class="fas fa-camera"></i> 📷 Abrir Câmera para Escanear QR Code
+                    </button>
+                    <p style="font-size:13px;color:var(--gray-dark);margin-top:8px;">
+                        <i class="fas fa-info-circle"></i> Aponte a câmera para o QR Code da carteirinha
+                    </p>
+                </div>
+
+                <div id="scannerContainer" style="display:none;">
+                    <div class="scanner-container">
+                        <div id="qr-reader"></div>
+                        <div class="scanner-overlay">
+                            <div class="corner tl"></div>
+                            <div class="corner tr"></div>
+                            <div class="corner bl"></div>
+                            <div class="corner br"></div>
+                        </div>
+                    </div>
+                    <div id="scannerStatus" style="text-align:center;padding:12px;font-size:14px;color:var(--gray-dark);">
+                        <i class="fas fa-spinner fa-spin"></i> Aguardando leitura...
+                    </div>
+                    <div class="scanner-controls" style="display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+                        <button class="btn btn-danger btn-sm" onclick="fecharScanner()">
+                            <i class="fas fa-times"></i> Fechar Câmera
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="reiniciarScanner()">
+                            <i class="fas fa-redo"></i> Reiniciar
+                        </button>
+                    </div>
+                </div>
+
+                <hr style="margin:20px 0;border-color:#e5e7eb;">
+
+                <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0;">
+                    <div style="display:flex;gap:10px;width:100%;max-width:500px;flex-wrap:wrap;justify-content:center;">
+                        <input type="text" id="qrCodeManual" placeholder="Ou digite o código do aluno" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
+                        <button class="btn btn-success" onclick="confirmarPresencaManual()">
+                            <i class="fas fa-check"></i> Confirmar
+                        </button>
+                    </div>
+                    <div style="font-size:13px;color:var(--gray-dark);">
+                        <i class="fas fa-info-circle"></i> Digite o número do aluno (ex: VRF-000001)
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Presenças de Hoje</h3>
+                    <span id="dataHoje" style="color:var(--gray-dark);font-size:13px;"></span>
+                </div>
+                <div id="presencasList">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-day"></i>
+                        <h3>Nenhuma presença registrada hoje</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== NOTIFICAÇÕES ===== -->
+        <div class="page" id="page-notificacoes">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bell"></i> Histórico de Notificações</h3>
+                    <button class="btn btn-danger btn-sm" onclick="limparNotificacoes()">
+                        <i class="fas fa-trash"></i> Limpar
+                    </button>
+                </div>
+                <div id="listaNotificacoes">
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>Nenhuma notificação</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RELATÓRIOS ===== -->
+        <div class="page" id="page-relatorios">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Relatório de Frequência</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <select id="filtroCategoria" onchange="renderRelatorio()" style="padding:8px 14px;border:2px solid #e5e7eb;border-radius:8px;">
+                            <option value="">Todas</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="exportarCSV()">
+                            <i class="fas fa-file-csv"></i> Exportar CSV
+                        </button>
+                    </div>
+                </div>
+                <div id="relatorioContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Nenhum dado disponível</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BACKUP ===== -->
+        <div class="page" id="page-backup">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-database"></i> Backup</h3>
+                </div>
+                <p style="color:var(--gray-dark);margin-bottom:16px;">Baixe um arquivo com todos os dados do sistema.</p>
+                <button class="btn btn-secondary" onclick="exportarBackup()">
+                    <i class="fas fa-download"></i> Baixar Backup (JSON)
+                </button>
+                <button class="btn btn-primary" onclick="exportarBackupCSV()" style="margin-left:8px;">
+                    <i class="fas fa-file-csv"></i> Baixar Backup (CSV)
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-upload"></i> Importar Backup</h3>
+                </div>
+                <div class="file-upload-area" onclick="document.getElementById('fileInputBackup').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Clique para selecionar um arquivo</p>
+                    <input type="file" id="fileInputBackup" accept=".json,.csv" style="display:none;" onchange="importarBackup(event)">
+                </div>
+                <div id="importStatus" style="margin-top:12px;display:none;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-import"></i> Importar CSV</h3>
+                </div>
+                <p style="color:var(--gray-dark);margin-bottom:16px;">Formato: nome,pai,telefone,whatsapp,email,nascimento,categoria</p>
+                <div class="file-upload-area" onclick="document.getElementById('fileInputCSV').click()">
+                    <i class="fas fa-file-csv"></i>
+                    <p>Clique para selecionar um arquivo CSV</p>
+                    <input type="file" id="fileInputCSV" accept=".csv" style="display:none;" onchange="importarAlunosCSV(event)">
+                </div>
+                <div id="csvImportStatus" style="margin-top:12px;display:none;"></div>
+            </div>
+        </div>
+
+        <!-- ===== CONFIGURAÇÕES ===== -->
+        <div class="page" id="page-configuracoes">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog"></i> Configurações</h3>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                    <div>
+                        <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
+                            <i class="fas fa-tag"></i> Categorias
+                        </h4>
+                        <div id="configCategorias"></div>
+                    </div>
+                    <div>
+                        <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
+                            <i class="fas fa-clock"></i> Dias de Treino
+                        </h4>
+                        <div class="config-item">
+                            <input type="text" id="diasTreino" value="Segunda, Terça, Quarta, Quinta, Sexta" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;width:100%;">
+                        </div>
+
+                        <div style="margin-top:16px;">
+                            <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </h4>
+                            <div class="config-item">
+                                <input type="tel" id="whatsappNumero" placeholder="(11) 99999-9999" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;width:100%;">
+                            </div>
+                            <div class="config-item">
+                                <input type="text" id="mensagemPadrao" value="Prezado(a) responsável, seu filho(a) esteve presente no treino do Vila Real Futsal hoje!" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;width:100%;">
+                            </div>
+                            <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                                <input type="checkbox" id="notifAutomatica" checked>
+                                <span style="font-size:13px;">Envio automático</span>
+                            </label>
+                        </div>
+
+                        <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== USUÁRIOS ===== -->
+        <div class="page" id="page-usuarios">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users-cog"></i> Gerenciar Usuários</h3>
+                    <button class="btn btn-secondary btn-sm" onclick="openModalUsuario()">
+                        <i class="fas fa-user-plus"></i> Novo Usuário
+                    </button>
+                </div>
+                <div id="listaUsuarios"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Senha Master</h3>
+                </div>
+                <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:var(--radius);padding:16px 20px;">
+                    <code id="senhaMasterDisplay" style="background:var(--primary);color:var(--secondary);padding:6px 16px;border-radius:8px;font-size:18px;font-weight:700;letter-spacing:2px;">••••••••</code>
+                    <button class="btn btn-secondary btn-sm" onclick="mostrarSenhaMaster()" style="margin-left:8px;">
+                        <i class="fas fa-eye"></i> Mostrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== MODAL ALUNO ===== -->
+    <div class="modal-overlay" id="modalAluno">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> <span id="modalAlunoTitle">Novo Aluno</span></h2>
+                <button class="modal-close" onclick="closeModal('modalAluno')">&times;</button>
+            </div>
+            <form id="alunoForm" onsubmit="return salvarAluno(event)">
+                <input type="hidden" id="alunoEditId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="alunoNumero" readonly style="background:#f0f2f5;">
+                    </div>
+                    <div class="form-group">
+                        <label>Nascimento</label>
+                        <input type="date" id="alunoNascimento" required onchange="calcularIdade()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="alunoNome" placeholder="Nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label>Pai/Mãe</label>
+                    <input type="text" id="alunoPai" placeholder="Nome do pai ou mãe" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="tel" id="alunoTelefone" placeholder="(99) 99999-9999" required>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp</label>
+                        <input type="tel" id="alunoWhatsapp" placeholder="(99) 99999-9999">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="alunoEmail" placeholder="responsavel@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Idade</label>
+                        <input type="text" id="alunoIdade" readonly style="background:#f0f2f5;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="text" id="alunoCategoria" readonly style="background:#f0f2f5;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL USUÁRIO ===== -->
+    <div class="modal-overlay" id="modalUsuario">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> <span id="modalUsuarioTitle">Novo Usuário</span></h2>
+                <button class="modal-close" onclick="closeModal('modalUsuario')">&times;</button>
+            </div>
+            <form id="usuarioForm" onsubmit="return salvarUsuario(event)">
+                <input type="hidden" id="usuarioEditId">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="usuarioNome" placeholder="Nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="usuarioEmail" placeholder="usuario@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Perfil</label>
+                    <select id="usuarioPerfil" required>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Pai">Pai/Responsável</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="usuarioSenha" placeholder="Deixe em branco para gerar">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('usuarioSenha', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPT ===== -->
+    <script>
+        // ============================================================
+        //  DADOS DO SISTEMA
+        // ============================================================
+        const STORAGE_KEY = 'vilaRealFutsalData_v19';
+
+        const ADMIN_DATA = {
+            id: 'admin',
+            nome: 'Gleuber Andrade',
+            email: 'gleuber.andrade@outlook.com',
+            perfil: 'Administrador',
+            usuario: 'gleuber',
+            senha: 'Opala77@2056',
+            primeiroAcesso: false
+        };
+
+        const MENU_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', page: 'dashboard' },
+            { id: 'alunos', label: 'Alunos', icon: 'fas fa-users', page: 'alunos' },
+            { id: 'carteirinhas', label: 'Carteirinhas', icon: 'fas fa-id-card', page: 'carteirinhas' },
+            { id: 'presencas', label: 'Presenças', icon: 'fas fa-qrcode', page: 'presencas' },
+            { id: 'notificacoes', label: 'Notificações', icon: 'fas fa-bell', page: 'notificacoes' },
+            { id: 'relatorios', label: 'Relatórios', icon: 'fas fa-chart-bar', page: 'relatorios' },
+            { id: 'backup', label: 'Backup', icon: 'fas fa-database', page: 'backup' },
+            { id: 'separator', label: 'Administração', isSeparator: true },
+            { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios' },
+            { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes' }
+        ];
+
+        function getDefaultData() {
+            return {
+                usuarios: [ADMIN_DATA],
+                alunos: [],
+                presencas: [],
+                notificacoes: [],
+                config: {
+                    categorias: [
+                        { nome: 'Sub-8', idadeMin: 6, idadeMax: 7 },
+                        { nome: 'Sub-10', idadeMin: 8, idadeMax: 9 },
+                        { nome: 'Sub-12', idadeMin: 10, idadeMax: 11 },
+                        { nome: 'Sub-14', idadeMin: 12, idadeMax: 13 },
+                        { nome: 'Sub-16', idadeMin: 14, idadeMax: 15 },
+                        { nome: 'Sub-18', idadeMin: 16, idadeMax: 17 }
+                    ],
+                    diasTreino: 'Segunda, Terça, Quarta, Quinta, Sexta',
+                    notifAutomatica: true,
+                    mensagemPadrao: 'Prezado(a) responsável, seu filho(a) esteve presente no treino do Vila Real Futsal hoje!',
+                    senhaMaster: 'Opala77@2056',
+                    whatsappNumero: '111946359524'
+                },
+                proximoNumeroAluno: 1,
+                proximoNumeroUsuario: 2
+            };
+        }
+
+        let data = loadData();
+        let currentUser = null;
+        let html5QrCode = null;
+        let scannerAtivo = false;
+        let mostrarSenhaFlag = false;
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    const defaults = getDefaultData();
+                    for (let key in defaults) {
+                        if (!(key in parsed)) parsed[key] = defaults[key];
+                    }
+                    const adminExists = parsed.usuarios.some(u => u.id === 'admin');
+                    if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
+                    return parsed;
+                }
+            } catch (e) { console.error('Erro ao carregar dados', e); }
+            return getDefaultData();
+        }
+
+        function saveData() {
+            try {
+                const adminExists = data.usuarios.some(u => u.id === 'admin');
+                if (!adminExists) data.usuarios.unshift(ADMIN_DATA);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) { console.error('Erro ao salvar dados', e); }
+        }
+
+        // ============================================================
+        //  TOAST
+        // ============================================================
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const message = document.getElementById('toastMessage');
+            toast.className = 'toast show ' + type;
+            message.textContent = msg;
+            const icon = toast.querySelector('i');
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        // ============================================================
+        //  TOGGLE SENHA
+        // ============================================================
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const icon = button.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ============================================================
+        //  FUNÇÕES DE LOGIN
+        // ============================================================
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('recuperarSenhaContainer').style.display = 'none';
+        }
+
+        function showRecuperarSenha() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('recuperarSenhaContainer').style.display = 'flex';
+        }
+
+        function handleRecuperarSenha(e) {
+            e.preventDefault();
+            const email = document.getElementById('recuperarEmail').value.trim();
+            const errorDiv = document.getElementById('recuperarError');
+            const successDiv = document.getElementById('recuperarSuccess');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            const admin = data.usuarios.find(u => u.perfil === 'Administrador' && u.email === email);
+            if (!admin) {
+                errorDiv.textContent = 'E-mail não encontrado';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase();
+            admin.senha = novaSenha;
+            data.config.senhaMaster = novaSenha;
+            saveData();
+
+            successDiv.innerHTML = `✅ Nova senha gerada!<br><strong style="font-size:18px;color:var(--secondary);">${novaSenha}</strong>`;
+            successDiv.style.display = 'block';
+            showToast('Nova senha gerada com sucesso!');
+            return false;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+
+            const loginUser = document.getElementById('loginUser').value.trim();
+            const loginPass = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            errorDiv.style.display = 'none';
+
+            if (!loginUser || !loginPass) {
+                errorDiv.textContent = 'Preencha todos os campos';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const user = data.usuarios.find(u =>
+                u.usuario === loginUser || u.email === loginUser
+            );
+
+            if (!user) {
+                errorDiv.textContent = 'Usuário não encontrado';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.senha !== loginPass) {
+                errorDiv.textContent = 'Senha incorreta';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            currentUser = user;
+
+            if (user.primeiroAcesso) {
+                user.primeiroAcesso = false;
+                saveData();
+            }
+
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+
+            document.getElementById('userName').textContent = user.nome;
+            document.getElementById('userRole').textContent = user.perfil;
+            document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
+
+            initSystem();
+            return false;
+        }
+
+        function logout() {
+            currentUser = null;
+            fecharScanner();
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+            showToast('Desconectado');
+        }
+
+        // ============================================================
+        //  RENDERIZAR MENU - FUNÇÃO PRINCIPAL
+        // ============================================================
+        function renderizarMenu() {
+            const container = document.getElementById('sidebarMenu');
+
+            if (!container) {
+                console.error('Container do menu não encontrado!');
+                return;
+            }
+
+            let html = '';
+
+            MENU_ITEMS.forEach((item) => {
+                if (item.isSeparator) {
+                    html += `<div class="menu-label">${item.label}</div>`;
+                    return;
+                }
+
+                html += `
+                    <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
+                        <i class="${item.icon}"></i>
+                        <span>${item.label}</span>
+                        <span class="badge" id="badge_${item.page}"></span>
+                    </button>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Atualizar badges
+            const badgeAlunos = document.getElementById('badge_alunos');
+            if (badgeAlunos) badgeAlunos.textContent = data.alunos.length || '';
+
+            const badgeNotif = document.getElementById('badge_notificacoes');
+            if (badgeNotif) badgeNotif.textContent = data.notificacoes.length || '';
+
+            // Ativar item atual
+            const currentPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
+            document.querySelectorAll('.menu-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === currentPage);
+            });
+
+            console.log('✅ Menu renderizado com sucesso!');
+            console.log('📋 Itens do menu:', document.querySelectorAll('.menu-item').length);
+        }
+
+        // ============================================================
+        //  NAVEGAÇÃO
+        // ============================================================
+        function mudarPagina(page) {
+            fecharScanner();
+
+            document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.menu-item[data-page="${page}"]`)?.classList.add('active');
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+
+            const titles = {
+                dashboard: ['Dashboard', 'Visão geral do sistema'],
+                alunos: ['Alunos', 'Gerenciamento de alunos'],
+                carteirinhas: ['Carteirinhas', 'Geração de carteirinhas'],
+                presencas: ['Presenças', 'Confirmação via QR Code'],
+                notificacoes: ['Notificações', 'Histórico de notificações'],
+                relatorios: ['Relatórios', 'Análise de frequência'],
+                backup: ['Backup', 'Exportar e importar dados'],
+                configuracoes: ['Configurações', 'Ajustes do sistema'],
+                usuarios: ['Usuários', 'Gerenciamento de usuários']
+            };
+
+            const [title, subtitle] = titles[page] || ['Página', ''];
+            document.getElementById('pageTitle').textContent = title;
+            document.getElementById('pageSubtitle').textContent = subtitle;
+
+            // Carregar conteúdo da página
+            if (page === 'relatorios') renderRelatorio();
+            if (page === 'presencas') carregarPresencasHoje();
+            if (page === 'alunos') renderAlunos();
+            if (page === 'carteirinhas') carregarCarteirinhas();
+            if (page === 'dashboard') renderDashboard();
+            if (page === 'notificacoes') renderNotificacoes();
+            if (page === 'usuarios') renderUsuarios();
+            if (page === 'configuracoes') renderConfiguracoes();
+        }
+
+        // ============================================================
+        //  INICIALIZAÇÃO DO SISTEMA
+        // ============================================================
+        function initSystem() {
+            console.log('🚀 Inicializando sistema...');
+
+            // Renderizar menu
+            renderizarMenu();
+
+            // Renderizar todas as páginas
+            renderDashboard();
+            renderAlunos();
+            renderCategoriasSelects();
+            renderConfiguracoes();
+            renderUsuarios();
+            renderRelatorio();
+            carregarPresencasHoje();
+            renderNotificacoes();
+
+            // Atualizar informações
+            document.getElementById('dataHoje').textContent = new Date().toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            document.getElementById('senhaMasterDisplay').textContent = '••••••••';
+
+            // Carregar configurações
+            if (data.config.whatsappNumero) {
+                document.getElementById('whatsappNumero').value = data.config.whatsappNumero;
+            }
+            if (data.config.mensagemPadrao) {
+                document.getElementById('mensagemPadrao').value = data.config.mensagemPadrao;
+            }
+            document.getElementById('notifAutomatica').checked = data.config.notifAutomatica !== false;
+            document.getElementById('diasTreino').value = data.config.diasTreino || 'Segunda, Terça, Quarta, Quinta, Sexta';
+
+            console.log('✅ Sistema inicializado!');
+            console.log('📊 Alunos:', data.alunos.length);
+            console.log('👥 Usuários:', data.usuarios.length);
+        }
+
+        // ============================================================
+        //  DASHBOARD
+        // ============================================================
+        function renderDashboard() {
+            document.getElementById('totalAlunos').textContent = data.alunos.length;
+            document.getElementById('totalCategorias').textContent = new Set(data.alunos.map(a => a.categoria)).size;
+
+            const hoje = new Date().toDateString();
+            const presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
+            document.getElementById('presencasHoje').textContent = presencasHoje.length;
+
+            const totalPresencas = data.presencas.length;
+            document.getElementById('frequenciaMedia').textContent = data.alunos.length > 0 ?
+                Math.round((totalPresencas / (data.alunos.length * 30)) * 100) + '%' : '0%';
+
+            // Últimas presenças
+            const ultimas = data.presencas.slice(-5).reverse();
+            const container = document.getElementById('ultimasPresencas');
+            if (ultimas.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding:20px;"><p>Nenhuma presença</p></div>';
+            } else {
+                container.innerHTML = ultimas.map(p => `
+                    <div class="list-item">
+                        <div class="item-info">
+                            <div class="item-avatar">${p.alunoNome.charAt(0)}</div>
+                            <div class="item-text">
+                                <div class="name">${p.alunoNome}</div>
+                                <div class="sub">${p.alunoNumero} · ${p.categoria}</div>
+                            </div>
+                        </div>
+                        <span class="item-badge presente">Presente</span>
+                    </div>
+                `).join('');
+            }
+
+            // Gráfico de categorias
+            const containerChart = document.getElementById('categoriaChartContainer');
+            if (data.alunos.length === 0) {
+                containerChart.innerHTML = '<div class="empty-state" style="padding:20px;"><p>Nenhum dado</p></div>';
+                return;
+            }
+
+            const catCount = {};
+            data.alunos.forEach(a => { catCount[a.categoria] = (catCount[a.categoria] || 0) + 1; });
+            const catLabels = Object.keys(catCount);
+            const catData = Object.values(catCount);
+            const maxVal = Math.max(...catData, 1);
+
+            let barsHtml = '<div style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;gap:6px;">';
+            catLabels.forEach((cat, i) => {
+                const height = (catData[i] / maxVal) * 120;
+                barsHtml += `
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+                        <div style="width:100%;max-width:40px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--secondary),#f5d060);height:${height}px;min-height:8px;"></div>
+                        <span style="font-size:10px;color:var(--gray-dark);font-weight:600;">${cat}</span>
+                    </div>
+                `;
+            });
+            barsHtml += '</div>';
+
+            containerChart.innerHTML = barsHtml;
+        }
+
+        // ============================================================
+        //  ALUNOS - CRUD
+        // ============================================================
+        function renderAlunos() {
+            const container = document.getElementById('alunosList');
+
+            if (data.alunos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Nenhum aluno</h3>
+                        <p>Clique em "Novo Aluno" para começar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = data.alunos.map(aluno => `
+                <div class="aluno-card">
+                    <span class="badge-categoria">${aluno.categoria}</span>
+                    <div class="aluno-nome">${aluno.nome}</div>
+                    <div class="aluno-info"><i class="fas fa-hashtag"></i> ${aluno.numero}</div>
+                    <div class="aluno-info"><i class="fas fa-calendar-alt"></i> ${aluno.idade} anos</div>
+                    <div class="aluno-info"><i class="fas fa-user-friends"></i> ${aluno.pai}</div>
+                    <div class="aluno-info"><i class="fas fa-phone"></i> ${aluno.telefone}</div>
+                    ${aluno.whatsapp ? `<div class="aluno-info"><i class="fab fa-whatsapp"></i> ${aluno.whatsapp}</div>` : ''}
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="verCarteirinha('${aluno.id}')">
+                            <i class="fas fa-id-card"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="editarAluno('${aluno.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="confirmarPresenca('${aluno.id}')">
+                            <i class="fas fa-check"></i> Presença
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            if (id === 'modalAluno') {
+                document.getElementById('modalAlunoTitle').textContent = 'Novo Aluno';
+                document.getElementById('alunoEditId').value = '';
+                document.getElementById('alunoForm').reset();
+                const proximo = String(data.proximoNumeroAluno).padStart(6, '0');
+                document.getElementById('alunoNumero').value = 'VRF-' + proximo;
+                document.getElementById('alunoIdade').value = '';
+                document.getElementById('alunoCategoria').value = '';
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function calcularIdade() {
+            const nasc = document.getElementById('alunoNascimento').value;
+            if (!nasc) return;
+            const hoje = new Date();
+            const nascDate = new Date(nasc);
+            let idade = hoje.getFullYear() - nascDate.getFullYear();
+            const mes = hoje.getMonth() - nascDate.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascDate.getDate())) idade--;
+            document.getElementById('alunoIdade').value = idade + ' anos';
+
+            const cat = data.config.categorias.find(c => idade >= c.idadeMin && idade <= c.idadeMax);
+            document.getElementById('alunoCategoria').value = cat ? cat.nome : 'Sem categoria';
+        }
+
+        function salvarAluno(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('alunoEditId').value;
+            const numero = document.getElementById('alunoNumero').value;
+            const nome = document.getElementById('alunoNome').value.trim();
+            const pai = document.getElementById('alunoPai').value.trim();
+            const telefone = document.getElementById('alunoTelefone').value.trim();
+            const whatsapp = document.getElementById('alunoWhatsapp').value.trim();
+            const email = document.getElementById('alunoEmail').value.trim();
+            const nascimento = document.getElementById('alunoNascimento').value;
+            const idade = parseInt(document.getElementById('alunoIdade').value) || 0;
+            const categoria = document.getElementById('alunoCategoria').value;
+
+            if (!nome || !pai || !telefone || !nascimento) {
+                showToast('Preencha todos os campos obrigatórios', 'error');
+                return false;
+            }
+
+            const aluno = {
+                id: id || 'aluno_' + Date.now(),
+                numero,
+                nome,
+                pai,
+                telefone,
+                whatsapp: whatsapp || '',
+                email: email || '',
+                nascimento,
+                idade,
+                categoria,
+                criadoEm: new Date().toISOString()
+            };
+
+            if (id) {
+                const index = data.alunos.findIndex(a => a.id === id);
+                if (index !== -1) data.alunos[index] = aluno;
+            } else {
+                data.alunos.push(aluno);
+                data.proximoNumeroAluno++;
+            }
+
+            saveData();
+            closeModal('modalAluno');
+            renderAlunos();
+            renderDashboard();
+            renderCategoriasSelects();
+            renderRelatorio();
+            carregarCarteirinhas();
+            // Atualizar badge
+            const badgeAlunos = document.getElementById('badge_alunos');
+            if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
+            showToast(id ? 'Aluno atualizado!' : 'Aluno cadastrado!');
+            return false;
+        }
+
+        function editarAluno(id) {
+            const aluno = data.alunos.find(a => a.id === id);
+            if (!aluno) return;
+            openModal('modalAluno');
+            document.getElementById('modalAlunoTitle').textContent = 'Editar Aluno';
+            document.getElementById('alunoEditId').value = aluno.id;
+            document.getElementById('alunoNumero').value = aluno.numero;
+            document.getElementById('alunoNome').value = aluno.nome;
+            document.getElementById('alunoPai').value = aluno.pai;
+            document.getElementById('alunoTelefone').value = aluno.telefone;
+            document.getElementById('alunoWhatsapp').value = aluno.whatsapp || '';
+            document.getElementById('alunoEmail').value = aluno.email || '';
+            document.getElementById('alunoNascimento').value = aluno.nascimento;
+            document.getElementById('alunoIdade').value = aluno.idade + ' anos';
+            document.getElementById('alunoCategoria').value = aluno.categoria;
+        }
+
+        function excluirAluno(id) {
+            if (!confirm('Tem certeza que deseja excluir este aluno?')) return;
+            data.alunos = data.alunos.filter(a => a.id !== id);
+            saveData();
+            renderAlunos();
+            renderDashboard();
+            renderCategoriasSelects();
+            renderRelatorio();
+            carregarCarteirinhas();
+            const badgeAlunos = document.getElementById('badge_alunos');
+            if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
+            showToast('Aluno excluído');
+        }
+
+        function buscarAluno(texto) {
+            const cards = document.querySelectorAll('.aluno-card');
+            const termo = texto.toLowerCase().trim();
+            cards.forEach(card => {
+                const nome = card.querySelector('.aluno-nome')?.textContent?.toLowerCase() || '';
+                card.style.display = nome.includes(termo) ? 'block' : 'none';
+            });
+        }
+
+        // ============================================================
+        //  CARTEIRINHA
+        // ============================================================
+        function renderCategoriasSelects() {
+            const select = document.getElementById('carteirinhaSelect');
+            const filtro = document.getElementById('filtroCategoria');
+            const categorias = [...new Set(data.alunos.map(a => a.categoria))];
+
+            [select, filtro].forEach(sel => {
+                if (!sel) return;
+                const current = sel.value;
+                sel.innerHTML = '<option value="">-- Selecione --</option>';
+                categorias.forEach(cat => {
+                    sel.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+                sel.value = current;
+            });
+        }
+
+        function carregarCarteirinhas() {
+            const select = document.getElementById('carteirinhaSelect');
+            const content = document.getElementById('carteirinhaContent');
+            const container = document.getElementById('carteirinhaContainer');
+
+            if (!select.value) {
+                content.style.display = 'none';
+                container.querySelector('.empty-state').style.display = 'block';
+                return;
+            }
+
+            const aluno = data.alunos.find(a => a.categoria === select.value);
+            if (!aluno) {
+                content.style.display = 'none';
+                container.querySelector('.empty-state').style.display = 'block';
+                return;
+            }
+
+            container.querySelector('.empty-state').style.display = 'none';
+            content.style.display = 'block';
+
+            content.innerHTML = `
+                <div class="carteirinha-wrapper">
+                    <div class="carteirinha" id="carteirinhaImpressao">
+                        <div class="crt-header">
+                            <div class="crt-foto">
+                                <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>
+                            </div>
+                            <div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div>
+                        </div>
+                        <div class="crt-body">
+                            <div class="crt-info">
+                                <div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div>
+                                <div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div>
+                                <div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div>
+                                <div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div>
+                                <div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div>
+                                <div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div>
+                            </div>
+                            <div class="crt-qr" id="qrCodeContainerCrt"></div>
+                        </div>
+                        <div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:14px;">
+                    <button class="btn btn-secondary btn-sm" onclick="imprimirCarteirinha()"><i class="fas fa-print"></i> Imprimir</button>
+                    <button class="btn btn-primary btn-sm" onclick="verCarteirinha('${aluno.id}')"><i class="fas fa-expand"></i> Ampliar</button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const containerQR = document.getElementById('qrCodeContainerCrt');
+                containerQR.innerHTML = '';
+                try {
+                    new QRCode(containerQR, {
+                        text: JSON.stringify({ id: aluno.id, numero: aluno.numero }),
+                        width: 110,
+                        height: 110,
+                        colorDark: '#0f1b2d',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch (e) {
+                    containerQR.innerHTML = `<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>`;
+                }
+            }, 100);
+        }
+
+        function gerarCarteirinha(value) {
+            carregarCarteirinhas();
+        }
+
+        function verCarteirinha(id) {
+            const aluno = data.alunos.find(a => a.id === id);
+            if (!aluno) return;
+            const win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Carteirinha - ${aluno.nome}</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#0f1b2d;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.5);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-title small{display:block;font-size:10px;opacity:0.6;font-weight:400;letter-spacing:2px;text-transform:uppercase;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}.btn-print{margin-top:16px;padding:10px 30px;background:#d4a020;border:none;border-radius:10px;font-weight:700;color:#0f1b2d;cursor:pointer;font-size:14px;}.btn-print:hover{background:#f5d060;}@media print{body{background:white;}.carteirinha{box-shadow:none;border-color:#ccc;}.btn-print{display:none;}}</style></head><body><div style="display:flex;flex-direction:column;align-items:center;"><div class="carteirinha" id="carteirinhaPrint"><div class="crt-header"><div class="crt-foto"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div></div><div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div></div><div class="crt-body"><div class="crt-info"><div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div><div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div><div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div><div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div><div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div><div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div></div><div class="crt-qr" id="qrPrintContainer"></div></div><div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div></div><button class="btn-print" onclick="window.print()">🖨️ Imprimir Carteirinha</button></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{const c=document.getElementById('qrPrintContainer');c.innerHTML='';try{new QRCode(c,{text:JSON.stringify({id:'${aluno.id}',numero:'${aluno.numero}'}),width:110,height:110,colorDark:'#0f1b2d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});}catch(e){c.innerHTML='<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>';}},200);<\/script></body></html>`);
+            win.document.close();
+        }
+
+        function imprimirCarteirinha() {
+            const conteudo = document.getElementById('carteirinhaImpressao');
+            if (!conteudo) return;
+            const win = window.open('', '_blank');
+            win.document.write(`<html><head><title>Carteirinha - Vila Real Futsal</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f2f5;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.3);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}@media print{body{background:white;}.carteirinha{box-shadow:none;}}</style></head><body>${conteudo.outerHTML}<script>window.onload=function(){window.print();setTimeout(()=>window.close(),1500);};<\/script></body></html>`);
+            win.document.close();
+        }
+
+        // ============================================================
+        //  SCANNER QR CODE
+        // ============================================================
+        function abrirScanner() {
+            const container = document.getElementById('scannerContainer');
+            const status = document.getElementById('scannerStatus');
+            container.style.display = 'block';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inicializando câmera...';
+
+            if (typeof Html5Qrcode === 'undefined') {
+                status.innerHTML = '<span style="color:#ef4444;">Biblioteca não carregada.</span>';
+                return;
+            }
+
+            try {
+                if (html5QrCode) { html5QrCode.clear();
+                    html5QrCode = null; }
+                html5QrCode = new Html5Qrcode('qr-reader');
+                const config = { fps: 15, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
+                html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
+                scannerAtivo = true;
+            } catch (err) {
+                status.innerHTML = `<span style="color:#ef4444;">Erro: ${err.message}</span>`;
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            const status = document.getElementById('scannerStatus');
+            status.innerHTML = `<span style="color:#22c55e;">QR Code identificado!</span>`;
+
+            try {
+                const data = JSON.parse(decodedText);
+                const alunoId = data.id;
+                if (alunoId) {
+                    const aluno = data.alunos.find(a => a.id === alunoId);
+                    if (aluno) {
+                        confirmarPresenca(alunoId);
+                        setTimeout(() => { fecharScanner();
+                            mudarPagina('presencas'); }, 1500);
+                    } else {
+                        status.innerHTML = `<span style="color:#ef4444;">Aluno não encontrado!</span>`;
+                    }
+                } else {
+                    const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
+                    if (aluno) {
+                        confirmarPresenca(aluno.id);
+                        setTimeout(() => { fecharScanner();
+                            mudarPagina('presencas'); }, 1500);
+                    } else {
+                        status.innerHTML = `<span style="color:#ef4444;">Código inválido!</span>`;
+                    }
+                }
+            } catch (e) {
+                const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
+                if (aluno) {
+                    confirmarPresenca(aluno.id);
+                    setTimeout(() => { fecharScanner();
+                        mudarPagina('presencas'); }, 1500);
+                } else {
+                    status.innerHTML = `<span style="color:#ef4444;">Código não reconhecido!</span>`;
+                }
+            }
+        }
+
+        function onScanError(err) {}
+
+        function fecharScanner() {
+            if (html5QrCode && scannerAtivo) {
+                try {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        scannerAtivo = false;
+                        document.getElementById('scannerContainer').style.display = 'none';
+                    }).catch(() => { scannerAtivo = false;
+                        document.getElementById('scannerContainer').style.display = 'none'; });
+                } catch (e) { scannerAtivo = false;
+                    document.getElementById('scannerContainer').style.display = 'none'; }
+            } else {
+                document.getElementById('scannerContainer').style.display = 'none';
+            }
+        }
+
+        function reiniciarScanner() { fecharScanner();
+            setTimeout(() => abrirScanner(), 500); }
+
+        // ============================================================
+        //  PRESENÇAS
+        // ============================================================
+        function confirmarPresenca(alunoId, enviarNotif = true) {
+            if (!alunoId) return;
+            const aluno = data.alunos.find(a => a.id === alunoId);
+            if (!aluno) { showToast('Aluno não encontrado', 'error'); return; }
+
+            const hoje = new Date().toISOString();
+            const jaMarcou = data.presencas.some(p => p.alunoId === alunoId && new Date(p.data).toDateString() === new Date()
+                .toDateString());
+            if (jaMarcou) { showToast(`${aluno.nome} já teve presença hoje!`, 'warning'); return; }
+
+            data.presencas.push({
+                id: 'pres_' + Date.now(),
+                alunoId: alunoId,
+                alunoNome: aluno.nome,
+                alunoNumero: aluno.numero,
+                categoria: aluno.categoria,
+                data: hoje,
+                confirmadoPor: currentUser ? currentUser.nome : 'Sistema',
+                notificacaoEnviada: false
+            });
+
+            saveData();
+            carregarPresencasHoje();
+            renderDashboard();
+            renderRelatorio();
+            showToast(`✅ Presença confirmada: ${aluno.nome}`);
+
+            if (enviarNotif && data.config.notifAutomatica && data.config.whatsappNumero && aluno.whatsapp) {
+                enviarNotificacaoWhatsApp(aluno);
+            }
+            return true;
+        }
+
+        function confirmarPresencaManual() {
+            const input = document.getElementById('qrCodeManual');
+            const code = input.value.trim();
+            if (!code) { showToast('Digite o código do aluno', 'error'); return; }
+
+            let aluno = data.alunos.find(a => a.numero === code || a.id === code);
+            if (!aluno) { aluno = data.alunos.find(a => a.nome.toLowerCase().includes(code.toLowerCase())); }
+            if (!aluno) { showToast('Aluno não encontrado', 'error'); return; }
+
+            const confirmado = confirmarPresenca(aluno.id);
+            if (confirmado) input.value = '';
+        }
+
+        function enviarNotificacaoWhatsApp(aluno) {
+            const mensagem = data.config.mensagemPadrao ||
+                `Prezado(a) ${aluno.pai}, ${aluno.nome} esteve presente no treino hoje! 🏆⚽`;
+            const numeroDestino = aluno.whatsapp.replace(/\D/g, '');
+            window.open(`https://wa.me/55${numeroDestino}?text=${encodeURIComponent(mensagem)}`, '_blank');
+
+            const notificacao = {
+                id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                alunoId: aluno.id,
+                alunoNome: aluno.nome,
+                destinatario: aluno.pai,
+                mensagem: mensagem,
+                canal: 'whatsapp',
+                destino: aluno.whatsapp,
+                data: new Date().toISOString(),
+                status: 'enviado',
+                enviadoPor: currentUser ? currentUser.nome : 'Sistema'
+            };
+            data.notificacoes.push(notificacao);
+            saveData();
+
+            const presenca = data.presencas.find(p => p.alunoId === aluno.id && new Date(p.data).toDateString() === new Date()
+                .toDateString());
+            if (presenca) { presenca.notificacaoEnviada = true;
+                saveData(); }
+
+            renderNotificacoes();
+            const badgeNotif = document.getElementById('badge_notificacoes');
+            if (badgeNotif) badgeNotif.textContent = data.notificacoes.length;
+            showToast(`📱 WhatsApp enviado para ${aluno.pai}`);
+        }
+
+        function renderNotificacoes() {
+            const container = document.getElementById('listaNotificacoes');
+            if (data.notificacoes.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>Nenhuma notificação</h3></div>`;
+                return;
+            }
+            const notifs = [...data.notificacoes].reverse();
+            container.innerHTML = notifs.slice(0, 50).map(n =>
+                `<div class="notificacao-item"><div style="display:flex;justify-content:space-between;"><div class="notif-msg"><i class="${n.canal === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-envelope'}" style="color:${n.canal === 'whatsapp' ? '#25D366' : '#ea4335'};"></i> <strong>${n.alunoNome}</strong> - ${n.destinatario}</div><span class="notif-time">${new Date(n.data).toLocaleString('pt-BR')}</span></div><div style="font-size:13px;color:var(--gray-dark);margin-top:4px;padding-left:24px;">${n.mensagem.length > 100 ? n.mensagem.substring(0,100)+'...' : n.mensagem}</div></div>`
+                ).join('');
+        }
+
+        function limparNotificacoes() {
+            if (!confirm('Limpar histórico?')) return;
+            data.notificacoes = [];
+            saveData();
+            renderNotificacoes();
+            const badgeNotif = document.getElementById('badge_notificacoes');
+            if (badgeNotif) badgeNotif.textContent = 0;
+            showToast('Histórico limpo');
+        }
+
+        // ============================================================
+        //  PRESENÇAS - LISTAGEM
+        // ============================================================
+        function carregarPresencasHoje() {
+            const container = document.getElementById('presencasList');
+            const hoje = new Date().toDateString();
+            const presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
+
+            if (presencasHoje.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-calendar-day"></i><h3>Nenhuma presença hoje</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = presencasHoje.map(p =>
+                `<div class="list-item"><div class="item-info"><div class="item-avatar">${p.alunoNome.charAt(0)}</div><div class="item-text"><div class="name">${p.alunoNome}</div><div class="sub">${p.alunoNumero} · ${p.categoria}</div></div></div><div style="display:flex;gap:8px;"><span class="item-badge presente">Presente</span><span style="font-size:12px;color:var(--gray-dark);">${new Date(p.data).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span></div></div>`
+                ).join('');
+        }
+
+        // ============================================================
+        //  RELATÓRIOS
+        // ============================================================
+        function renderRelatorio() {
+            const container = document.getElementById('relatorioContainer');
+            const filtro = document.getElementById('filtroCategoria').value;
+
+            let alunos = data.alunos;
+            if (filtro) alunos = alunos.filter(a => a.categoria === filtro);
+
+            if (alunos.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-file-alt"></i><h3>Nenhum aluno</h3></div>`;
+                return;
+            }
+
+            let html =
+                `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--primary);color:white;"><th style="padding:10px 12px;">Nº</th><th style="padding:10px 12px;">Nome</th><th style="padding:10px 12px;">Categoria</th><th style="padding:10px 12px;text-align:center;">Presenças</th><th style="padding:10px 12px;text-align:center;">Frequência</th></tr></thead><tbody>`;
+
+            alunos.forEach(aluno => {
+                const presencas = data.presencas.filter(p => p.alunoId === aluno.id);
+                const total = presencas.length;
+                const diasDesde = Math.max(1, Math.floor((new Date() - new Date(aluno.criadoEm)) / (1000 * 60 * 60 * 24)) ||
+                    1);
+                const freq = Math.min(100, Math.round((total / diasDesde) * 100));
+
+                html += `
+                    <tr style="border-bottom:1px solid #e5e7eb;">
+                        <td style="padding:10px 12px;font-weight:600;">${aluno.numero}</td>
+                        <td style="padding:10px 12px;">${aluno.nome}</td>
+                        <td style="padding:10px 12px;"><span class="badge-categoria">${aluno.categoria}</span></td>
+                        <td style="padding:10px 12px;text-align:center;font-weight:600;">${total}</td>
+                        <td style="padding:10px 12px;text-align:center;">
+                            <div style="background:#e5e7eb;border-radius:10px;height:6px;width:80px;overflow:hidden;display:inline-block;">
+                                <div style="background:${freq > 70 ? '#22c55e' : freq > 40 ? '#d4a020' : '#ef4444'};height:100%;width:${freq}%;border-radius:10px;"></div>
+                            </div>
+                            <span style="font-weight:700;font-size:13px;margin-left:8px;">${freq}%</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        function exportarCSV() {
+            const filtro = document.getElementById('filtroCategoria').value;
+            let alunos = data.alunos;
+            if (filtro) alunos = alunos.filter(a => a.categoria === filtro);
+
+            if (alunos.length === 0) { showToast('Nenhum dado', 'error'); return; }
+
+            let csv = 'Número,Nome,Categoria,Presenças,Frequência\n';
+            alunos.forEach(aluno => {
+                const presencas = data.presencas.filter(p => p.alunoId === aluno.id);
+                const total = presencas.length;
+                const diasDesde = Math.max(1, Math.floor((new Date() - new Date(aluno.criadoEm)) / (1000 * 60 * 60 * 24)) ||
+                    1);
+                const freq = Math.min(100, Math.round((total / diasDesde) * 100));
+                csv += `${aluno.numero},"${aluno.nome}",${aluno.categoria},${total},${freq}%\n`;
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `relatorio_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            showToast('Relatório exportado!');
+        }
+
+        // ============================================================
+        //  BACKUP
+        // ============================================================
+        function exportarBackup() {
+            const dados = { usuarios: data.usuarios, alunos: data.alunos, presencas: data.presencas,
+                notificacoes: data.notificacoes, config: data.config, proximoNumeroAluno: data.proximoNumeroAluno,
+                proximoNumeroUsuario: data.proximoNumeroUsuario, exportadoEm: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_vila_real_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+            showToast('Backup exportado!');
+        }
+
+        function exportarBackupCSV() {
+            if (data.alunos.length === 0) { showToast('Nenhum aluno', 'error'); return; }
+            let csv = 'Número,Nome,Pai,Telefone,WhatsApp,Email,Nascimento,Idade,Categoria\n';
+            data.alunos.forEach(aluno => {
+                csv +=
+                    `${aluno.numero},"${aluno.nome}","${aluno.pai}","${aluno.telefone}","${aluno.whatsapp || ''}","${aluno.email || ''}","${aluno.nascimento}",${aluno.idade},"${aluno.categoria}"\n`;
+            });
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_alunos_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            showToast('Backup CSV exportado!');
+        }
+
+        function importarBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!importedData.alunos || !importedData.usuarios) {
+                        showToast('Arquivo inválido', 'error');
+                        return;
+                    }
+                    if (!confirm('Substituir todos os dados?')) return;
+
+                    const adminExists = importedData.usuarios.some(u => u.id === 'admin');
+                    if (!adminExists) importedData.usuarios.unshift(ADMIN_DATA);
+
+                    data.usuarios = importedData.usuarios || [];
+                    data.alunos = importedData.alunos || [];
+                    data.presencas = importedData.presencas || [];
+                    data.notificacoes = importedData.notificacoes || [];
+                    data.config = importedData.config || data.config;
+                    data.proximoNumeroAluno = importedData.proximoNumeroAluno || 1;
+                    data.proximoNumeroUsuario = importedData.proximoNumeroUsuario || 2;
+
+                    saveData();
+                    showToast('✅ Backup restaurado!');
+                    document.getElementById('importStatus').innerHTML =
+                        `<span style="color:#22c55e;">✅ Restaurado: ${data.alunos.length} alunos</span>`;
+                    document.getElementById('importStatus').style.display = 'block';
+                    initSystem();
+                } catch (error) {
+                    showToast('Erro: ' + error.message, 'error');
+                    document.getElementById('importStatus').innerHTML =
+                        `<span style="color:#ef4444;">❌ Erro: ${error.message}</span>`;
+                    document.getElementById('importStatus').style.display = 'block';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        //  IMPORTAR ALUNOS CSV
+        // ============================================================
+        function importarAlunosCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n').filter(line => line.trim());
+                    let importados = 0,
+                        erros = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                        if (values.length < 4) continue;
+                        try {
+                            const nome = values[0] || '';
+                            const pai = values[1] || '';
+                            const telefone = values[2] || '';
+                            const whatsapp = values[3] || '';
+                            const email = values[4] || '';
+                            const nascimento = values[5] || '';
+                            const categoria = values[6] || '';
+
+                            if (!nome || !pai || !telefone) { erros++; continue; }
+
+                            let idade = 0;
+                            let categoriaFinal = categoria;
+                            if (nascimento) {
+                                const hoje = new Date();
+                                const nascDate = new Date(nascimento);
+                                idade = hoje.getFullYear() - nascDate.getFullYear();
+                                const mes = hoje.getMonth() - nascDate.getMonth();
+                                if (mes < 0 || (mes === 0 && hoje.getDate() < nascDate.getDate())) idade--;
+                                if (!categoriaFinal) {
+                                    const cat = data.config.categorias.find(c => idade >= c.idadeMin && idade <= c
+                                        .idadeMax);
+                                    categoriaFinal = cat ? cat.nome : 'Sem categoria';
+                                }
+                            }
+
+                            const numero = 'VRF-' + String(data.proximoNumeroAluno).padStart(6, '0');
+                            data.alunos.push({
+                                id: 'aluno_' + Date.now() + '_' + i,
+                                numero: numero,
+                                nome: nome,
+                                pai: pai,
+                                telefone: telefone,
+                                whatsapp: whatsapp || '',
+                                email: email || '',
+                                nascimento: nascimento || '',
+                                idade: idade || 0,
+                                categoria: categoriaFinal || 'Sem categoria',
+                                criadoEm: new Date().toISOString()
+                            });
+                            data.proximoNumeroAluno++;
+                            importados++;
+                        } catch (err) { erros++; }
+                    }
+
+                    saveData();
+                    renderAlunos();
+                    renderDashboard();
+                    renderCategoriasSelects();
+                    renderRelatorio();
+                    carregarCarteirinhas();
+                    const badgeAlunos = document.getElementById('badge_alunos');
+                    if (badgeAlunos) badgeAlunos.textContent = data.alunos.length;
+                    showToast(`✅ ${importados} alunos importados!`);
+                    document.getElementById('csvImportStatus').innerHTML =
+                        `✅ ${importados} importados! ${erros > 0 ? `⚠️ ${erros} erros` : ''}`;
+                    document.getElementById('csvImportStatus').style.display = 'block';
+                } catch (error) {
+                    showToast('Erro: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        //  CONFIGURAÇÕES
+        // ============================================================
+        function renderConfiguracoes() {
+            const container = document.getElementById('configCategorias');
+            container.innerHTML = data.config.categorias.map((cat, index) => `
+                <div class="config-item">
+                    <span>${cat.nome}</span>
+                    <span>${cat.idadeMin} - ${cat.idadeMax} anos</span>
+                    <button class="btn btn-danger btn-sm" onclick="removerCategoria(${index})"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+
+            container.innerHTML += `
+                <div style="margin-top:12px;display:flex;gap:8px;">
+                    <input type="text" id="novaCatNome" placeholder="Nome" style="flex:1;padding:8px 12px;border:2px solid #e5e7eb;border-radius:6px;">
+                    <input type="number" id="novaCatMin" placeholder="Min" style="width:60px;padding:8px 6px;border:2px solid #e5e7eb;border-radius:6px;">
+                    <input type="number" id="novaCatMax" placeholder="Max" style="width:60px;padding:8px 6px;border:2px solid #e5e7eb;border-radius:6px;">
+                    <button class="btn btn-secondary btn-sm" onclick="adicionarCategoria()"><i class="fas fa-plus"></i></button>
+                </div>
+            `;
+
+            document.getElementById('diasTreino').value = data.config.diasTreino || 'Segunda, Terça, Quarta, Quinta, Sexta';
+            document.getElementById('whatsappNumero').value = data.config.whatsappNumero || '111946359524';
+            document.getElementById('mensagemPadrao').value = data.config.mensagemPadrao || '';
+            document.getElementById('notifAutomatica').checked = data.config.notifAutomatica !== false;
+        }
+
+        function adicionarCategoria() {
+            const nome = document.getElementById('novaCatNome').value.trim();
+            const min = parseInt(document.getElementById('novaCatMin').value);
+            const max = parseInt(document.getElementById('novaCatMax').value);
+            if (!nome || isNaN(min) || isNaN(max)) { showToast('Preencha todos', 'error'); return; }
+            if (min > max) { showToast('Idade mínima > máxima', 'error'); return; }
+
+            data.config.categorias.push({ nome, idadeMin: min, idadeMax: max });
+            saveData();
+            renderConfiguracoes();
+            renderCategoriasSelects();
+            showToast('Categoria adicionada!');
+        }
+
+        function removerCategoria(index) {
+            if (data.config.categorias.length <= 1) { showToast('Deve haver pelo menos uma', 'error'); return; }
+            if (!confirm('Remover?')) return;
+            data.config.categorias.splice(index, 1);
+            saveData();
+            renderConfiguracoes();
+            renderCategoriasSelects();
+            showToast('Categoria removida');
+        }
+
+        function salvarConfiguracoes() {
+            data.config.categorias.forEach((cat, index) => {
+                const min = parseInt(document.getElementById(`catMin_${index}`)?.value);
+                const max = parseInt(document.getElementById(`catMax_${index}`)?.value);
+                if (!isNaN(min) && !isNaN(max) && min <= max) { cat.idadeMin = min;
+                    cat.idadeMax = max; }
+            });
+
+            data.config.diasTreino = document.getElementById('diasTreino').value.trim();
+            data.config.whatsappNumero = document.getElementById('whatsappNumero').value.trim();
+            data.config.mensagemPadrao = document.getElementById('mensagemPadrao').value.trim();
+            data.config.notifAutomatica = document.getElementById('notifAutomatica').checked;
+
+            saveData();
+            showToast('Configurações salvas!');
+        }
+
+        // ============================================================
+        //  USUÁRIOS
+        // ============================================================
+        function renderUsuarios() {
+            const container = document.getElementById('listaUsuarios');
+            if (data.usuarios.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum usuário</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead><tr style="background:var(--gray);">
+                            <th style="padding:8px 12px;">Usuário</th>
+                            <th style="padding:8px 12px;">Nome</th>
+                            <th style="padding:8px 12px;">Perfil</th>
+                            <th style="padding:8px 12px;">E-mail</th>
+                            <th style="padding:8px 12px;text-align:center;">Status</th>
+                            <th style="padding:8px 12px;">Ações</th>
+                        </tr></thead>
+                        <tbody>
+                            ${data.usuarios.map(u => `
+                                <tr style="border-bottom:1px solid #e5e7eb;">
+                                    <td style="padding:8px 12px;font-weight:600;">${u.usuario || u.email}</td>
+                                    <td style="padding:8px 12px;">${u.nome} ${u.id === 'admin' ? '👑' : ''}</td>
+                                    <td style="padding:8px 12px;"><span class="badge-categoria">${u.perfil}</span></td>
+                                    <td style="padding:8px 12px;color:var(--gray-dark);">${u.email}</td>
+                                    <td style="padding:8px 12px;text-align:center;">
+                                        ${u.primeiroAcesso ? '<span style="background:#fef3c7;color:#d97706;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;">Pendente</span>' : '<span style="background:#dcfce7;color:#16a34a;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;">Ativo</span>'}
+                                    </td>
+                                    <td style="padding:8px 12px;text-align:center;">
+                                        ${u.id !== 'admin' ? `
+                                            <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')"><i class="fas fa-trash"></i></button>
+                                        ` : `<span style="font-size:12px;color:var(--secondary);font-weight:600;">Admin</span>`}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function openModalUsuario() {
+            if (!currentUser || currentUser.perfil !== 'Administrador') {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+
+            document.getElementById('modalUsuario').classList.add('active');
+            document.getElementById('usuarioEditId').value = '';
+            document.getElementById('usuarioForm').reset();
+            document.getElementById('usuarioSenha').placeholder = 'Deixe em branco para gerar';
+        }
+
+        function salvarUsuario(e) {
+            e.preventDefault();
+            if (!currentUser || currentUser.perfil !== 'Administrador') {
+                showToast('Apenas administradores', 'error');
+                return false;
+            }
+
+            const nome = document.getElementById('usuarioNome').value.trim();
+            const email = document.getElementById('usuarioEmail').value.trim();
+            const perfil = document.getElementById('usuarioPerfil').value;
+            const senhaInput = document.getElementById('usuarioSenha').value.trim();
+
+            if (!nome || !email) { showToast('Nome e e-mail obrigatórios', 'error'); return false; }
+
+            const emailExists = data.usuarios.some(u => u.email === email);
+            if (emailExists) { showToast('E-mail já cadastrado', 'error'); return false; }
+
+            const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
+            const usuarioGerado = 'user' + numero;
+            const senha = senhaInput || Math.random().toString(36).slice(-8).toUpperCase();
+
+            data.usuarios.push({
+                id: 'user_' + Date.now(),
+                nome: nome,
+                email: email,
+                perfil: perfil,
+                usuario: usuarioGerado,
+                senha: senha,
+                criadoEm: new Date().toISOString(),
+                primeiroAcesso: true
+            });
+
+            saveData();
+            closeModal('modalUsuario');
+            renderUsuarios();
+            showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
+            return false;
+        }
+
+        function excluirUsuario(id) {
+            if (!currentUser || currentUser.perfil !== 'Administrador') {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+            if (id === 'admin') { showToast('Não é possível excluir o admin', 'error'); return; }
+            if (!confirm('Tem certeza?')) return;
+
+            data.usuarios = data.usuarios.filter(u => u.id !== id);
+            saveData();
+            renderUsuarios();
+            showToast('Usuário excluído');
+        }
+
+        // ============================================================
+        //  SENHA MASTER
+        // ============================================================
+        function mostrarSenhaMaster() {
+            const display = document.getElementById('senhaMasterDisplay');
+            if (mostrarSenhaFlag) {
+                display.textContent = '••••••••';
+                mostrarSenhaFlag = false;
+            } else {
+                display.textContent = data.config.senhaMaster || 'Nenhuma';
+                mostrarSenhaFlag = true;
+            }
+        }
+
+        // ============================================================
+        //  INICIALIZAÇÃO
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Carregando sistema...');
+
+            const adminExists = data.usuarios.some(u => u.id === 'admin');
+            if (!adminExists) {
+                data.usuarios.unshift(ADMIN_DATA);
+                data.config.senhaMaster = ADMIN_DATA.senha;
+                data.config.whatsappNumero = '111946359524';
+                saveData();
+            }
+
+            // Se não houver alunos, adicionar exemplos
+            if (data.alunos.length === 0) {
+                const exemplos = [
+                    { nome: 'João Pedro Silva', pai: 'Carlos Silva', telefone: '(11) 99999-1111',
+                        whatsapp: '(11) 98888-1111', nascimento: '2015-05-10', idade: 9, categoria: 'Sub-10' },
+                    { nome: 'Lucas Oliveira Santos', pai: 'Ana Santos', telefone: '(11) 99999-2222',
+                        whatsapp: '(11) 98888-2222', nascimento: '2014-08-20', idade: 10, categoria: 'Sub-12' },
+                    { nome: 'Miguel Pereira Lima', pai: 'José Oliveira', telefone: '(11) 99999-3333',
+                        whatsapp: '(11) 98888-3333', nascimento: '2012-03-15', idade: 12, categoria: 'Sub-14' },
+                    { nome: 'Arthur Rodrigues', pai: 'Roberto Paula', telefone: '(11) 99999-4444',
+                        whatsapp: '(11) 98888-4444', nascimento: '2016-11-30', idade: 8, categoria: 'Sub-10' },
+                    { nome: 'Enzo Gabriel Alves', pai: 'Marcos Ferreira', telefone: '(11) 99999-5555',
+                        whatsapp: '(11) 98888-5555', nascimento: '2010-07-25', idade: 14, categoria: 'Sub-16' }
+                ];
+
+                exemplos.forEach((ex, i) => {
+                    const numero = 'VRF-' + String(i + 1).padStart(6, '0');
+                    data.alunos.push({
+                        id: 'aluno_' + Date.now() + '_' + i,
+                        numero,
+                        ...ex,
+                        criadoEm: new Date().toISOString()
+                    });
+                });
+                data.proximoNumeroAluno = exemplos.length + 1;
+                saveData();
+            }
+
+            // Adicionar algumas presenças
+            if (data.presencas.length === 0 && data.alunos.length > 0) {
+                const hoje = new Date().toISOString();
+                data.alunos.slice(0, 3).forEach((aluno, i) => {
+                    data.presencas.push({
+                        id: 'pres_' + Date.now() + '_' + i,
+                        alunoId: aluno.id,
+                        alunoNome: aluno.nome,
+                        alunoNumero: aluno.numero,
+                        categoria: aluno.categoria,
+                        data: hoje,
+                        confirmadoPor: 'Sistema',
+                        notificacaoEnviada: false
+                    });
+                });
+                saveData();
+            }
+
+            // Mostrar login
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            showLogin();
+
+            console.log('🏆 Vila Real Futsal - Sistema de Gestão');
+            console.log('👑 Administrador:', ADMIN_DATA.nome);
+            console.log('📊 Alunos:', data.alunos.length);
+            console.log('📋 Sistema pronto!');
+            console.log('💡 Use o usuário: gleuber | Senha: Opala77@2056');
+        });
+    </script>
+
+</body>
+</html>
