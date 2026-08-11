@@ -1725,7 +1725,7 @@
         }
 
         /* ============================================================
-           RESPONSIVO
+           RESPONSIVO - CORREÇÕES PARA CELULAR
            ============================================================ */
         @media (max-width: 1024px) {
             .double-grid {
@@ -1734,9 +1734,13 @@
             .main-content {
                 padding: 20px 24px 24px 24px;
             }
+            .permissoes-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
+            /* Sidebar mobile */
             .sidebar {
                 width: 280px;
                 transform: translateX(-100%);
@@ -1752,6 +1756,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                padding: 8px 12px;
+                font-size: 18px;
             }
 
             .sidebar-overlay.active {
@@ -1762,7 +1768,7 @@
                 margin-left: 0;
                 width: 100%;
                 padding: 16px 16px 80px 16px;
-                padding-top: 70px;
+                padding-top: 65px;
             }
 
             .top-header {
@@ -1787,6 +1793,8 @@
             .top-header .header-actions .search-box input {
                 min-width: 80px;
                 width: 100%;
+                font-size: 14px;
+                padding: 8px 4px;
             }
 
             .stats-grid {
@@ -1823,6 +1831,7 @@
             .login-box {
                 padding: 28px 24px;
                 margin: 10px;
+                max-width: 95%;
             }
 
             .alunos-grid {
@@ -1865,7 +1874,7 @@
             }
 
             .carteirinha-alunos-list {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
 
             .btn-preview-grid {
@@ -1876,10 +1885,68 @@
                 padding: 20px;
                 margin: 10px;
                 max-height: 85vh;
+                max-width: 95%;
             }
 
             .modal-header h2 {
                 font-size: 17px;
+            }
+
+            .modal-close {
+                font-size: 24px;
+                padding: 5px;
+            }
+
+            .btn {
+                font-size: calc(var(--btn-font-size, 13px) - 1px);
+                padding: 8px 14px;
+                min-height: 44px;
+            }
+
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: calc(var(--btn-font-size, 13px) - 2px);
+                min-height: 36px;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-size: 16px;
+                padding: 12px 14px;
+            }
+
+            .config-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .config-item input[type="text"],
+            .config-item input[type="tel"] {
+                width: 100%;
+            }
+
+            .usuario-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .usuario-item .usuario-actions {
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
+
+            .usuario-item .usuario-info {
+                flex-wrap: wrap;
+            }
+
+            .toast {
+                bottom: 80px;
+                right: 16px;
+                left: 16px;
+                max-width: 100%;
+                font-size: 14px;
+                padding: 12px 16px;
             }
         }
 
@@ -1913,18 +1980,6 @@
             .top-header .header-actions .search-box input {
                 min-width: 60px;
             }
-            .btn {
-                font-size: calc(var(--btn-font-size, 13px) - 1px);
-                padding: 8px 14px;
-            }
-            .btn-sm {
-                padding: 4px 10px;
-                font-size: calc(var(--btn-font-size, 13px) - 2px);
-            }
-            .btn-scan {
-                font-size: 14px;
-                padding: 12px 20px;
-            }
             .carteirinha {
                 padding: 20px 18px;
             }
@@ -1938,6 +1993,20 @@
             }
             .carteirinha .crt-title {
                 font-size: 15px;
+            }
+            .carteirinha-alunos-list {
+                grid-template-columns: 1fr;
+            }
+            .btn-preview-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .usuario-item .usuario-actions .btn {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .usuario-item .usuario-actions .btn-sm {
+                padding: 4px 8px;
+                font-size: 10px;
             }
         }
 
@@ -2053,6 +2122,28 @@
             font-size: 32px;
             margin-bottom: 10px;
             color: var(--secondary);
+        }
+
+        /* Correção para toque em dispositivos móveis */
+        .btn,
+        .menu-item,
+        .quick-action,
+        .carteirinha-aluno-item,
+        .stat-card,
+        .sidebar-mobile-toggle {
+            -webkit-touch-callout: none;
+        }
+
+        /* Melhorar visualização de checkboxes em mobile */
+        .permissoes-grid .perm-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+        }
+
+        .permissoes-grid .perm-item {
+            font-size: 15px;
+            padding: 4px 0;
         }
     </style>
 </head>
@@ -2317,7 +2408,7 @@
 
             <div style="text-align:center;padding:20px 0 10px 0;color:var(--gray-dark);font-size:12px;">
                 <p><strong>Nosso objetivo é formar campeões</strong> — dentro e fora das quadras!</p>
-                <p style="margin-top:4px;opacity:0.5;">© 2026 Vila Real Futsal</p>
+                <p style="margin-top:4px;opacity:0.5;">© 2025 Vila Real Futsal</p>
             </div>
         </div>
 
@@ -3101,7 +3192,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v28';
+        const STORAGE_KEY = 'vilaRealFutsalData_v29';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3449,7 +3540,7 @@
         }
 
         // ============================================================
-        //  HANDLE LOGIN - CORRIGIDO
+        //  HANDLE LOGIN
         // ============================================================
         function handleLogin(e) {
             e.preventDefault();
@@ -3877,7 +3968,7 @@
         }
 
         // ============================================================
-        //  RENDERIZAR MENU - CORREÇÃO COMPLETA
+        //  RENDERIZAR MENU
         // ============================================================
         function renderizarMenu() {
             const container = document.getElementById('sidebarMenu');
@@ -4532,7 +4623,6 @@
         function initSystem() {
             console.log('🚀 Inicializando sistema...');
 
-            // O menu já foi renderizado no handleLogin, mas vamos garantir
             renderizarMenu();
 
             renderDashboard();
@@ -5475,7 +5565,7 @@
         }
 
         // ============================================================
-        //  PERMISSÕES DO USUÁRIO
+        //  PERMISSÕES DO USUÁRIO - CORRIGIDO
         // ============================================================
         function abrirPermissoesUsuario(userId) {
             if (!isAdmin()) {
@@ -5484,7 +5574,10 @@
             }
 
             const user = data.usuarios.find(u => u.id === userId);
-            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+            if (!user) {
+                showToast('Usuário não encontrado', 'error');
+                return;
+            }
 
             document.getElementById('permissoesUsuarioId').value = userId;
             document.getElementById('permissoesUsuarioNome').value = user.nome;
@@ -5510,9 +5603,14 @@
 
             const userId = document.getElementById('permissoesUsuarioId').value;
             const user = data.usuarios.find(u => u.id === userId);
-            if (!user) { showToast('Usuário não encontrado', 'error'); return false; }
 
-            user.permissoes = {
+            if (!user) {
+                showToast('Usuário não encontrado', 'error');
+                return false;
+            }
+
+            // Criar objeto de permissões com os valores dos checkboxes
+            const permissoes = {
                 alunos: document.getElementById('permEditAlunos').checked,
                 presencas: document.getElementById('permEditPresencas').checked,
                 carteirinhas: document.getElementById('permEditCarteirinhas').checked,
@@ -5525,10 +5623,19 @@
                 personalizar: document.getElementById('permEditPersonalizar').checked
             };
 
+            // Atualizar permissões do usuário
+            user.permissoes = permissoes;
+
             saveData();
+
+            // Fechar modal
             closeModal('modalPermissoesUsuario');
+
+            // Atualizar lista de usuários
             renderUsuarios();
-            showToast(`✅ Permissões de ${user.nome} atualizadas!`);
+
+            showToast(`✅ Permissões de ${user.nome} atualizadas com sucesso!`);
+
             return false;
         }
 
@@ -5606,10 +5713,14 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
+            // Aplicar personalização antes do login
             aplicarPersonalizacaoCompleta();
 
+            // Ocultar sidebar e main até login
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
+
+            // Mostrar tela de login
             showLogin();
 
             console.log('🏆 Vila Real Futsal - Sistema de Gestão');
