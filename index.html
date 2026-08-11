@@ -2040,6 +2040,20 @@
             border: none;
             border-radius: 6px;
         }
+
+        /* Carregando... */
+        .menu-loading {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        .menu-loading i {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -2144,7 +2158,10 @@
 
         <div class="sidebar-menu" id="sidebarMenu">
             <!-- Menu renderizado por JavaScript -->
-            <div class="menu-label">Carregando...</div>
+            <div class="menu-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                Carregando...
+            </div>
         </div>
 
         <div class="sidebar-footer">
@@ -3084,7 +3101,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v26';
+        const STORAGE_KEY = 'vilaRealFutsalData_v27';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3843,26 +3860,53 @@
         }
 
         // ============================================================
-        //  RENDERIZAR MENU - CORREÇÃO PRINCIPAL
+        //  RENDERIZAR MENU - CORREÇÃO COMPLETA
         // ============================================================
         function renderizarMenu() {
             const container = document.getElementById('sidebarMenu');
             if (!container) {
                 console.error('❌ sidebarMenu não encontrado!');
+                setTimeout(() => renderizarMenu(), 200);
                 return;
             }
 
-            const isAdmin = currentUser && currentUser.perfil === 'Administrador';
-            const permissoes = currentUser ? currentUser.permissoes || {} : {};
+            if (!currentUser) {
+                console.warn('⚠️ Nenhum usuário logado');
+                container.innerHTML = `<div class="menu-loading"><i class="fas fa-user-slash"></i>Faça login</div>`;
+                return;
+            }
+
+            console.log('📋 Renderizando menu para:', currentUser.nome);
+
+            const isAdmin = currentUser.perfil === 'Administrador';
+            const permissoes = currentUser.permissoes || {};
 
             let html = '';
-            MENU_ITEMS.forEach((item) => {
-                if (item.isSeparator) {
-                    html += `<div class="menu-label">${item.label}</div>`;
-                    return;
-                }
 
-                // Verificar permissões para usuários não-admin
+            // Itens principais
+            const mainItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', page: 'dashboard' },
+                { id: 'alunos', label: 'Alunos', icon: 'fas fa-users', page: 'alunos' },
+                { id: 'carteirinhas', label: 'Carteirinhas', icon: 'fas fa-id-card', page: 'carteirinhas' },
+                { id: 'presencas', label: 'Presenças', icon: 'fas fa-qrcode', page: 'presencas' },
+                { id: 'notificacoes', label: 'Notificações', icon: 'fas fa-bell', page: 'notificacoes' },
+                { id: 'relatorios', label: 'Relatórios', icon: 'fas fa-chart-bar', page: 'relatorios' },
+                { id: 'backup', label: 'Backup', icon: 'fas fa-database', page: 'backup' }
+            ];
+
+            // Itens administrativos
+            const adminItems = [
+                { id: 'separator', label: 'Administração', isSeparator: true },
+                { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios', permissao: 'usuarios' },
+                { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes',
+                    permissao: 'configuracoes' },
+                { id: 'personalizar', label: 'Personalizar', icon: 'fas fa-paint-brush', page: 'personalizar',
+                    permissao: 'personalizar' }
+            ];
+
+            // Renderizar itens principais
+            mainItems.forEach((item) => {
+                // Verificar permissão para itens principais
                 if (!isAdmin && item.page !== 'dashboard') {
                     const mapa = {
                         'alunos': 'alunos',
@@ -3870,18 +3914,12 @@
                         'presencas': 'presencas',
                         'notificacoes': 'notificacoes',
                         'relatorios': 'relatorios',
-                        'backup': 'backup',
-                        'configuracoes': 'configuracoes',
-                        'usuarios': 'usuarios',
-                        'personalizar': 'personalizar'
+                        'backup': 'backup'
                     };
                     if (!permissoes[mapa[item.page]]) return;
                 }
 
-                // Personalizar só aparece para quem tem permissão
-                if (item.page === 'personalizar' && !podePersonalizar() && !isAdmin) return;
-
-                const badgeId = item.page !== 'dashboard' && item.page !== 'separator' ? `badge_${item.page}` : '';
+                const badgeId = item.page !== 'dashboard' ? `badge_${item.page}` : '';
                 const badgeHtml = badgeId ? `<span class="badge" id="${badgeId}"></span>` : '';
 
                 html += `
@@ -3892,6 +3930,31 @@
                     </button>
                 `;
             });
+
+            // Renderizar itens administrativos
+            let hasAdminItems = false;
+            adminItems.forEach((item) => {
+                if (item.isSeparator) {
+                    html += `<div class="menu-label">${item.label}</div>`;
+                    return;
+                }
+
+                // Verificar permissão
+                if (!isAdmin && !permissoes[item.permissao]) return;
+
+                hasAdminItems = true;
+                html += `
+                    <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
+                        <i class="${item.icon}"></i>
+                        <span>${item.label}</span>
+                    </button>
+                `;
+            });
+
+            // Se não tiver itens admin, remover o separador
+            if (!hasAdminItems) {
+                html = html.replace('<div class="menu-label">Administração</div>', '');
+            }
 
             container.innerHTML = html;
 
@@ -5528,8 +5591,10 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
+            // Aplicar personalização antes do login
             aplicarPersonalizacaoCompleta();
 
+            // Ocultar sidebar e main até login
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
             showLogin();
@@ -5542,13 +5607,6 @@
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
             console.log('📱 Versão mobile otimizada!');
-
-            // Forçar renderização do menu após carregar
-            setTimeout(() => {
-                if (currentUser) {
-                    renderizarMenu();
-                }
-            }, 100);
         });
     </script>
 
