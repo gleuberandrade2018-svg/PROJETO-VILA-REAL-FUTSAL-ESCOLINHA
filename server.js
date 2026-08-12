@@ -13,7 +13,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'CHANGE_THIS_JWT_SECRET_IN_RENDER';
 const ADMIN_USER = process.env.ADMIN_USER || 'gleuber';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Opala77@2056';
 
-if (!process.env.DATABASE_URL) {fab4c055e9549570aa8c01b42cda252b
+if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL não configurada. Crie um Render Postgres e conecte a variável ao Web Service.');
 }
 
