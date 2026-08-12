@@ -3566,6 +3566,7 @@
         //  VERIFICAR PERMISSÃO
         // ============================================================
         function temPermissao(permissao) {
+            sincronizarUsuarioAtual();
             if (!currentUser) return false;
             if (currentUser.perfil === 'Administrador') return true;
             const p = currentUser.permissoes || {};
@@ -3795,6 +3796,7 @@
         //  ATUALIZAR BOTÕES POR PERFIL POR PERFIL
         // ============================================================
         function atualizarBotoesPorPerfil() {
+            sincronizarUsuarioAtual();
             const admin = isAdmin();
             const pai = isPai();
             const p = currentUser?.permissoes || {};
@@ -4243,27 +4245,30 @@
                 `;
             });
 
-            if (isAdmin) {
-                let hasAdminItems = false;
-                adminItems.forEach((item) => {
-                    if (item.isSeparator) {
-                        html += `<div class="menu-label">${item.label}</div>`;
-                        return;
-                    }
+            // Administração: o administrador vê tudo; demais usuários
+            // somente as áreas explicitamente autorizadas.
+            let hasAdminItems = false;
+            adminItems.forEach((item) => {
+                if (item.isSeparator) return;
+                if (!isAdmin && permissoes[item.permissao] !== true) return;
 
-                    if (!isAdmin && !permissoes[item.permissao]) return;
+                hasAdminItems = true;
+                html += `
+                    <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
+                        <i class="${item.icon}"></i>
+                        <span>${item.label}</span>
+                    </button>
+                `;
+            });
 
-                    hasAdminItems = true;
-                    html += `
-                        <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
-                            <i class="${item.icon}"></i>
-                            <span>${item.label}</span>
-                        </button>
-                    `;
-                });
-
-                if (!hasAdminItems) {
-                    html = html.replace('<div class="menu-label">Administração</div>', '');
+            if (hasAdminItems) {
+                const marker = html.lastIndexOf('</button>');
+                // Insere o título antes do primeiro item administrativo.
+                const firstAdmin = adminItems.find(item => !item.isSeparator && (isAdmin || permissoes[item.permissao] === true));
+                if (firstAdmin) {
+                    const firstButton = `<button class="menu-item" data-page="${firstAdmin.page}"`;
+                    const pos = html.indexOf(firstButton);
+                    if (pos >= 0) html = html.slice(0, pos) + '<div class="menu-label">Administração</div>' + html.slice(pos);
                 }
             }
 
@@ -4290,7 +4295,14 @@
         // ============================================================
         //  NAVEGAÇÃO
         // ============================================================
+        function sincronizarUsuarioAtual() {
+            if (!currentUser || !Array.isArray(data.usuarios)) return;
+            const atualizado = data.usuarios.find(u => u.id === currentUser.id);
+            if (atualizado) currentUser = { ...atualizado };
+        }
+
         function mudarPagina(page) {
+            sincronizarUsuarioAtual();
             const permissoes = currentUser?.permissoes || {};
             const mapaPermissao = { alunos:'alunos', carteirinhas:'carteirinhas', presencas:'presencas', notificacoes:'notificacoes', relatorios:'relatorios', backup:'backup', usuarios:'usuarios', configuracoes:'configuracoes' };
             if (!isAdmin() && page !== 'dashboard' && mapaPermissao[page] && permissoes[mapaPermissao[page]] !== true) {
@@ -6217,15 +6229,15 @@
             if (!user) { showToast('Usuário não encontrado', 'error'); return false; }
 
             user.permissoes = {
-                alunos: document.getElementById('permEditAlunos').checked,
-                presencas: document.getElementById('permEditPresencas').checked,
-                carteirinhas: document.getElementById('permEditCarteirinhas').checked,
-                relatorios: document.getElementById('permEditRelatorios').checked,
-                notificacoes: document.getElementById('permEditNotificacoes').checked,
-                backup: document.getElementById('permEditBackup').checked,
-                configuracoes: document.getElementById('permEditConfiguracoes').checked,
-                usuarios: document.getElementById('permEditUsuarios').checked,
-                excluirAlunos: document.getElementById('permEditExcluirAlunos').checked
+                alunos: !!document.getElementById('permEditAlunos').checked,
+                presencas: !!document.getElementById('permEditPresencas').checked,
+                carteirinhas: !!document.getElementById('permEditCarteirinhas').checked,
+                relatorios: !!document.getElementById('permEditRelatorios').checked,
+                notificacoes: !!document.getElementById('permEditNotificacoes').checked,
+                backup: !!document.getElementById('permEditBackup').checked,
+                configuracoes: !!document.getElementById('permEditConfiguracoes').checked,
+                usuarios: !!document.getElementById('permEditUsuarios').checked,
+                excluirAlunos: !!document.getElementById('permEditExcluirAlunos').checked
             };
 
             if (currentUser && currentUser.id === userId) {
@@ -6363,7 +6375,24 @@
         // ============================================================
         //  INICIALIZAÇÃO
         // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
+                // Sincroniza alterações de permissões entre abas/janelas do mesmo navegador.
+        window.addEventListener('storage', (event) => {
+            if (event.key !== STORAGE_KEY || !event.newValue) return;
+            try {
+                const novoData = JSON.parse(event.newValue);
+                if (!novoData || !Array.isArray(novoData.usuarios)) return;
+                data = novoData;
+                sincronizarUsuarioAtual();
+                if (currentUser) {
+                    renderizarMenu();
+                    atualizarBotoesPorPerfil();
+                }
+            } catch (e) {
+                console.warn('Falha ao sincronizar dados:', e);
+            }
+        });
+
+document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Carregando sistema...');
 
             aplicarPersonalizacaoCompleta();
