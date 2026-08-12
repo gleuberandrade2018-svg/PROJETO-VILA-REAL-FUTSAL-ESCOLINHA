@@ -93,10 +93,6 @@
             transition: all 0.3s ease;
         }
 
-        .sidebar-mobile-toggle:hover {
-            transform: scale(1.05);
-        }
-
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -704,13 +700,19 @@
             gap: 8px;
             font-size: 13px;
             color: var(--primary);
+            padding: 4px 0;
         }
 
         .permissoes-grid .perm-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
             accent-color: var(--secondary);
             cursor: pointer;
+        }
+
+        .permissoes-grid .perm-item span {
+            font-size: 14px;
         }
 
         /* ===== MODAL ===== */
@@ -1725,7 +1727,7 @@
         }
 
         /* ============================================================
-           RESPONSIVO - CORREÇÕES PARA CELULAR
+           RESPONSIVO
            ============================================================ */
         @media (max-width: 1024px) {
             .double-grid {
@@ -1740,7 +1742,6 @@
         }
 
         @media (max-width: 768px) {
-            /* Sidebar mobile */
             .sidebar {
                 width: 280px;
                 transform: translateX(-100%);
@@ -2007,6 +2008,14 @@
             .usuario-item .usuario-actions .btn-sm {
                 padding: 4px 8px;
                 font-size: 10px;
+            }
+            .permissoes-grid .perm-item {
+                font-size: 14px;
+            }
+            .permissoes-grid .perm-item input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                min-width: 20px;
             }
         }
 
@@ -3112,14 +3121,14 @@
     <div class="modal-overlay" id="modalPermissoesUsuario">
         <div class="modal" style="max-width:550px;">
             <div class="modal-header">
-                <h2><i class="fas fa-user-lock"></i> <span id="permissoesUsuarioTitle">Permissões</span></h2>
+                <h2><i class="fas fa-user-lock"></i> <span id="permissoesUsuarioTitle">Gerenciar Permissões</span></h2>
                 <button class="modal-close" onclick="closeModal('modalPermissoesUsuario')">&times;</button>
             </div>
             <form id="permissoesUsuarioForm" onsubmit="return salvarPermissoesUsuario(event)">
                 <input type="hidden" id="permissoesUsuarioId">
                 <div class="form-group">
                     <label>Usuário</label>
-                    <input type="text" id="permissoesUsuarioNome" readonly style="background:#f0f2f5;">
+                    <input type="text" id="permissoesUsuarioNome" readonly style="background:#f0f2f5;font-weight:600;">
                 </div>
                 <div class="form-group">
                     <label>Perfil</label>
@@ -3127,23 +3136,60 @@
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Permissões de Acesso</label>
+                    <p style="font-size:12px;color:var(--gray-dark);margin-bottom:8px;">
+                        Marque as áreas que este usuário poderá acessar
+                    </p>
                     <div class="permissoes-grid">
-                        <label class="perm-item"><input type="checkbox" id="permEditAlunos"><span>Alunos</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditPresencas"><span>Presenças</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditCarteirinhas"><span>Carteirinhas</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditRelatorios"><span>Relatórios</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditNotificacoes"><span>Notificações</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditBackup"><span>Backup</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditConfiguracoes"><span>Configurações</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditUsuarios"><span>Usuários</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditExcluirAlunos"><span>Excluir Alunos</span></label>
-                        <label class="perm-item"><input type="checkbox" id="permEditPersonalizar"><span>Personalizar</span></label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditAlunos"> 
+                            <span>📋 Alunos</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditPresencas"> 
+                            <span>✅ Presenças</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditCarteirinhas"> 
+                            <span>🪪 Carteirinhas</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditRelatorios"> 
+                            <span>📊 Relatórios</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditNotificacoes"> 
+                            <span>🔔 Notificações</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditBackup"> 
+                            <span>💾 Backup</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditConfiguracoes"> 
+                            <span>⚙️ Configurações</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditUsuarios"> 
+                            <span>👥 Usuários</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditExcluirAlunos"> 
+                            <span>🗑️ Excluir Alunos</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" id="permEditPersonalizar"> 
+                            <span>🎨 Personalizar</span>
+                        </label>
                     </div>
-                    <small style="color:var(--gray-dark);font-size:12px;">Desmarque para remover o acesso do usuário</small>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
-                    <i class="fas fa-save"></i> Salvar Permissões
-                </button>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">
+                        <i class="fas fa-save"></i> Salvar Permissões
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalPermissoesUsuario')">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -3192,7 +3238,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v29';
+        const STORAGE_KEY = 'vilaRealFutsalData_v30';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -5584,6 +5630,8 @@
             document.getElementById('permissoesUsuarioPerfil').value = user.perfil;
 
             const p = user.permissoes || {};
+
+            // Carregar valores atuais das permissões
             document.getElementById('permEditAlunos').checked = p.alunos !== false;
             document.getElementById('permEditPresencas').checked = p.presencas !== false;
             document.getElementById('permEditCarteirinhas').checked = p.carteirinhas !== false;
@@ -5731,6 +5779,7 @@
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
             console.log('📱 Versão mobile otimizada!');
+            console.log('✅ Sistema de permissões corrigido!');
         });
     </script>
 
