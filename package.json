@@ -1,8 +1,0 @@
-{
-  "name": "vila-real-futsal-auth",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Backend seguro de autenticação e recuperação de senha do Vila Real Futsal",
-  "scripts": {"start":"node server.js"},
-  "engines": {"node": ">=18"}
-}
