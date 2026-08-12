@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS (mantidos) ===== */
+        /* ===== ESTILOS COMPLETOS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -506,6 +506,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-email-test {
+            background: #ea4335;
+            color: white;
+        }
+
+        .btn-email-test:hover {
+            background: #d33426;
+            transform: translateY(-2px);
+        }
+
         /* ===== LISTAS ===== */
         .list-item {
             display: flex;
@@ -571,6 +581,11 @@
         .list-item .item-badge.presente {
             background: #dcfce7;
             color: #16a34a;
+        }
+
+        .list-item .item-badge.pendente {
+            background: #fef3c7;
+            color: #d97706;
         }
 
         /* ===== QUICK ACTIONS ===== */
@@ -1524,6 +1539,85 @@
             color: #1d4ed8;
         }
 
+        /* ===== SOLICITAÇÃO PENDENTE ===== */
+        .solicitacao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 2px solid #dbeafe;
+            flex-wrap: wrap;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .solicitacao-item:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .solicitacao-item .solicitacao-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .solicitacao-item .solicitacao-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .solicitacao-item .solicitacao-info .dados .nome {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .solicitacao-item .solicitacao-info .dados .email {
+            font-size: 12px;
+            color: var(--gray-dark);
+        }
+
+        .solicitacao-item .solicitacao-info .dados .perfil {
+            font-size: 11px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .solicitacao-item .solicitacao-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .solicitacao-item .solicitacao-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .solicitacao-item .solicitacao-data {
+            font-size: 11px;
+            color: var(--gray-dark);
+        }
+
         /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
@@ -1933,6 +2027,20 @@
                 font-size: 14px;
                 padding: 12px 16px;
             }
+
+            .solicitacao-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .solicitacao-item .solicitacao-info {
+                flex-wrap: wrap;
+            }
+
+            .solicitacao-item .solicitacao-actions {
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -2000,6 +2108,14 @@
                 width: 20px;
                 height: 20px;
                 min-width: 20px;
+            }
+            .solicitacao-item .solicitacao-actions .btn {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .solicitacao-item .solicitacao-actions .btn-sm {
+                padding: 4px 8px;
+                font-size: 10px;
             }
         }
 
@@ -2735,12 +2851,15 @@
                                 <span class="config-label">Public Key</span>
                                 <input type="text" id="emailjsPublicKey" placeholder="public_xxxx" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;">
                             </div>
-                            <button class="btn btn-secondary btn-sm" onclick="salvarConfigEmailJS()" style="margin-top:8px;">
-                                <i class="fas fa-save"></i> Salvar Configurações
-                            </button>
-                            <button class="btn btn-success btn-sm" onclick="testarEmailJS()" style="margin-top:8px;margin-left:8px;">
-                                <i class="fas fa-paper-plane"></i> Testar Envio
-                            </button>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                                <button class="btn btn-secondary btn-sm" onclick="salvarConfigEmailJS()">
+                                    <i class="fas fa-save"></i> Salvar Configurações
+                                </button>
+                                <button class="btn btn-email-test btn-sm" onclick="testarEmailJS()">
+                                    <i class="fas fa-paper-plane"></i> Testar Envio de E-mail
+                                </button>
+                            </div>
+                            <div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
                         </div>
 
                         <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;width:100%;">
@@ -2981,6 +3100,7 @@
                     <button class="btn btn-secondary btn-sm" onclick="openModalUsuario()">
                         <i class="fas fa-user-plus"></i> Novo Usuário
                     </button>
+                    <span id="solicitacoesBadge" style="display:none;background:#ef4444;color:white;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;"></span>
                 </div>
                 <div id="listaUsuarios"></div>
             </div>
@@ -3257,7 +3377,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v31';
+        const STORAGE_KEY = 'vilaRealFutsalData_v32';
         const SESSION_KEY = 'vilaRealFutsalSession';
 
         const ADMIN_DATA = {
@@ -3560,7 +3680,7 @@
         }
 
         // ============================================================
-        //  REGISTRO DE NOVO USUÁRIO
+        //  REGISTRO DE NOVO USUÁRIO - CORRIGIDO
         // ============================================================
         async function handleRegistroUsuario(e) {
             e.preventDefault();
@@ -3595,7 +3715,6 @@
                 return false;
             }
 
-            // Verificar se e-mail já existe
             if (data.usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {
                 errorDiv.textContent = 'Este e-mail já está cadastrado no sistema';
                 errorDiv.style.display = 'block';
@@ -3608,7 +3727,6 @@
             const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
             const usuarioGerado = 'user' + numero;
 
-            // Criar usuário com status pendente
             const novoUsuario = {
                 id: 'user_' + Date.now(),
                 nome: nome,
@@ -3645,29 +3763,45 @@
 
             saveData();
 
+            // Adicionar notificação para o administrador
+            const admin = data.usuarios.find(u => u.perfil === 'Administrador');
+            if (admin) {
+                data.notificacoes.push({
+                    id: 'notif_' + Date.now(),
+                    tipo: 'nova_solicitacao',
+                    usuarioId: admin.id,
+                    mensagem: `📋 Nova solicitação de cadastro: ${nome} (${email})`,
+                    data: new Date().toISOString(),
+                    status: 'nao_lido',
+                    acao: 'aprovar_usuario',
+                    acaoId: novoUsuario.id
+                });
+                saveData();
+            }
+
             // Tentar enviar e-mail para o administrador
             const emailEnviado = await enviarEmailAdminNovoUsuario(nome, email, perfil, usuarioGerado);
 
             if (emailEnviado) {
                 successDiv.innerHTML = `
                     ✅ <strong>Solicitação enviada com sucesso!</strong><br>
-                    <span style="font-size:12px;color:var(--gray-dark);">Aguarde a aprovação do administrador.</span>
+                    <span style="font-size:12px;color:var(--gray-dark);">O administrador foi notificado por e-mail.</span>
                     <br><br>
                     <small style="color:var(--gray-dark);">Você receberá um e-mail quando seu cadastro for aprovado.</small>
                 `;
+                showToast('✅ Solicitação enviada! Administrador notificado por e-mail.');
             } else {
                 successDiv.innerHTML = `
                     ✅ <strong>Solicitação enviada com sucesso!</strong><br>
                     <span style="font-size:12px;color:var(--gray-dark);">Aguarde a aprovação do administrador.</span>
                     <br><br>
-                    <small style="color:var(--orange);">⚠️ Não foi possível enviar o e-mail de notificação. O administrador será notificado na próxima vez que acessar o sistema.</small>
+                    <small style="color:var(--orange);">⚠️ Configure o EmailJS para receber notificações por e-mail.</small>
                 `;
+                showToast('✅ Solicitação enviada! Aguarde aprovação do administrador.');
             }
 
             successDiv.style.display = 'block';
-            showToast('✅ Solicitação de cadastro enviada! Aguarde aprovação.');
 
-            // Limpar formulário
             document.getElementById('registroNome').value = '';
             document.getElementById('registroEmail').value = '';
             document.getElementById('registroSenha').value = '';
@@ -3689,7 +3823,7 @@
         async function enviarEmailAdminNovoUsuario(nome, email, perfil, usuario) {
             const config = data.config.emailjs || {};
             if (!config.serviceId || !config.templateId || !config.publicKey) {
-                console.warn('⚠️ EmailJS não configurado. Não foi possível enviar notificação.');
+                console.warn('⚠️ EmailJS não configurado.');
                 return false;
             }
 
@@ -3698,7 +3832,6 @@
                     emailjs.init(config.publicKey);
                 }
 
-                // Buscar admin
                 const admin = data.usuarios.find(u => u.perfil === 'Administrador');
                 const adminEmail = admin ? admin.email : 'admin@vilarealfutsal.com';
 
@@ -3710,7 +3843,7 @@
                     usuario_perfil: perfil,
                     usuario_usuario: usuario,
                     sistema: 'Vila Real Futsal',
-                    mensagem: `Um novo usuário solicitou cadastro no sistema. Acesse o painel de administração para aprovar ou rejeitar a solicitação.`,
+                    mensagem: `Um novo usuário solicitou cadastro no sistema.\n\nNome: ${nome}\nE-mail: ${email}\nPerfil: ${perfil}\nUsuário: ${usuario}\n\nAcesse o sistema para aprovar ou rejeitar a solicitação.`,
                     link_aprovacao: window.location.href
                 };
 
@@ -3744,7 +3877,8 @@
                     usuario: usuario,
                     senha: senha,
                     sistema: 'Vila Real Futsal',
-                    mensagem: 'Seu cadastro foi aprovado! Agora você pode acessar o sistema com as credenciais abaixo.'
+                    mensagem: `Seu cadastro foi aprovado!\n\nUsuário: ${usuario}\nSenha: ${senha}\n\nAcesse o sistema no link abaixo:`,
+                    link_aprovacao: window.location.href
                 };
 
                 await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
@@ -3757,7 +3891,7 @@
         }
 
         // ============================================================
-        //  APROVAR/REJEITAR USUÁRIO
+        //  APROVAR/REJEITAR USUÁRIO - CORRIGIDO
         // ============================================================
         function aprovarUsuario(userId) {
             if (!isAdmin()) {
@@ -3786,8 +3920,6 @@
             }
 
             saveData();
-            renderUsuarios();
-            showToast(`✅ Usuário ${user.nome} aprovado!`);
 
             // Enviar e-mail de aprovação
             enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
@@ -3803,6 +3935,10 @@
                 status: 'lido'
             });
             saveData();
+
+            renderUsuarios();
+            renderNotificacoes();
+            showToast(`✅ Usuário ${user.nome} aprovado! E-mail enviado.`);
         }
 
         function rejeitarUsuario(userId) {
@@ -3822,8 +3958,6 @@
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
 
             saveData();
-            renderUsuarios();
-            showToast(`❌ Usuário ${user.nome} rejeitado`);
 
             // Adicionar notificação
             data.notificacoes.push({
@@ -3836,6 +3970,10 @@
                 status: 'lido'
             });
             saveData();
+
+            renderUsuarios();
+            renderNotificacoes();
+            showToast(`❌ Usuário ${user.nome} rejeitado`);
         }
 
         // ============================================================
@@ -3867,7 +4005,6 @@
                 return false;
             }
 
-            // Verificar status do usuário
             if (user.status === 'pendente') {
                 errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
                 errorDiv.style.display = 'block';
@@ -3893,48 +4030,42 @@
                 saveData();
             }
 
-            // Salvar sessão
             salvarSessao();
 
-            // Mostrar interface
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
 
-            // Atualizar informações do usuário
             document.getElementById('userName').textContent = user.nome;
             document.getElementById('userRole').textContent = user.perfil;
             document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
 
-            // Mostrar WhatsApp
             document.getElementById('whatsappFloat').style.display = 'flex';
             atualizarWhatsAppBadge();
 
-            // Badge de admin
             const securityBadge = document.getElementById('securityBadge');
             securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
 
-            // Ocultar botões de edição para perfil Pai
             atualizarBotoesPorPerfil();
 
-            // Inicializar EmailJS
             initEmailJS();
 
             // Verificar solicitações pendentes (apenas admin)
             if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
                 setTimeout(() => {
                     showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`, 'info');
+                    // Atualizar badge
+                    const badge = document.getElementById('solicitacoesBadge');
+                    badge.textContent = data.solicitacoesPendentes.length;
+                    badge.style.display = 'inline-block';
                 }, 1500);
             }
 
-            // Renderizar menu e sistema
             renderizarMenu();
             initSystem();
 
-            // Aplicar personalização
             aplicarPersonalizacaoCompleta();
 
-            // Fechar sidebar mobile
             closeSidebar();
 
             showToast(`✅ Bem-vindo, ${user.nome}!`);
@@ -3948,13 +4079,11 @@
             const isAdminUser = isAdmin();
             const isPaiUser = isPai();
 
-            // Botões de criação de aluno
             const botoesNovoAluno = document.querySelectorAll('#btnNovoAluno, #alunosNovoAluno, #quickNovoAluno');
             botoesNovoAluno.forEach(btn => {
                 btn.style.display = isAdminUser ? 'inline-flex' : 'none';
             });
 
-            // Botões de presença - apenas admin e professor
             const botoesPresenca = document.querySelectorAll('#btnAbrirScanner, #btnConfirmarPresenca, .btn-scan, .btn-success');
             botoesPresenca.forEach(btn => {
                 if (isPaiUser) {
@@ -3964,12 +4093,10 @@
                 }
             });
 
-            // Botões de edição e exclusão em cards de aluno
             document.querySelectorAll('.aluno-card .actions .btn-primary, .aluno-card .actions .btn-danger').forEach(btn => {
                 if (isAdminUser) {
                     btn.style.display = 'inline-flex';
                 } else if (isPaiUser) {
-                    // Para pais, mostrar apenas se for o aluno vinculado
                     const card = btn.closest('.aluno-card');
                     if (card) {
                         const alunoId = card.dataset?.alunoId || '';
@@ -3984,7 +4111,6 @@
                 }
             });
 
-            // Para pais, ocultar botões de exclusão
             if (isPaiUser) {
                 document.querySelectorAll('.aluno-card .actions .btn-danger').forEach(btn => {
                     btn.style.display = 'none';
@@ -4371,7 +4497,6 @@
 
             let html = '';
 
-            // Itens principais
             const mainItems = [
                 { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', page: 'dashboard' },
                 { id: 'alunos', label: 'Alunos', icon: 'fas fa-users', page: 'alunos' },
@@ -4382,7 +4507,6 @@
                 { id: 'backup', label: 'Backup', icon: 'fas fa-database', page: 'backup' }
             ];
 
-            // Itens administrativos
             const adminItems = [
                 { id: 'separator', label: 'Administração', isSeparator: true },
                 { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios', permissao: 'usuarios' },
@@ -4392,9 +4516,7 @@
                     permissao: 'personalizar' }
             ];
 
-            // Renderizar itens principais
             mainItems.forEach((item) => {
-                // Para perfil Pai, mostrar apenas Dashboard, Alunos, Carteirinhas, Presenças (sem botões de ação)
                 if (isPaiUser && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(item.page)) {
                     return;
                 }
@@ -4423,7 +4545,6 @@
                 `;
             });
 
-            // Renderizar itens administrativos (apenas para Admin)
             if (isAdmin) {
                 let hasAdminItems = false;
                 adminItems.forEach((item) => {
@@ -4450,7 +4571,6 @@
 
             container.innerHTML = html;
 
-            // Atualizar badges
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) {
                 const alunosVisiveis = isPaiUser && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0 ?
@@ -4461,7 +4581,6 @@
             const badgeNotif = document.getElementById('badge_notificacoes');
             if (badgeNotif) badgeNotif.textContent = data.notificacoes.length || '';
 
-            // Marcar item ativo
             const currentPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
             document.querySelectorAll('.menu-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === currentPage);
@@ -4474,7 +4593,6 @@
         //  NAVEGAÇÃO
         // ============================================================
         function mudarPagina(page) {
-            // Verificar permissão para perfil Pai
             if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(page)) {
                 showToast('❌ Você não tem permissão para acessar esta página', 'error');
                 return;
@@ -4527,7 +4645,6 @@
             if (page === 'usuarios') renderUsuarios();
             if (page === 'configuracoes') renderConfiguracoes();
 
-            // Atualizar botões por perfil
             atualizarBotoesPorPerfil();
 
             closeSidebar();
@@ -4910,7 +5027,6 @@
         }
 
         function enviarPresencaWhatsApp() {
-            // Pais não podem enviar presença por WhatsApp
             if (isPai()) {
                 showToast('❌ Pais não podem marcar presença', 'error');
                 return;
@@ -4946,10 +5062,9 @@
         }
 
         // ============================================================
-        //  SCANNER QR CODE - CORRIGIDO
+        //  SCANNER QR CODE
         // ============================================================
         async function abrirScanner() {
-            // Pais não podem abrir o scanner
             if (isPai()) {
                 showToast('❌ Pais não podem marcar presença', 'error');
                 return;
@@ -4959,7 +5074,6 @@
             const status = document.getElementById('scannerStatus');
             if (!container || !status) return;
 
-            // Fechar scanner anterior se existir
             await fecharScanner();
 
             container.style.display = 'block';
@@ -5038,9 +5152,7 @@
             }
         }
 
-        function onScanError(err) {
-            // Ignorar erros de leitura (são normais)
-        }
+        function onScanError(err) {}
 
         async function fecharScanner() {
             scannerFechadoAutomaticamente = true;
@@ -5117,7 +5229,13 @@
                 pagePersonalizar.classList.remove('visible');
             }
 
-            // Atualizar botões por perfil
+            // Atualizar badge de solicitações
+            if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
+                const badge = document.getElementById('solicitacoesBadge');
+                badge.textContent = data.solicitacoesPendentes.length;
+                badge.style.display = 'inline-block';
+            }
+
             atualizarBotoesPorPerfil();
 
             console.log('✅ Sistema inicializado!');
@@ -5405,7 +5523,6 @@
             const aluno = data.alunos.find(a => a.id === id);
             data.alunos = data.alunos.filter(a => a.id !== id);
 
-            // Verificar se algum pai está vinculado a este aluno
             data.usuarios.forEach(u => {
                 if (u.alunosVinculados && u.alunosVinculados.includes(id)) {
                     u.alunosVinculados = u.alunosVinculados.filter(aId => aId !== id);
@@ -5449,7 +5566,6 @@
         //  PRESENÇAS - APENAS ADMIN E PROFESSOR
         // ============================================================
         function confirmarPresenca(alunoId, enviarNotif = true) {
-            // Pais não podem marcar presença
             if (isPai()) {
                 showToast('❌ Pais não podem marcar presença', 'error');
                 return false;
@@ -5488,7 +5604,6 @@
         }
 
         function confirmarPresencaManual() {
-            // Pais não podem marcar presença
             if (isPai()) {
                 showToast('❌ Pais não podem marcar presença', 'error');
                 return;
@@ -5523,9 +5638,41 @@
                 return;
             }
             const notifs = [...notificacoes].reverse();
-            container.innerHTML = notifs.slice(0, 50).map(n =>
-                `<div class="notificacao-item" style="padding:8px 0;border-bottom:1px solid #f0f2f5;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;"><div class="notif-msg"><i class="${n.canal === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-envelope'}" style="color:${n.canal === 'whatsapp' ? '#25D366' : '#ea4335'};"></i> <strong>${n.alunoNome}</strong> - ${n.destinatario}</div><span class="notif-time" style="font-size:12px;color:var(--gray-dark);">${new Date(n.data).toLocaleString('pt-BR')}</span></div><div style="font-size:13px;color:var(--gray-dark);margin-top:4px;padding-left:24px;">${n.mensagem.length > 100 ? n.mensagem.substring(0,100)+'...' : n.mensagem}</div></div>`
-                ).join('');
+            container.innerHTML = notifs.slice(0, 50).map(n => {
+                let icon = 'fas fa-envelope';
+                let color = '#ea4335';
+                if (n.canal === 'whatsapp') { icon = 'fab fa-whatsapp';
+                    color = '#25D366'; }
+                if (n.tipo === 'nova_solicitacao') { icon = 'fas fa-user-plus';
+                    color = '#1d4ed8'; }
+                if (n.tipo === 'aprovacao') { icon = 'fas fa-check-circle';
+                    color = '#22c55e'; }
+                if (n.tipo === 'rejeicao') { icon = 'fas fa-times-circle';
+                    color = '#ef4444'; }
+
+                return `
+                    <div class="notificacao-item" style="padding:8px 0;border-bottom:1px solid #f0f2f5;">
+                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                            <div class="notif-msg">
+                                <i class="${icon}" style="color:${color};"></i> 
+                                <strong>${n.alunoNome || n.usuarioNome || 'Sistema'}</strong> 
+                                - ${n.mensagem}
+                            </div>
+                            <span class="notif-time" style="font-size:12px;color:var(--gray-dark);">${new Date(n.data).toLocaleString('pt-BR')}</span>
+                        </div>
+                        ${n.acao === 'aprovar_usuario' && n.acaoId ? `
+                            <div style="margin-top:4px;padding-left:24px;display:flex;gap:8px;flex-wrap:wrap;">
+                                <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${n.acaoId}')">
+                                    <i class="fas fa-check"></i> Aprovar
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${n.acaoId}')">
+                                    <i class="fas fa-times"></i> Rejeitar
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         function limparNotificacoes() {
@@ -5870,7 +6017,6 @@
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
 
-            // Reativar campos
             document.getElementById('diasTreino').disabled = false;
             document.getElementById('whatsappNumero').disabled = false;
             document.getElementById('mensagemPadrao').disabled = false;
@@ -5950,6 +6096,64 @@
         }
 
         // ============================================================
+        //  TESTAR ENVIO DE E-MAIL - CORRIGIDO
+        // ============================================================
+        async function testarEmailJS() {
+            const config = data.config.emailjs || {};
+            const resultDiv = document.getElementById('emailTestResult');
+
+            if (!config.serviceId || !config.templateId || !config.publicKey) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <span style="color:#ef4444;">❌ Configure o EmailJS primeiro! Preencha Service ID, Template ID e Public Key.</span>
+                `;
+                resultDiv.style.background = '#fee2e2';
+                showToast('Configure o EmailJS primeiro!', 'error');
+                return;
+            }
+
+            const emailTeste = currentUser ? currentUser.email : 'teste@email.com';
+            const nomeTeste = currentUser ? currentUser.nome : 'Usuário Teste';
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <i class="fas fa-spinner fa-spin"></i> Enviando e-mail de teste para ${emailTeste}...
+            `;
+            resultDiv.style.background = '#fef3c7';
+
+            try {
+                if (typeof emailjs !== 'undefined' && emailjs.init) {
+                    emailjs.init(config.publicKey);
+                }
+
+                const templateParams = {
+                    to_email: emailTeste,
+                    to_name: nomeTeste,
+                    nova_senha: 'SenhaTeste@123',
+                    sistema: 'Vila Real Futsal - Teste',
+                    mensagem: 'Este é um e-mail de teste para verificar a configuração do EmailJS.'
+                };
+
+                const response = await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
+
+                resultDiv.innerHTML = `
+                    <span style="color:#22c55e;">✅ E-mail de teste enviado com sucesso para <strong>${emailTeste}</strong>!</span>
+                    <br><small style="color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</small>
+                `;
+                resultDiv.style.background = '#dcfce7';
+                showToast(`✅ E-mail de teste enviado para ${emailTeste}!`);
+            } catch (error) {
+                console.error('Erro no teste:', error);
+                resultDiv.innerHTML = `
+                    <span style="color:#ef4444;">❌ Erro ao enviar e-mail de teste: ${error?.message || 'Erro desconhecido'}</span>
+                    <br><small style="color:var(--gray-dark);">Verifique suas configurações do EmailJS.</small>
+                `;
+                resultDiv.style.background = '#fee2e2';
+                showToast('❌ Erro ao enviar e-mail de teste', 'error');
+            }
+        }
+
+        // ============================================================
         //  USUÁRIOS - APENAS ADMIN
         // ============================================================
         function renderUsuarios() {
@@ -5967,28 +6171,30 @@
                 return;
             }
 
-            // Separar usuários pendentes e aprovados
             const pendentes = data.usuarios.filter(u => u.status === 'pendente');
             const aprovados = data.usuarios.filter(u => u.status !== 'pendente');
 
             let html = '';
 
-            // Solicitações pendentes
+            // Solicitações pendentes com destaque
             if (pendentes.length > 0) {
                 html += `
                     <div style="background:#dbeafe;border-radius:12px;padding:16px;margin-bottom:16px;border-left:4px solid #1d4ed8;">
-                        <h4 style="color:#1d4ed8;margin-bottom:8px;"><i class="fas fa-clock"></i> Solicitações Pendentes (${pendentes.length})</h4>
+                        <h4 style="color:#1d4ed8;margin-bottom:12px;">
+                            <i class="fas fa-clock"></i> Solicitações Pendentes (${pendentes.length})
+                        </h4>
                         ${pendentes.map(u => `
-                            <div class="usuario-item" style="background:white;border-radius:8px;padding:12px;margin-bottom:8px;">
-                                <div class="usuario-info">
-                                    <div class="usuario-avatar" style="background:#dbeafe;color:#1d4ed8;">${u.nome.charAt(0).toUpperCase()}</div>
-                                    <div class="usuario-dados">
+                            <div class="solicitacao-item">
+                                <div class="solicitacao-info">
+                                    <div class="avatar">${u.nome.charAt(0).toUpperCase()}</div>
+                                    <div class="dados">
                                         <div class="nome">${u.nome}</div>
                                         <div class="email">${u.email} • ${u.usuario || u.email}</div>
-                                        <div style="font-size:12px;color:#1d4ed8;">⏳ Aguardando aprovação</div>
+                                        <div class="perfil">${u.perfil}</div>
                                     </div>
                                 </div>
-                                <div class="usuario-actions">
+                                <div class="solicitacao-badge">⏳ Aguardando</div>
+                                <div class="solicitacao-actions">
                                     <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${u.id}')">
                                         <i class="fas fa-check"></i> Aprovar
                                     </button>
@@ -6152,9 +6358,7 @@
             if (id === 'admin') { showToast('Não é possível excluir o admin', 'error'); return; }
             if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
 
-            // Remover de solicitações pendentes
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== id);
-
             data.usuarios = data.usuarios.filter(u => u.id !== id);
             saveData();
             renderUsuarios();
@@ -6207,7 +6411,7 @@
         }
 
         // ============================================================
-        //  VINCULAR ALUNOS AO PERFIL PAI (MULTIPLOS)
+        //  VINCULAR ALUNOS AO PERFIL PAI
         // ============================================================
         function vincularAlunoPai(userId) {
             if (!isAdmin()) {
@@ -6289,13 +6493,10 @@
 
             saveData();
 
-            // Atualizar a lista de usuários
             renderUsuarios();
 
-            // Atualizar a visualização do modal atual
             const modal = document.querySelector('div[style*="position:fixed"][style*="background:rgba(0,0,0,0.7)"]');
             if (modal) {
-                // Reconstruir o modal com os dados atualizados
                 const userUpdated = data.usuarios.find(u => u.id === userId);
                 if (userUpdated) {
                     const alunos = data.alunos;
@@ -6500,10 +6701,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Carregando sistema...');
 
-            // Aplicar personalização
             aplicarPersonalizacaoCompleta();
 
-            // Garantir que admin existe
             const adminExists = data.usuarios.some(u => u.id === 'admin');
             if (!adminExists) {
                 data.usuarios.unshift(ADMIN_DATA);
@@ -6512,13 +6711,11 @@
                 saveData();
             }
 
-            // Garantir que todos os usuários tenham status
             data.usuarios.forEach(u => {
                 if (!u.status) u.status = 'aprovado';
                 if (!u.alunosVinculados) u.alunosVinculados = [];
             });
 
-            // Criar dados de exemplo se não houver alunos
             if (data.alunos.length === 0) {
                 const exemplos = [
                     { nome: 'João Pedro Silva', pai: 'Carlos Silva', telefone: '(11) 99999-1111',
@@ -6566,10 +6763,8 @@
             if (!data.whatsappMessages) data.whatsappMessages = [];
             if (!data.solicitacoesPendentes) data.solicitacoesPendentes = [];
 
-            // Tentar restaurar sessão
             const usuarioSessao = carregarSessao();
             if (usuarioSessao) {
-                // Verificar se o usuário ainda está aprovado
                 if (usuarioSessao.status === 'aprovado') {
                     currentUser = usuarioSessao;
                     document.getElementById('loginContainer').style.display = 'none';
@@ -6591,7 +6786,6 @@
 
                     console.log('🔄 Sessão restaurada para:', currentUser.nome);
 
-                    // Verificar solicitações pendentes (apenas admin)
                     if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
                         setTimeout(() => {
                             showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`,
@@ -6599,7 +6793,6 @@
                         }, 1500);
                     }
                 } else {
-                    // Usuário não está mais aprovado, limpar sessão
                     limparSessao();
                     document.getElementById('sidebar').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'none';
@@ -6607,7 +6800,6 @@
                     showToast('⚠️ Seu acesso foi revogado. Entre em contato com o administrador.', 'error');
                 }
             } else {
-                // Mostrar login
                 document.getElementById('sidebar').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'none';
                 showLogin();
@@ -6623,7 +6815,7 @@
             console.log('📱 Versão mobile otimizada!');
             console.log('👨‍👦 Perfil Pai com vínculo a múltiplos alunos!');
             console.log('🔄 Sessão persistente - não volta ao login ao atualizar a página!');
-            console.log('📋 Cadastro com aprovação do administrador!');
+            console.log('📋 Cadastro com aprovação do administrador e notificações por e-mail!');
         });
     </script>
 
