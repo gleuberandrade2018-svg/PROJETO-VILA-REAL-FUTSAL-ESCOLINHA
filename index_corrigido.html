@@ -2426,21 +2426,8 @@
                     <label><i class="fas fa-envelope"></i> E-mail</label>
                     <input type="email" id="recuperarEmail" placeholder="Digite seu e-mail" required>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-key"></i> Código de recuperação</label>
-                    <input type="text" id="recuperarCodigo" placeholder="Código recebido por e-mail" maxlength="6" inputmode="numeric">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Nova senha</label>
-                    <input type="password" id="recuperarNovaSenha" placeholder="Nova senha" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Confirmar nova senha</label>
-                    <input type="password" id="recuperarConfirmarSenha" placeholder="Confirme a nova senha" autocomplete="new-password">
-                </div>
                 <div id="recuperarError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
                 <div id="recuperarSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
-                <button type="button" class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px;" id="btnSolicitarCodigo" onclick="solicitarCodigoRecuperacao()"><i class="fas fa-envelope"></i> Enviar Código de Recuperação</button>
                 <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;" id="btnRecuperar">
                     <i class="fas fa-paper-plane"></i> Enviar Nova Senha
                 </button>
@@ -2899,7 +2886,7 @@
                                     <i class="fas fa-paper-plane"></i> Testar Envio de E-mail
                                 </button>
                             </div>
-                            <div style="margin-top:16px;border-top:1px solid #e5e7eb;padding-top:16px;"><h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;"><i class="fas fa-reply"></i> Responder por E-mail</h4><input id="emailRespostaDestino" type="email" placeholder="destinatario@email.com" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"><input id="emailRespostaAssunto" type="text" placeholder="Assunto" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"><textarea id="emailRespostaMensagem" placeholder="Mensagem" rows="5" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"></textarea><button class="btn btn-secondary btn-sm" onclick="enviarRespostaEmail()"><i class="fas fa-paper-plane"></i> Enviar Resposta</button><div id="emailRespostaStatus" style="display:none;margin-top:8px;padding:8px;border-radius:8px;"></div></div><div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
+                            <div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
                         </div>
 
                         <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;width:100%;">
@@ -3450,7 +3437,6 @@
                 presencas: [],
                 notificacoes: [],
                 whatsappMessages: [],
-                recuperacaoSenhas: {},
                 solicitacoesPendentes: [],
                 config: {
                     categorias: [
@@ -3766,14 +3752,15 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
             const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
-            const usuarioGerado = 'usuario' + numero;
+            const usuarioGerado = 'user' + numero;
 
             const novoUsuario = {
-                id: 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                id: 'user_' + Date.now(),
                 nome: nome,
                 email: email,
                 perfil: perfil,
                 usuario: usuarioGerado,
+                senha: senha,
                 status: 'pendente',
                 permissoes: {
                     alunos: perfil === 'Pai' ? false : true,
@@ -3934,7 +3921,7 @@
         // ============================================================
         //  APROVAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
-        async function aprovarUsuario(userId) {
+        function aprovarUsuario(userId) {
             console.log('📋 Aprovando usuário:', userId);
 
             if (!isAdmin()) {
@@ -3954,7 +3941,7 @@
             }
 
             // Atualizar status
-            user.status='aprovado'; delete user.senha;
+            user.status = 'aprovado';
             user.primeiroAcesso = true;
 
             // Gerar senha se não tiver
@@ -4005,7 +3992,7 @@
         // ============================================================
         //  REJEITAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
-        async function rejeitarUsuario(userId) {
+        function rejeitarUsuario(userId) {
             console.log('📋 Rejeitando usuário:', userId);
 
             if (!isAdmin()) {
@@ -4021,7 +4008,7 @@
 
             if (!confirm(`Tem certeza que deseja rejeitar o usuário ${user.nome}?`)) return;
 
-            user.status='rejeitado'; delete user.senha;
+            user.status = 'rejeitado';
 
             // Remover da lista de pendentes
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
@@ -4074,28 +4061,97 @@
         // ============================================================
         //  HANDLE LOGIN
         // ============================================================
-        function handleLogin(e){
+        function handleLogin(e) {
             e.preventDefault();
-            const loginUser=document.getElementById('loginUser').value.trim();
-            const loginPass=document.getElementById('loginPassword').value;
-            const err=document.getElementById('loginError');
-            err.style.display='none';
-            if(!loginUser||!loginPass){err.textContent='Preencha todos os campos';err.style.display='block';return false;}
-            const lu=data.usuarios.find(u => (u.usuario||'').toLowerCase()===loginUser.toLowerCase() || (u.email||'').toLowerCase()===loginUser.toLowerCase());
-            if(!lu || lu.senha !== loginPass){err.textContent='Usuário/e-mail ou senha inválidos';err.style.display='block';return false;}
-            if(lu.status==='pendente'){err.textContent='Seu cadastro está aguardando aprovação do administrador.';err.style.display='block';return false;}
-            if(lu.status==='rejeitado'){err.textContent='Seu cadastro foi rejeitado. Entre em contato com o administrador.';err.style.display='block';return false;}
-            currentUser={...lu};
+
+            const loginUser = document.getElementById('loginUser').value.trim();
+            const loginPass = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            errorDiv.style.display = 'none';
+
+            if (!loginUser || !loginPass) {
+                errorDiv.textContent = 'Preencha todos os campos';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const user = data.usuarios.find(u =>
+                u.usuario.toLowerCase() === loginUser.toLowerCase() ||
+                u.email.toLowerCase() === loginUser.toLowerCase()
+            );
+
+            if (!user) {
+                errorDiv.textContent = 'Usuário não encontrado';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'pendente') {
+                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'rejeitado') {
+                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.senha !== loginPass) {
+                errorDiv.textContent = 'Senha incorreta';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            currentUser = user;
+
+            if (user.primeiroAcesso) {
+                user.primeiroAcesso = false;
+                saveData();
+            }
+
             salvarSessao();
-            document.getElementById('loginContainer').style.display='none';
-            document.getElementById('sidebar').style.display='flex';
+
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+
+            document.getElementById('userName').textContent = user.nome;
+            document.getElementById('userRole').textContent = user.perfil;
+            document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
+
+            document.getElementById('whatsappFloat').style.display = 'flex';
+            atualizarWhatsAppBadge();
+
+            const securityBadge = document.getElementById('securityBadge');
+            securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
+
+            atualizarBotoesPorPerfil();
+
+            initEmailJS();
+
+            if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
+                setTimeout(() => {
+                    showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`, 'info');
+                    atualizarBadgeSolicitacoes();
+                }, 1500);
+            }
+
             renderizarMenu();
             initSystem();
+
+            aplicarPersonalizacaoCompleta();
+
+            closeSidebar();
+
+            showToast(`✅ Bem-vindo, ${user.nome}!`);
             return false;
         }
 
         // ============================================================
-        //  ATUALIZAR BOTÕES POR PERFIL POR PERFIL
+        //  ATUALIZAR BOTÕES POR PERFIL
         // ============================================================
         function atualizarBotoesPorPerfil() {
             const isAdminUser = isAdmin();
@@ -6677,23 +6733,6 @@
             return false;
         }
 
-        async function enviarRespostaEmail(){
-            if(!isAdmin()){showToast('❌ Apenas administradores.','error');return;}
-            const to=document.getElementById('emailRespostaDestino')?.value.trim();
-            const subject=document.getElementById('emailRespostaAssunto')?.value.trim();
-            const message=document.getElementById('emailRespostaMensagem')?.value.trim();
-            const status=document.getElementById('emailRespostaStatus');
-            const config=data.config.emailjs||{};
-            if(!to||!subject||!message){if(status){status.textContent='❌ Preencha destinatário, assunto e mensagem.';status.style.display='block';}return;}
-            if(!config.serviceId||!config.templateId||!config.publicKey){showToast('❌ Configure o EmailJS primeiro.','error');return;}
-            try{
-                if(typeof emailjs!=='undefined'&&emailjs.init)emailjs.init(config.publicKey);
-                await emailjs.send(config.serviceId,config.templateId,{to_email:to,to_name:'',from_name:data.config.emailRemetenteNome||'Vila Real Futsal',subject,assunto:subject,mensagem:message,sistema:'Vila Real Futsal',tipo_email:'Resposta manual',usuario:'',senha:'',nova_senha:'',codigo_recuperacao:''},config.publicKey);
-                if(status){status.textContent='✅ Resposta enviada com sucesso.';status.style.display='block';}
-                showToast('✅ E-mail enviado!');
-            }catch(e){if(status){status.textContent='❌ '+(e?.text||e?.message||'Falha no envio.');status.style.display='block';}showToast('❌ Falha ao enviar e-mail.','error');}
-        }
-
         // ============================================================
         //  SENHA MASTER
         // ============================================================
@@ -6711,91 +6750,82 @@
         // ============================================================
         //  RECUPERAR SENHA
         // ============================================================
-        async function hashTexto(texto) {
-            const bytes = new TextEncoder().encode(texto);
-            const digest = await crypto.subtle.digest('SHA-256', bytes);
-            return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
-        }
-
-        async function solicitarCodigoRecuperacao(){
-            const email=document.getElementById('recuperarEmail').value.trim().toLowerCase();
-            const err=document.getElementById('recuperarError');
-            const ok=document.getElementById('recuperarSuccess');
-            const btn=document.getElementById('btnSolicitarCodigo');
-            err.style.display='none'; ok.style.display='none';
-            const user=data.usuarios.find(u=>(u.email||'').toLowerCase()===email);
-            if(!email){err.textContent='Digite seu e-mail';err.style.display='block';return;}
-            if(!user){err.textContent='Não foi possível localizar este e-mail.';err.style.display='block';return;}
-            if(user.status==='pendente'){err.textContent='Seu cadastro ainda aguarda aprovação.';err.style.display='block';return;}
-            if(user.status==='rejeitado'){err.textContent='Seu cadastro foi rejeitado.';err.style.display='block';return;}
-            btn.disabled=true;
-            try{
-                const codigo=String(Math.floor(100000+Math.random()*900000));
-                data.recuperacaoSenhas=data.recuperacaoSenhas||{};
-                data.recuperacaoSenhas[email]={hash:await hashTexto(codigo),expiraEm:Date.now()+15*60*1000,tentativas:0};
-                saveData();
-                const enviado=await enviarEmailRecuperacao(email,user.nome,codigo);
-                if(!enviado){
-                    delete data.recuperacaoSenhas[email]; saveData();
-                    throw new Error('Não foi possível enviar o código. Verifique a configuração do EmailJS.');
-                }
-                ok.textContent='✅ Código enviado para seu e-mail. Ele é válido por 15 minutos.';
-                ok.style.display='block';
-                document.getElementById('recuperarCodigo').focus();
-            }catch(e){err.textContent=e.message;err.style.display='block';}
-            finally{btn.disabled=false;}
-        }
-
-        async function handleRecuperarSenha(e){
+        async function handleRecuperarSenha(e) {
             e.preventDefault();
-            const email=document.getElementById('recuperarEmail').value.trim().toLowerCase();
-            const codigo=document.getElementById('recuperarCodigo').value.trim();
-            const novaSenha=document.getElementById('recuperarNovaSenha').value;
-            const conf=document.getElementById('recuperarConfirmarSenha').value;
-            const err=document.getElementById('recuperarError');
-            const ok=document.getElementById('recuperarSuccess');
-            const btn=document.getElementById('btnRecuperar');
-            err.style.display='none'; ok.style.display='none';
-            const user=data.usuarios.find(u=>(u.email||'').toLowerCase()===email);
-            const rec=(data.recuperacaoSenhas||{})[email];
-            if(!user||!rec){err.textContent='Solicite primeiro um código de recuperação.';err.style.display='block';return false;}
-            if(Date.now()>rec.expiraEm){delete data.recuperacaoSenhas[email];saveData();err.textContent='Código expirado. Solicite um novo código.';err.style.display='block';return false;}
-            if((rec.tentativas||0)>=5){delete data.recuperacaoSenhas[email];saveData();err.textContent='Limite de tentativas atingido. Solicite um novo código.';err.style.display='block';return false;}
-            if(!/^[0-9]{6}$/.test(codigo)){err.textContent='Informe o código de 6 dígitos.';err.style.display='block';return false;}
-            if(!validarSenha(novaSenha)){err.textContent='A nova senha deve ter mínimo 6 caracteres, letra, número e caractere especial.';err.style.display='block';return false;}
-            if(novaSenha!==conf){err.textContent='As senhas não coincidem.';err.style.display='block';return false;}
-            rec.tentativas=(rec.tentativas||0)+1;
-            if(await hashTexto(codigo)!==rec.hash){saveData();err.textContent='Código de recuperação inválido.';err.style.display='block';return false;}
-            btn.disabled=true;
-            user.senha=novaSenha;
-            if(user.id==='admin') data.config.senhaMaster=novaSenha;
-            delete data.recuperacaoSenhas[email];
+            const email = document.getElementById('recuperarEmail').value.trim();
+            const errorDiv = document.getElementById('recuperarError');
+            const successDiv = document.getElementById('recuperarSuccess');
+
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (!email) {
+                errorDiv.textContent = 'Digite seu e-mail';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!user) {
+                errorDiv.textContent = 'E-mail não encontrado no sistema';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'pendente') {
+                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'rejeitado') {
+                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
+                .toUpperCase();
+            user.senha = novaSenha;
+            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
             saveData();
-            ok.textContent='✅ Senha alterada com sucesso. Você já pode fazer login.';
-            ok.style.display='block';
-            document.getElementById('recuperarCodigo').value='';
-            document.getElementById('recuperarNovaSenha').value='';
-            document.getElementById('recuperarConfirmarSenha').value='';
-            showToast('✅ Senha alterada com sucesso!');
-            setTimeout(()=>showLogin(),1800);
-            btn.disabled=false;
+
+            const config = data.config.emailjs || {};
+            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
+
+            if (emailEnviado) {
+                successDiv.innerHTML =
+                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
+                successDiv.style.display = 'block';
+                showToast('✅ Nova senha enviada para o e-mail!');
+                document.getElementById('recuperarEmail').value = '';
+            } else {
+                successDiv.innerHTML =
+                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
+                successDiv.style.display = 'block';
+                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
+            }
             return false;
         }
 
-        async function enviarEmailRecuperacao(email,nome,codigo){
-            const config=data.config.emailjs||{};
-            if(!config.serviceId||!config.templateId||!config.publicKey)return false;
-            try{
-                if(typeof emailjs!=='undefined'&&emailjs.init)emailjs.init(config.publicKey);
-                await emailjs.send(config.serviceId,config.templateId,{
-                    to_email:email,to_name:nome||'Usuário',codigo_recuperacao:codigo,
-                    nova_senha:'',usuario:'',senha:'',tipo_email:'Recuperação de senha',
-                    assunto:'Código de recuperação de senha',subject:'Código de recuperação de senha',
-                    sistema:'Vila Real Futsal',
-                    mensagem:`Seu código de recuperação de senha é: ${codigo}\n\nEste código é válido por 15 minutos. Se você não solicitou esta recuperação, ignore este e-mail.`
-                },config.publicKey);
+        async function enviarEmailRecuperacao(email, nome, novaSenha) {
+            const config = data.config.emailjs || {};
+            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
+            try {
+                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
+                const templateParams = {
+                    to_email: email,
+                    to_name: nome || 'Usuário',
+                    nova_senha: novaSenha,
+                    sistema: 'Vila Real Futsal',
+                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
+                };
+                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
                 return true;
-            }catch(error){console.error('Erro ao enviar código de recuperação:',error);return false;}
+            } catch (error) {
+                console.error('❌ Erro ao enviar e-mail:', error);
+                return false;
+            }
         }
 
         // ============================================================
