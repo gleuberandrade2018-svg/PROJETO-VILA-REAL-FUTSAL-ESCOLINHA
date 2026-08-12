@@ -9,7 +9,7 @@ const DATA_DIR = path.join(__dirname, 'server-data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const RESET_FILE = path.join(DATA_DIR, 'resets.json');
-const HTML_FILE = path.join(__dirname, 'index_corrigido(5).html');
+const HTML_FILE = path.join(__dirname, 'index_corrigido.html');
 const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID || '';
 const EMAILJS_TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID || '';
 const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY || '';
@@ -166,7 +166,7 @@ async function api(req, res, pathname) {
 const server=http.createServer(async (req,res)=>{
   const url=new URL(req.url,`http://${req.headers.host||'localhost'}`);
   if(url.pathname.startsWith('/api/')) return api(req,res,url.pathname);
-  if(req.method==='GET' && (url.pathname==='/' || url.pathname==='/index_corrigido(5).html')) { res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'}); return fs.createReadStream(HTML_FILE).pipe(res); }
+  if(req.method==='GET' && (url.pathname==='/' || url.pathname==='/index_corrigido.html')) { res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'}); return fs.createReadStream(HTML_FILE).pipe(res); }
   if(req.method==='GET' && url.pathname==='/health') { res.writeHead(200,{'Content-Type':'text/plain'}); return res.end('OK'); }
   res.writeHead(404); res.end('Not found');
 });
