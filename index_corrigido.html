@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS ===== */
+        /* ===== ESTILOS COMPLETOS (mantidos) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1519,6 +1519,11 @@
             color: #d97706;
         }
 
+        .usuario-item .usuario-status.aprovacao {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
         /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
@@ -2167,6 +2172,12 @@
                 <p id="loginSubtitle">Futsal · Gestão de Presenças</p>
             </div>
 
+            <div style="text-align:center;margin-bottom:12px;">
+                <span style="font-size:12px;color:var(--gray-dark);">
+                    <i class="fas fa-info-circle"></i> Novo? <a onclick="showRegistroUsuario()" style="color:var(--secondary);cursor:pointer;font-weight:600;">Cadastre-se aqui</a>
+                </span>
+            </div>
+
             <form id="loginForm" onsubmit="return handleLogin(event)">
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Usuário ou E-mail</label>
@@ -2194,6 +2205,66 @@
 
             <div class="register-link" style="margin-top:8px;font-size:12px;color:#6b7280;">
                 <i class="fas fa-shield-alt"></i> Sistema seguro
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== REGISTRO DE NOVO USUÁRIO ===== -->
+    <div id="registroUsuarioContainer" class="login-page" style="display:none;">
+        <div class="login-box">
+            <div class="login-brand">
+                <div class="logo-big">⚽</div>
+                <h2>VILA <span>REAL</span></h2>
+                <p>Cadastro de Novo Usuário</p>
+            </div>
+
+            <form id="registroUsuarioForm" onsubmit="return handleRegistroUsuario(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nome Completo</label>
+                    <input type="text" id="registroNome" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> E-mail</label>
+                    <input type="email" id="registroEmail" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Perfil</label>
+                    <select id="registroPerfil" required>
+                        <option value="Pai">Pai/Responsável</option>
+                        <option value="Professor">Professor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="registroSenha" placeholder="Crie uma senha" required minlength="6">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registroSenha', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small style="color:var(--gray-dark);font-size:11px;">Mínimo 6 caracteres, com letra, número e caractere especial</small>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Confirmar Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="registroConfirmarSenha" placeholder="Confirme sua senha" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registroConfirmarSenha', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="registroError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <div id="registroSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;" id="btnRegistrar">
+                    <i class="fas fa-user-plus"></i> Solicitar Cadastro
+                </button>
+                <p style="font-size:12px;color:var(--gray-dark);text-align:center;margin-top:8px;">
+                    <i class="fas fa-info-circle"></i> Após o cadastro, aguarde a aprovação do administrador.
+                </p>
+            </form>
+
+            <div class="register-link">
+                <a onclick="showLogin()"><i class="fas fa-arrow-left"></i> Voltar para o login</a>
             </div>
         </div>
     </div>
@@ -2452,7 +2523,7 @@
                 </div>
 
                 <div style="text-align:center;margin-bottom:16px;">
-                    <button class="btn btn-scan" onclick="abrirScanner()">
+                    <button class="btn btn-scan" onclick="abrirScanner()" id="btnAbrirScanner">
                         <i class="fas fa-camera"></i> 📷 Abrir Câmera para Escanear QR Code
                     </button>
                     <p style="font-size:13px;color:var(--gray-dark);margin-top:8px;">
@@ -2488,7 +2559,7 @@
                 <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0;">
                     <div style="display:flex;gap:10px;width:100%;max-width:500px;flex-wrap:wrap;justify-content:center;">
                         <input type="text" id="qrCodeManual" placeholder="Ou digite o código do aluno" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;">
-                        <button class="btn btn-success" onclick="confirmarPresencaManual()">
+                        <button class="btn btn-success" onclick="confirmarPresencaManual()" id="btnConfirmarPresenca">
                             <i class="fas fa-check"></i> Confirmar
                         </button>
                         <button class="btn btn-whatsapp" onclick="enviarPresencaWhatsApp()">
@@ -3040,6 +3111,14 @@
                     <small style="color:var(--gray-dark);font-size:12px;">Marque as áreas que este usuário poderá acessar</small>
                 </div>
                 <div class="form-group">
+                    <label>Status</label>
+                    <select id="usuarioStatus" required>
+                        <option value="aprovado">Aprovado</option>
+                        <option value="pendente">Pendente (Aguardando aprovação)</option>
+                        <option value="rejeitado">Rejeitado</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Senha</label>
                     <div class="password-wrapper">
                         <input type="password" id="usuarioSenha" placeholder="Deixe em branco para gerar">
@@ -3178,7 +3257,7 @@
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v30';
+        const STORAGE_KEY = 'vilaRealFutsalData_v31';
         const SESSION_KEY = 'vilaRealFutsalSession';
 
         const ADMIN_DATA = {
@@ -3188,8 +3267,9 @@
             perfil: 'Administrador',
             usuario: 'gleuber',
             senha: 'Opala77@2056',
+            status: 'aprovado',
             primeiroAcesso: false,
-            alunoVinculado: null, // ID do aluno vinculado (apenas para perfil Pai)
+            alunosVinculados: [],
             permissoes: {
                 alunos: true,
                 presencas: true,
@@ -3210,6 +3290,7 @@
                 presencas: [],
                 notificacoes: [],
                 whatsappMessages: [],
+                solicitacoesPendentes: [],
                 config: {
                     categorias: [
                         { nome: 'Sub-8', idadeMin: 6, idadeMax: 7 },
@@ -3274,7 +3355,6 @@
         // ============================================================
         function loadData() {
             try {
-                // Tentar carregar dados
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (stored) {
                     const parsed = JSON.parse(stored);
@@ -3289,6 +3369,7 @@
                     if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
                     if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
                     if (!parsed.whatsappMessages) parsed.whatsappMessages = [];
+                    if (!parsed.solicitacoesPendentes) parsed.solicitacoesPendentes = [];
                     parsed.usuarios.forEach(u => {
                         if (!u.permissoes) {
                             u.permissoes = { alunos: true, presencas: true, carteirinhas: true, relatorios: true,
@@ -3296,7 +3377,12 @@
                                 excluirAlunos: true };
                         }
                         if (!('excluirAlunos' in u.permissoes)) u.permissoes.excluirAlunos = true;
-                        if (!('alunoVinculado' in u)) u.alunoVinculado = null;
+                        if (!('alunosVinculados' in u)) u.alunosVinculados = [];
+                        if (!('status' in u)) u.status = 'aprovado';
+                        if (!('senha' in u) && u.senhaInicial) {
+                            u.senha = u.senhaInicial;
+                            delete u.senhaInicial;
+                        }
                     });
                     return parsed;
                 }
@@ -3378,11 +3464,14 @@
             return currentUser && currentUser.perfil === 'Pai';
         }
 
+        function isUsuarioAprovado() {
+            return currentUser && currentUser.status === 'aprovado';
+        }
+
         function getAlunosVinculados() {
             if (isAdmin()) return data.alunos;
-            if (isPai() && currentUser.alunoVinculado) {
-                const aluno = data.alunos.find(a => a.id === currentUser.alunoVinculado);
-                return aluno ? [aluno] : [];
+            if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
+                return data.alunos.filter(a => currentUser.alunosVinculados.includes(a.id));
             }
             return [];
         }
@@ -3390,7 +3479,7 @@
         function podeEditarAluno(alunoId) {
             if (isAdmin()) return true;
             if (isPai()) {
-                return currentUser.alunoVinculado === alunoId;
+                return currentUser.alunosVinculados && currentUser.alunosVinculados.includes(alunoId);
             }
             return false;
         }
@@ -3445,144 +3534,312 @@
         }
 
         // ============================================================
-        //  FUNÇÕES DE LOGIN
+        //  FUNÇÕES DE LOGIN E REGISTRO
         // ============================================================
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('registroUsuarioContainer').style.display = 'none';
             document.getElementById('recuperarSenhaContainer').style.display = 'none';
             aplicarPersonalizacaoCompleta();
         }
 
+        function showRegistroUsuario() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('registroUsuarioContainer').style.display = 'flex';
+            document.getElementById('recuperarSenhaContainer').style.display = 'none';
+            document.getElementById('registroError').style.display = 'none';
+            document.getElementById('registroSuccess').style.display = 'none';
+        }
+
         function showRecuperarSenha() {
             document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('registroUsuarioContainer').style.display = 'none';
             document.getElementById('recuperarSenhaContainer').style.display = 'flex';
             document.getElementById('recuperarError').style.display = 'none';
             document.getElementById('recuperarSuccess').style.display = 'none';
         }
 
-        async function handleRecuperarSenha(e) {
+        // ============================================================
+        //  REGISTRO DE NOVO USUÁRIO
+        // ============================================================
+        async function handleRegistroUsuario(e) {
             e.preventDefault();
-            const email = document.getElementById('recuperarEmail').value.trim();
-            const errorDiv = document.getElementById('recuperarError');
-            const successDiv = document.getElementById('recuperarSuccess');
+
+            const nome = document.getElementById('registroNome').value.trim();
+            const email = document.getElementById('registroEmail').value.trim();
+            const perfil = document.getElementById('registroPerfil').value;
+            const senha = document.getElementById('registroSenha').value;
+            const confirmarSenha = document.getElementById('registroConfirmarSenha').value;
+            const errorDiv = document.getElementById('registroError');
+            const successDiv = document.getElementById('registroSuccess');
+            const btn = document.getElementById('btnRegistrar');
 
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
-            if (!email) {
-                errorDiv.textContent = 'Digite seu e-mail';
+            if (!nome || !email || !senha) {
+                errorDiv.textContent = 'Preencha todos os campos';
                 errorDiv.style.display = 'block';
                 return false;
             }
 
-            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
-            if (!user) {
-                errorDiv.textContent = 'E-mail não encontrado no sistema';
+            if (senha !== confirmarSenha) {
+                errorDiv.textContent = 'As senhas não coincidem';
                 errorDiv.style.display = 'block';
                 return false;
             }
 
-            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
-                .toUpperCase();
-            user.senha = novaSenha;
-            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
+            if (!validarSenha(senha)) {
+                errorDiv.textContent = 'Senha deve ter mínimo 6 caracteres, com letra, número e caractere especial';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            // Verificar se e-mail já existe
+            if (data.usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                errorDiv.textContent = 'Este e-mail já está cadastrado no sistema';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
+            const usuarioGerado = 'user' + numero;
+
+            // Criar usuário com status pendente
+            const novoUsuario = {
+                id: 'user_' + Date.now(),
+                nome: nome,
+                email: email,
+                perfil: perfil,
+                usuario: usuarioGerado,
+                senha: senha,
+                status: 'pendente',
+                permissoes: {
+                    alunos: perfil === 'Pai' ? false : true,
+                    presencas: perfil === 'Pai' ? false : true,
+                    carteirinhas: perfil === 'Pai' ? false : true,
+                    relatorios: perfil === 'Pai' ? false : true,
+                    notificacoes: perfil === 'Pai' ? false : true,
+                    backup: false,
+                    configuracoes: false,
+                    usuarios: false,
+                    excluirAlunos: false
+                },
+                alunosVinculados: [],
+                criadoEm: new Date().toISOString(),
+                primeiroAcesso: true
+            };
+
+            data.usuarios.push(novoUsuario);
+            data.solicitacoesPendentes.push({
+                id: 'sol_' + Date.now(),
+                usuarioId: novoUsuario.id,
+                nome: nome,
+                email: email,
+                perfil: perfil,
+                data: new Date().toISOString()
+            });
+
             saveData();
 
-            const config = data.config.emailjs || {};
-            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
+            // Tentar enviar e-mail para o administrador
+            const emailEnviado = await enviarEmailAdminNovoUsuario(nome, email, perfil, usuarioGerado);
 
             if (emailEnviado) {
-                successDiv.innerHTML =
-                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
-                successDiv.style.display = 'block';
-                showToast('✅ Nova senha enviada para o e-mail!');
-                document.getElementById('recuperarEmail').value = '';
+                successDiv.innerHTML = `
+                    ✅ <strong>Solicitação enviada com sucesso!</strong><br>
+                    <span style="font-size:12px;color:var(--gray-dark);">Aguarde a aprovação do administrador.</span>
+                    <br><br>
+                    <small style="color:var(--gray-dark);">Você receberá um e-mail quando seu cadastro for aprovado.</small>
+                `;
             } else {
-                successDiv.innerHTML =
-                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
-                successDiv.style.display = 'block';
-                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
+                successDiv.innerHTML = `
+                    ✅ <strong>Solicitação enviada com sucesso!</strong><br>
+                    <span style="font-size:12px;color:var(--gray-dark);">Aguarde a aprovação do administrador.</span>
+                    <br><br>
+                    <small style="color:var(--orange);">⚠️ Não foi possível enviar o e-mail de notificação. O administrador será notificado na próxima vez que acessar o sistema.</small>
+                `;
             }
+
+            successDiv.style.display = 'block';
+            showToast('✅ Solicitação de cadastro enviada! Aguarde aprovação.');
+
+            // Limpar formulário
+            document.getElementById('registroNome').value = '';
+            document.getElementById('registroEmail').value = '';
+            document.getElementById('registroSenha').value = '';
+            document.getElementById('registroConfirmarSenha').value = '';
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> Solicitar Cadastro';
+
+            setTimeout(() => {
+                showLogin();
+            }, 4000);
+
             return false;
         }
 
-        async function enviarEmailRecuperacao(email, nome, novaSenha) {
+        // ============================================================
+        //  ENVIAR E-MAIL PARA ADMIN SOBRE NOVO USUÁRIO
+        // ============================================================
+        async function enviarEmailAdminNovoUsuario(nome, email, perfil, usuario) {
             const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
+            if (!config.serviceId || !config.templateId || !config.publicKey) {
+                console.warn('⚠️ EmailJS não configurado. Não foi possível enviar notificação.');
+                return false;
+            }
+
             try {
-                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
+                if (emailjs && typeof emailjs.init === 'function') {
+                    emailjs.init(config.publicKey);
+                }
+
+                // Buscar admin
+                const admin = data.usuarios.find(u => u.perfil === 'Administrador');
+                const adminEmail = admin ? admin.email : 'admin@vilarealfutsal.com';
+
                 const templateParams = {
-                    to_email: email,
-                    to_name: nome || 'Usuário',
-                    nova_senha: novaSenha,
+                    to_email: adminEmail,
+                    to_name: admin ? admin.nome : 'Administrador',
+                    usuario_nome: nome,
+                    usuario_email: email,
+                    usuario_perfil: perfil,
+                    usuario_usuario: usuario,
                     sistema: 'Vila Real Futsal',
-                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
+                    mensagem: `Um novo usuário solicitou cadastro no sistema. Acesse o painel de administração para aprovar ou rejeitar a solicitação.`,
+                    link_aprovacao: window.location.href
                 };
+
                 await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
+                console.log('✅ E-mail de notificação enviado para o administrador!');
                 return true;
             } catch (error) {
-                console.error('❌ Erro ao enviar e-mail:', error);
+                console.error('❌ Erro ao enviar e-mail de notificação:', error);
                 return false;
             }
         }
 
         // ============================================================
-        //  CONFIGURAÇÕES DO EMAILJS
+        //  ENVIAR E-MAIL PARA USUÁRIO APROVADO
         // ============================================================
-        function salvarConfigEmailJS() {
-            const serviceId = document.getElementById('emailjsServiceId').value.trim();
-            const templateId = document.getElementById('emailjsTemplateId').value.trim();
-            const publicKey = document.getElementById('emailjsPublicKey').value.trim();
-
-            if (!serviceId || !templateId || !publicKey) {
-                showToast('Preencha todos os campos do EmailJS', 'error');
-                return;
-            }
-
-            data.config.emailjs = { serviceId, templateId, publicKey };
-            saveData();
-
-            try {
-                if (typeof emailjs !== 'undefined' && emailjs.init) {
-                    emailjs.init(publicKey);
-                    showToast('✅ Configurações do EmailJS salvas e inicializadas!');
-                } else {
-                    showToast('⚠️ EmailJS não carregado. Atualize a página.', 'error');
-                }
-            } catch (e) {
-                showToast('Erro ao inicializar EmailJS: ' + e.message, 'error');
-            }
-        }
-
-        async function testarEmailJS() {
+        async function enviarEmailUsuarioAprovado(email, nome, usuario, senha) {
             const config = data.config.emailjs || {};
             if (!config.serviceId || !config.templateId || !config.publicKey) {
-                showToast('Configure o EmailJS primeiro!', 'error');
-                return;
+                console.warn('⚠️ EmailJS não configurado.');
+                return false;
             }
 
-            const emailTeste = currentUser ? currentUser.email : 'teste@email.com';
-            const nomeTeste = currentUser ? currentUser.nome : 'Usuário Teste';
-
             try {
-                if (typeof emailjs !== 'undefined' && emailjs.init) emailjs.init(config.publicKey);
+                if (emailjs && typeof emailjs.init === 'function') {
+                    emailjs.init(config.publicKey);
+                }
+
                 const templateParams = {
-                    to_email: emailTeste,
-                    to_name: nomeTeste,
-                    nova_senha: 'SenhaTeste@123',
-                    sistema: 'Vila Real Futsal - Teste',
-                    mensagem: 'Este é um e-mail de teste para verificar a configuração do EmailJS.'
+                    to_email: email,
+                    to_name: nome,
+                    usuario: usuario,
+                    senha: senha,
+                    sistema: 'Vila Real Futsal',
+                    mensagem: 'Seu cadastro foi aprovado! Agora você pode acessar o sistema com as credenciais abaixo.'
                 };
+
                 await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                showToast(`✅ E-mail de teste enviado para ${emailTeste}!`);
+                console.log('✅ E-mail de aprovação enviado para o usuário!');
+                return true;
             } catch (error) {
-                console.error('Erro no teste:', error);
-                showToast('❌ Erro ao enviar e-mail de teste: ' + error.message, 'error');
+                console.error('❌ Erro ao enviar e-mail de aprovação:', error);
+                return false;
             }
         }
 
         // ============================================================
-        //  HANDLE LOGIN - COM PERSISTÊNCIA DE SESSÃO
+        //  APROVAR/REJEITAR USUÁRIO
+        // ============================================================
+        function aprovarUsuario(userId) {
+            if (!isAdmin()) {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+
+            if (user.status === 'aprovado') {
+                showToast('Usuário já está aprovado', 'warning');
+                return;
+            }
+
+            user.status = 'aprovado';
+            user.primeiroAcesso = true;
+
+            // Remover da lista de pendentes
+            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
+
+            // Gerar nova senha se não tiver
+            if (!user.senha) {
+                user.senha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
+                    .toUpperCase();
+            }
+
+            saveData();
+            renderUsuarios();
+            showToast(`✅ Usuário ${user.nome} aprovado!`);
+
+            // Enviar e-mail de aprovação
+            enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
+
+            // Adicionar notificação
+            data.notificacoes.push({
+                id: 'notif_' + Date.now(),
+                tipo: 'aprovacao',
+                usuarioId: user.id,
+                usuarioNome: user.nome,
+                mensagem: `✅ Usuário ${user.nome} foi aprovado!`,
+                data: new Date().toISOString(),
+                status: 'lido'
+            });
+            saveData();
+        }
+
+        function rejeitarUsuario(userId) {
+            if (!isAdmin()) {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+
+            if (!confirm(`Tem certeza que deseja rejeitar o usuário ${user.nome}?`)) return;
+
+            user.status = 'rejeitado';
+
+            // Remover da lista de pendentes
+            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
+
+            saveData();
+            renderUsuarios();
+            showToast(`❌ Usuário ${user.nome} rejeitado`);
+
+            // Adicionar notificação
+            data.notificacoes.push({
+                id: 'notif_' + Date.now(),
+                tipo: 'rejeicao',
+                usuarioId: user.id,
+                usuarioNome: user.nome,
+                mensagem: `❌ Usuário ${user.nome} foi rejeitado.`,
+                data: new Date().toISOString(),
+                status: 'lido'
+            });
+            saveData();
+        }
+
+        // ============================================================
+        //  HANDLE LOGIN - COM VALIDAÇÃO DE STATUS
         // ============================================================
         function handleLogin(e) {
             e.preventDefault();
@@ -3606,6 +3863,19 @@
 
             if (!user) {
                 errorDiv.textContent = 'Usuário não encontrado';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            // Verificar status do usuário
+            if (user.status === 'pendente') {
+                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'rejeitado') {
+                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
                 errorDiv.style.display = 'block';
                 return false;
             }
@@ -3650,6 +3920,13 @@
             // Inicializar EmailJS
             initEmailJS();
 
+            // Verificar solicitações pendentes (apenas admin)
+            if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
+                setTimeout(() => {
+                    showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`, 'info');
+                }, 1500);
+            }
+
             // Renderizar menu e sistema
             renderizarMenu();
             initSystem();
@@ -3677,6 +3954,16 @@
                 btn.style.display = isAdminUser ? 'inline-flex' : 'none';
             });
 
+            // Botões de presença - apenas admin e professor
+            const botoesPresenca = document.querySelectorAll('#btnAbrirScanner, #btnConfirmarPresenca, .btn-scan, .btn-success');
+            botoesPresenca.forEach(btn => {
+                if (isPaiUser) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'inline-flex';
+                }
+            });
+
             // Botões de edição e exclusão em cards de aluno
             document.querySelectorAll('.aluno-card .actions .btn-primary, .aluno-card .actions .btn-danger').forEach(btn => {
                 if (isAdminUser) {
@@ -3686,7 +3973,7 @@
                     const card = btn.closest('.aluno-card');
                     if (card) {
                         const alunoId = card.dataset?.alunoId || '';
-                        if (alunoId === currentUser?.alunoVinculado) {
+                        if (currentUser.alunosVinculados && currentUser.alunosVinculados.includes(alunoId)) {
                             btn.style.display = 'inline-flex';
                         } else {
                             btn.style.display = 'none';
@@ -4107,9 +4394,8 @@
 
             // Renderizar itens principais
             mainItems.forEach((item) => {
-                // Para perfil Pai, mostrar apenas Dashboard, Alunos, Carteirinhas, Presenças
-                if (isPaiUser && !['dashboard', 'alunos', 'carteirinhas', 'presencas', 'notificacoes'].includes(item
-                    .page)) {
+                // Para perfil Pai, mostrar apenas Dashboard, Alunos, Carteirinhas, Presenças (sem botões de ação)
+                if (isPaiUser && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(item.page)) {
                     return;
                 }
 
@@ -4167,8 +4453,8 @@
             // Atualizar badges
             const badgeAlunos = document.getElementById('badge_alunos');
             if (badgeAlunos) {
-                const alunosVisiveis = isPaiUser && currentUser.alunoVinculado ? 
-                    data.alunos.filter(a => a.id === currentUser.alunoVinculado).length : data.alunos.length;
+                const alunosVisiveis = isPaiUser && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0 ?
+                    data.alunos.filter(a => currentUser.alunosVinculados.includes(a.id)).length : data.alunos.length;
                 badgeAlunos.textContent = alunosVisiveis || '';
             }
 
@@ -4189,7 +4475,7 @@
         // ============================================================
         function mudarPagina(page) {
             // Verificar permissão para perfil Pai
-            if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'presencas', 'notificacoes'].includes(page)) {
+            if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(page)) {
                 showToast('❌ Você não tem permissão para acessar esta página', 'error');
                 return;
             }
@@ -4624,6 +4910,12 @@
         }
 
         function enviarPresencaWhatsApp() {
+            // Pais não podem enviar presença por WhatsApp
+            if (isPai()) {
+                showToast('❌ Pais não podem marcar presença', 'error');
+                return;
+            }
+
             const input = document.getElementById('qrCodeManual');
             const code = input.value.trim();
 
@@ -4654,9 +4946,15 @@
         }
 
         // ============================================================
-        //  SCANNER QR CODE - CORRIGIDO COM FECHAMENTO AUTOMÁTICO
+        //  SCANNER QR CODE - CORRIGIDO
         // ============================================================
         async function abrirScanner() {
+            // Pais não podem abrir o scanner
+            if (isPai()) {
+                showToast('❌ Pais não podem marcar presença', 'error');
+                return;
+            }
+
             const container = document.getElementById('scannerContainer');
             const status = document.getElementById('scannerStatus');
             if (!container || !status) return;
@@ -4674,18 +4972,13 @@
 
             try {
                 html5QrCode = new Html5Qrcode('qr-reader');
-                const config = { 
-                    fps: 15, 
-                    qrbox: { width: 250, height: 250 }, 
+                const config = {
+                    fps: 15,
+                    qrbox: { width: 250, height: 250 },
                     aspectRatio: 1.0,
                     experimentalFeatures: { useBarCodeDetectorIfSupported: true }
                 };
-                await html5QrCode.start(
-                    { facingMode: 'environment' }, 
-                    config, 
-                    onScanSuccess, 
-                    onScanError
-                );
+                await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
                 scannerAtivo = true;
                 scannerFechadoAutomaticamente = false;
                 status.innerHTML = '<span style="color:#22c55e;">📷 Aponte a câmera para o QR Code.</span>';
@@ -4693,7 +4986,8 @@
                 scannerAtivo = false;
                 try { html5QrCode?.clear(); } catch (_) {}
                 html5QrCode = null;
-                status.innerHTML = `<span style="color:#ef4444;">❌ Não foi possível iniciar a câmera: ${err?.message || 'erro desconhecido'}</span>`;
+                status.innerHTML =
+                `<span style="color:#ef4444;">❌ Não foi possível iniciar a câmera: ${err?.message || 'erro desconhecido'}</span>`;
             }
         }
 
@@ -4708,7 +5002,6 @@
                     const aluno = data.alunos.find(a => a.id === alunoId);
                     if (aluno) {
                         confirmarPresenca(alunoId);
-                        // Fechar scanner automaticamente após 1.5s
                         setTimeout(() => {
                             fecharScanner();
                             mudarPagina('presencas');
@@ -4765,9 +5058,9 @@
             if (container) container.style.display = 'none';
         }
 
-        function reiniciarScanner() { 
+        function reiniciarScanner() {
             fecharScanner();
-            setTimeout(() => abrirScanner(), 500); 
+            setTimeout(() => abrirScanner(), 500);
         }
 
         // ============================================================
@@ -4831,6 +5124,7 @@
             console.log('📊 Alunos:', data.alunos.length);
             console.log('👥 Usuários:', data.usuarios.length);
             console.log('👤 Perfil:', currentUser ? currentUser.perfil : 'Nenhum');
+            console.log('📋 Solicitações pendentes:', data.solicitacoesPendentes ? data.solicitacoesPendentes.length : 0);
         }
 
         // ============================================================
@@ -4845,22 +5139,25 @@
             const presencasHoje = data.presencas.filter(p => {
                 const aluno = data.alunos.find(a => a.id === p.alunoId);
                 if (!aluno) return false;
-                if (isPai() && currentUser.alunoVinculado && aluno.id !== currentUser.alunoVinculado) return false;
+                if (isPai() && currentUser.alunosVinculados && !currentUser.alunosVinculados.includes(aluno.id))
+                    return false;
                 return new Date(p.data).toDateString() === hoje;
             });
             document.getElementById('presencasHoje').textContent = presencasHoje.length;
 
             const totalPresencas = data.presencas.filter(p => {
                 const aluno = data.alunos.find(a => a.id === p.alunoId);
-                return aluno && (isAdmin() || (isPai() && aluno.id === currentUser.alunoVinculado));
+                return aluno && (isAdmin() || (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados
+                    .includes(aluno.id)));
             }).length;
-            
+
             document.getElementById('frequenciaMedia').textContent = alunos.length > 0 ?
                 Math.round((totalPresencas / (alunos.length * 30)) * 100) + '%' : '0%';
 
             const ultimas = data.presencas.slice(-5).reverse().filter(p => {
                 const aluno = data.alunos.find(a => a.id === p.alunoId);
-                return aluno && (isAdmin() || (isPai() && aluno.id === currentUser.alunoVinculado));
+                return aluno && (isAdmin() || (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados
+                    .includes(aluno.id)));
             });
             const container = document.getElementById('ultimasPresencas');
             if (ultimas.length === 0) {
@@ -4919,7 +5216,7 @@
                     <div class="empty-state" style="grid-column:1/-1;">
                         <i class="fas fa-user-graduate"></i>
                         <h3>${isPai() ? 'Nenhum aluno vinculado à sua conta' : 'Nenhum aluno cadastrado'}</h3>
-                        <p>${isPai() ? 'Entre em contato com a administração para vincular seu aluno.' : 'Clique em "Novo Aluno" para começar.'}</p>
+                        <p>${isPai() ? 'Entre em contato com a administração para vincular seu(s) aluno(s).' : 'Clique em "Novo Aluno" para começar.'}</p>
                     </div>
                 `;
                 return;
@@ -4950,9 +5247,9 @@
                         ${podeExcluir && isAdmin() ? `<button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
                             <i class="fas fa-trash"></i>
                         </button>` : ''}
-                        <button class="btn btn-success btn-sm" onclick="confirmarPresenca('${aluno.id}')">
+                        ${!isPai() ? `<button class="btn btn-success btn-sm" onclick="confirmarPresenca('${aluno.id}')">
                             <i class="fas fa-check"></i> Presença
-                        </button>
+                        </button>` : ''}
                         ${aluno.whatsapp ? `<button class="btn btn-whatsapp btn-sm" onclick="enviarWhatsAppAluno('${aluno.id}')"><i class="fab fa-whatsapp"></i></button>` : ''}
                     </div>
                 </div>
@@ -4960,8 +5257,8 @@
         }
 
         function openModal(id) {
-            if (id === 'modalAluno' && isPai()) {
-                showToast('❌ Pais não podem criar novos alunos', 'error');
+            if (id === 'modalAluno' && !isAdmin()) {
+                showToast('❌ Apenas administradores podem criar alunos', 'error');
                 return;
             }
             document.getElementById(id).classList.add('active');
@@ -5000,8 +5297,8 @@
         function salvarAluno(e) {
             e.preventDefault();
 
-            if (isPai()) {
-                showToast('❌ Pais não podem criar ou editar alunos', 'error');
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem criar alunos', 'error');
                 return false;
             }
 
@@ -5107,14 +5404,14 @@
 
             const aluno = data.alunos.find(a => a.id === id);
             data.alunos = data.alunos.filter(a => a.id !== id);
-            
+
             // Verificar se algum pai está vinculado a este aluno
             data.usuarios.forEach(u => {
-                if (u.alunoVinculado === id) {
-                    u.alunoVinculado = null;
+                if (u.alunosVinculados && u.alunosVinculados.includes(id)) {
+                    u.alunosVinculados = u.alunosVinculados.filter(aId => aId !== id);
                 }
             });
-            
+
             saveData();
             renderAlunos();
             renderDashboard();
@@ -5149,18 +5446,18 @@
         }
 
         // ============================================================
-        //  PRESENÇAS
+        //  PRESENÇAS - APENAS ADMIN E PROFESSOR
         // ============================================================
         function confirmarPresenca(alunoId, enviarNotif = true) {
+            // Pais não podem marcar presença
+            if (isPai()) {
+                showToast('❌ Pais não podem marcar presença', 'error');
+                return false;
+            }
+
             if (!alunoId) return;
             const aluno = data.alunos.find(a => a.id === alunoId);
             if (!aluno) { showToast('Aluno não encontrado', 'error'); return; }
-
-            // Verificar se o pai pode marcar presença do aluno
-            if (isPai() && currentUser.alunoVinculado !== alunoId) {
-                showToast('❌ Você só pode marcar presença do seu aluno vinculado', 'error');
-                return;
-            }
 
             const hoje = new Date().toISOString();
             const jaMarcou = data.presencas.some(p => p.alunoId === alunoId && new Date(p.data).toDateString() === new Date()
@@ -5191,6 +5488,12 @@
         }
 
         function confirmarPresencaManual() {
+            // Pais não podem marcar presença
+            if (isPai()) {
+                showToast('❌ Pais não podem marcar presença', 'error');
+                return;
+            }
+
             const input = document.getElementById('qrCodeManual');
             const code = input.value.trim();
             if (!code) { showToast('Digite o código do aluno', 'error'); return; }
@@ -5208,12 +5511,12 @@
         // ============================================================
         function renderNotificacoes() {
             const container = document.getElementById('listaNotificacoes');
-            
+
             let notificacoes = data.notificacoes;
-            if (isPai() && currentUser.alunoVinculado) {
-                notificacoes = notificacoes.filter(n => n.alunoId === currentUser.alunoVinculado);
+            if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
+                notificacoes = notificacoes.filter(n => currentUser.alunosVinculados.includes(n.alunoId));
             }
-            
+
             if (notificacoes.length === 0) {
                 container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>Nenhuma notificação</h3></div>`;
@@ -5227,13 +5530,13 @@
 
         function limparNotificacoes() {
             if (!confirm('Limpar histórico?')) return;
-            
-            if (isPai() && currentUser.alunoVinculado) {
-                data.notificacoes = data.notificacoes.filter(n => n.alunoId !== currentUser.alunoVinculado);
+
+            if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
+                data.notificacoes = data.notificacoes.filter(n => !currentUser.alunosVinculados.includes(n.alunoId));
             } else {
                 data.notificacoes = [];
             }
-            
+
             saveData();
             renderNotificacoes();
             const badgeNotif = document.getElementById('badge_notificacoes');
@@ -5247,11 +5550,11 @@
         function carregarPresencasHoje() {
             const container = document.getElementById('presencasList');
             const hoje = new Date().toDateString();
-            
+
             let presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
-            
-            if (isPai() && currentUser.alunoVinculado) {
-                presencasHoje = presencasHoje.filter(p => p.alunoId === currentUser.alunoVinculado);
+
+            if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
+                presencasHoje = presencasHoje.filter(p => currentUser.alunosVinculados.includes(p.alunoId));
             }
 
             if (presencasHoje.length === 0) {
@@ -5337,15 +5640,16 @@
         }
 
         // ============================================================
-        //  BACKUP
+        //  BACKUP - APENAS ADMIN
         // ============================================================
         function exportarBackup() {
-            if (isPai()) {
-                showToast('❌ Pais não podem acessar backups', 'error');
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem acessar backups', 'error');
                 return;
             }
             const dados = { usuarios: data.usuarios, alunos: data.alunos, presencas: data.presencas,
                 notificacoes: data.notificacoes, whatsappMessages: data.whatsappMessages, config: data.config,
+                solicitacoesPendentes: data.solicitacoesPendentes,
                 proximoNumeroAluno: data.proximoNumeroAluno, proximoNumeroUsuario: data.proximoNumeroUsuario,
                 exportadoEm: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
@@ -5357,8 +5661,8 @@
         }
 
         function exportarBackupCSV() {
-            if (isPai()) {
-                showToast('❌ Pais não podem acessar backups', 'error');
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem acessar backups', 'error');
                 return;
             }
             if (data.alunos.length === 0) { showToast('Nenhum aluno', 'error'); return; }
@@ -5376,8 +5680,8 @@
         }
 
         function importarBackup(event) {
-            if (isPai()) {
-                showToast('❌ Pais não podem importar backups', 'error');
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem importar backups', 'error');
                 return;
             }
             const file = event.target.files[0];
@@ -5400,6 +5704,7 @@
                     data.presencas = importedData.presencas || [];
                     data.notificacoes = importedData.notificacoes || [];
                     data.whatsappMessages = importedData.whatsappMessages || [];
+                    data.solicitacoesPendentes = importedData.solicitacoesPendentes || [];
                     data.config = importedData.config || data.config;
                     data.proximoNumeroAluno = importedData.proximoNumeroAluno || 1;
                     data.proximoNumeroUsuario = importedData.proximoNumeroUsuario || 2;
@@ -5421,11 +5726,11 @@
         }
 
         // ============================================================
-        //  IMPORTAR ALUNOS CSV
+        //  IMPORTAR ALUNOS CSV - APENAS ADMIN
         // ============================================================
         function importarAlunosCSV(event) {
-            if (isPai()) {
-                showToast('❌ Pais não podem importar alunos', 'error');
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem importar alunos', 'error');
                 return;
             }
             const file = event.target.files[0];
@@ -5505,11 +5810,11 @@
         }
 
         // ============================================================
-        //  CONFIGURAÇÕES
+        //  CONFIGURAÇÕES - APENAS ADMIN
         // ============================================================
         function renderConfiguracoes() {
-            if (isPai()) {
-                document.getElementById('configCategorias').innerHTML = 
+            if (!isAdmin()) {
+                document.getElementById('configCategorias').innerHTML =
                     `<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>`;
                 document.getElementById('configHorariosCategoria').innerHTML = '';
                 document.getElementById('diasTreino').disabled = true;
@@ -5564,7 +5869,7 @@
             document.getElementById('emailjsServiceId').value = emailjsConfig.serviceId || '';
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
-            
+
             // Reativar campos
             document.getElementById('diasTreino').disabled = false;
             document.getElementById('whatsappNumero').disabled = false;
@@ -5576,7 +5881,7 @@
         }
 
         function adicionarCategoria() {
-            if (isPai()) {
+            if (!isAdmin()) {
                 showToast('❌ Apenas administradores', 'error');
                 return;
             }
@@ -5594,7 +5899,7 @@
         }
 
         function removerCategoria(index) {
-            if (isPai()) {
+            if (!isAdmin()) {
                 showToast('❌ Apenas administradores', 'error');
                 return;
             }
@@ -5608,7 +5913,7 @@
         }
 
         function salvarConfiguracoes() {
-            if (isPai()) {
+            if (!isAdmin()) {
                 showToast('❌ Apenas administradores', 'error');
                 return;
             }
@@ -5645,45 +5950,83 @@
         }
 
         // ============================================================
-        //  USUÁRIOS
+        //  USUÁRIOS - APENAS ADMIN
         // ============================================================
         function renderUsuarios() {
             const container = document.getElementById('listaUsuarios');
-            
-            if (isPai()) {
-                container.innerHTML = 
+
+            if (!isAdmin()) {
+                container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>`;
                 return;
             }
-            
+
             if (data.usuarios.length === 0) {
                 container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum usuário</h3></div>`;
                 return;
             }
 
-            const isAdminUser = isAdmin();
+            // Separar usuários pendentes e aprovados
+            const pendentes = data.usuarios.filter(u => u.status === 'pendente');
+            const aprovados = data.usuarios.filter(u => u.status !== 'pendente');
 
-            container.innerHTML = data.usuarios.map(u => {
-                return `
+            let html = '';
+
+            // Solicitações pendentes
+            if (pendentes.length > 0) {
+                html += `
+                    <div style="background:#dbeafe;border-radius:12px;padding:16px;margin-bottom:16px;border-left:4px solid #1d4ed8;">
+                        <h4 style="color:#1d4ed8;margin-bottom:8px;"><i class="fas fa-clock"></i> Solicitações Pendentes (${pendentes.length})</h4>
+                        ${pendentes.map(u => `
+                            <div class="usuario-item" style="background:white;border-radius:8px;padding:12px;margin-bottom:8px;">
+                                <div class="usuario-info">
+                                    <div class="usuario-avatar" style="background:#dbeafe;color:#1d4ed8;">${u.nome.charAt(0).toUpperCase()}</div>
+                                    <div class="usuario-dados">
+                                        <div class="nome">${u.nome}</div>
+                                        <div class="email">${u.email} • ${u.usuario || u.email}</div>
+                                        <div style="font-size:12px;color:#1d4ed8;">⏳ Aguardando aprovação</div>
+                                    </div>
+                                </div>
+                                <div class="usuario-actions">
+                                    <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${u.id}')">
+                                        <i class="fas fa-check"></i> Aprovar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${u.id}')">
+                                        <i class="fas fa-times"></i> Rejeitar
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Usuários aprovados
+            if (aprovados.length > 0) {
+                html += `<div style="margin-top:8px;">`;
+                html += aprovados.map(u => {
+                    const alunoVinculado = u.alunosVinculados && u.alunosVinculados.length > 0 ?
+                        data.alunos.filter(a => u.alunosVinculados.includes(a.id)).map(a => a.nome).join(', ') :
+                        'Nenhum';
+                    return `
                     <div class="usuario-item">
                         <div class="usuario-info">
                             <div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}</div>
                             <div class="usuario-dados">
                                 <div class="nome">${u.nome} ${u.id === 'admin' ? '👑' : ''}</div>
                                 <div class="email">${u.email} • ${u.usuario || u.email}</div>
-                                ${u.perfil === 'Pai' && u.alunoVinculado ? 
-                                    `<div style="font-size:12px;color:var(--secondary);">👨‍👦 Vinculado a: ${data.alunos.find(a => a.id === u.alunoVinculado)?.nome || 'Aluno não encontrado'}</div>` : ''}
+                                ${u.perfil === 'Pai' ? `<div style="font-size:12px;color:var(--secondary);">👨‍👦 Alunos vinculados: ${alunoVinculado}</div>` : ''}
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span class="usuario-perfil">${u.perfil}</span>
-                            <span class="usuario-status ${u.primeiroAcesso ? 'pendente' : 'ativo'}">
-                                ${u.primeiroAcesso ? '⏳ Pendente' : '✅ Ativo'}
+                            <span class="usuario-status ${u.status === 'aprovado' ? 'ativo' : 'pendente'}">
+                                ${u.status === 'aprovado' ? '✅ Aprovado' : '⏳ Pendente'}
                             </span>
                         </div>
                         <div class="usuario-actions">
-                            ${u.id !== 'admin' && isAdminUser ? `
+                            ${u.id !== 'admin' ? `
                                 <button class="btn btn-permissoes btn-sm" onclick="abrirPermissoesUsuario('${u.id}')" title="Gerenciar Permissões">
                                     <i class="fas fa-user-lock"></i>
                                 </button>
@@ -5691,7 +6034,7 @@
                                     <i class="fas fa-key"></i>
                                 </button>
                                 ${u.perfil === 'Pai' ? `
-                                    <button class="btn btn-secondary btn-sm" onclick="vincularAlunoPai('${u.id}')" title="Vincular Aluno">
+                                    <button class="btn btn-secondary btn-sm" onclick="vincularAlunoPai('${u.id}')" title="Vincular Alunos">
                                         <i class="fas fa-link"></i>
                                     </button>
                                 ` : ''}
@@ -5699,12 +6042,15 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             ` : `
-                                ${u.id === 'admin' && isAdminUser ? '<span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>' : ''}
+                                <span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>
                             `}
                         </div>
                     </div>
-                `;
-            }).join('');
+                `}).join('');
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
         }
 
         function openModalUsuario() {
@@ -5717,6 +6063,7 @@
             document.getElementById('usuarioEditId').value = '';
             document.getElementById('usuarioForm').reset();
             document.getElementById('usuarioSenha').placeholder = 'Deixe em branco para gerar';
+            document.getElementById('usuarioStatus').value = 'aprovado';
 
             document.getElementById('permAlunos').checked = true;
             document.getElementById('permPresencas').checked = true;
@@ -5739,6 +6086,7 @@
             const nome = document.getElementById('usuarioNome').value.trim();
             const email = document.getElementById('usuarioEmail').value.trim();
             const perfil = document.getElementById('usuarioPerfil').value;
+            const status = document.getElementById('usuarioStatus').value;
             const senhaInput = document.getElementById('usuarioSenha').value.trim();
 
             const permissoes = {
@@ -5775,17 +6123,24 @@
                 perfil: perfil,
                 usuario: usuarioGerado,
                 senha: senha,
+                status: status,
                 permissoes: permissoes,
                 criadoEm: new Date().toISOString(),
                 primeiroAcesso: true,
-                alunoVinculado: null
+                alunosVinculados: []
             };
 
             data.usuarios.push(novoUsuario);
             saveData();
             closeModal('modalUsuario');
             renderUsuarios();
-            showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
+
+            if (status === 'pendente') {
+                showToast(`✅ Usuário criado com status PENDENTE!`);
+            } else {
+                showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
+            }
+
             return false;
         }
 
@@ -5796,6 +6151,9 @@
             }
             if (id === 'admin') { showToast('Não é possível excluir o admin', 'error'); return; }
             if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+            // Remover de solicitações pendentes
+            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== id);
 
             data.usuarios = data.usuarios.filter(u => u.id !== id);
             saveData();
@@ -5849,7 +6207,7 @@
         }
 
         // ============================================================
-        //  VINCULAR ALUNO AO PERFIL PAI
+        //  VINCULAR ALUNOS AO PERFIL PAI (MULTIPLOS)
         // ============================================================
         function vincularAlunoPai(userId) {
             if (!isAdmin()) {
@@ -5865,32 +6223,36 @@
                 return;
             }
 
-            // Criar modal simples para selecionar aluno
             const alunos = data.alunos;
             if (alunos.length === 0) {
                 showToast('Nenhum aluno cadastrado para vincular', 'error');
                 return;
             }
 
+            const alunosVinculados = user.alunosVinculados || [];
+
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
-            
+            overlay.style.cssText =
+                'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
+
             const modal = document.createElement('div');
-            modal.style.cssText = 'background:white;border-radius:16px;max-width:500px;width:100%;padding:30px;max-height:80vh;overflow-y:auto;';
-            
+            modal.style.cssText =
+                'background:white;border-radius:16px;max-width:550px;width:100%;padding:30px;max-height:80vh;overflow-y:auto;';
+
             let html = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                    <h2 style="color:var(--primary);font-size:20px;"><i class="fas fa-link"></i> Vincular Aluno a ${user.nome}</h2>
+                    <h2 style="color:var(--primary);font-size:20px;"><i class="fas fa-link"></i> Vincular Alunos a ${user.nome}</h2>
                     <button onclick="this.closest('div[style]').parentElement.remove()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#6b7280;">&times;</button>
                 </div>
-                <p style="color:var(--gray-dark);margin-bottom:16px;">Selecione o aluno que será vinculado a este pai:</p>
-                <div style="display:flex;flex-direction:column;gap:8px;">
+                <p style="color:var(--gray-dark);margin-bottom:16px;">Selecione os alunos que este pai poderá visualizar:</p>
+                <p style="font-size:12px;color:var(--gray-dark);margin-bottom:12px;"><i class="fas fa-info-circle"></i> O pai poderá ver todos os alunos selecionados abaixo.</p>
+                <div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;">
             `;
 
             alunos.forEach(aluno => {
-                const isSelected = user.alunoVinculado === aluno.id;
+                const isSelected = alunosVinculados.includes(aluno.id);
                 html += `
-                    <div onclick="selecionarAlunoPai('${userId}', '${aluno.id}')" style="padding:12px 16px;background:${isSelected ? 'var(--secondary)' : 'var(--gray)'};border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:2px solid ${isSelected ? 'var(--secondary)' : 'transparent'};">
+                    <div onclick="toggleVinculoAlunoPai('${userId}', '${aluno.id}')" style="padding:10px 16px;background:${isSelected ? 'var(--secondary)' : 'var(--gray)'};border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:2px solid ${isSelected ? 'var(--secondary)' : 'transparent'};">
                         <div>
                             <strong>${aluno.nome}</strong>
                             <div style="font-size:12px;color:var(--gray-dark);">${aluno.numero} • ${aluno.categoria}</div>
@@ -5912,21 +6274,68 @@
             document.body.appendChild(overlay);
         }
 
-        function selecionarAlunoPai(userId, alunoId) {
+        function toggleVinculoAlunoPai(userId, alunoId) {
             const user = data.usuarios.find(u => u.id === userId);
             if (!user) return;
 
-            user.alunoVinculado = user.alunoVinculado === alunoId ? null : alunoId;
+            if (!user.alunosVinculados) user.alunosVinculados = [];
+
+            const index = user.alunosVinculados.indexOf(alunoId);
+            if (index > -1) {
+                user.alunosVinculados.splice(index, 1);
+            } else {
+                user.alunosVinculados.push(alunoId);
+            }
+
             saveData();
-            
-            // Atualizar lista de usuários
+
+            // Atualizar a lista de usuários
             renderUsuarios();
-            
-            // Fechar modal de seleção
-            const overlay = document.querySelector('div[style*="position:fixed"][style*="background:rgba(0,0,0,0.7)"]');
-            if (overlay) overlay.remove();
-            
-            showToast(user.alunoVinculado ? '✅ Aluno vinculado com sucesso!' : '❌ Vínculo removido');
+
+            // Atualizar a visualização do modal atual
+            const modal = document.querySelector('div[style*="position:fixed"][style*="background:rgba(0,0,0,0.7)"]');
+            if (modal) {
+                // Reconstruir o modal com os dados atualizados
+                const userUpdated = data.usuarios.find(u => u.id === userId);
+                if (userUpdated) {
+                    const alunos = data.alunos;
+                    const alunosVinculados = userUpdated.alunosVinculados || [];
+                    let html = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                            <h2 style="color:var(--primary);font-size:20px;"><i class="fas fa-link"></i> Vincular Alunos a ${userUpdated.nome}</h2>
+                            <button onclick="this.closest('div[style]').parentElement.remove()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#6b7280;">&times;</button>
+                        </div>
+                        <p style="color:var(--gray-dark);margin-bottom:16px;">Selecione os alunos que este pai poderá visualizar:</p>
+                        <p style="font-size:12px;color:var(--gray-dark);margin-bottom:12px;"><i class="fas fa-info-circle"></i> O pai poderá ver todos os alunos selecionados abaixo.</p>
+                        <div style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;">
+                    `;
+
+                    alunos.forEach(aluno => {
+                        const isSelected = alunosVinculados.includes(aluno.id);
+                        html += `
+                            <div onclick="toggleVinculoAlunoPai('${userId}', '${aluno.id}')" style="padding:10px 16px;background:${isSelected ? 'var(--secondary)' : 'var(--gray)'};border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:2px solid ${isSelected ? 'var(--secondary)' : 'transparent'};">
+                                <div>
+                                    <strong>${aluno.nome}</strong>
+                                    <div style="font-size:12px;color:var(--gray-dark);">${aluno.numero} • ${aluno.categoria}</div>
+                                </div>
+                                ${isSelected ? '<span style="color:var(--primary);"><i class="fas fa-check-circle"></i> Vinculado</span>' : '<span style="color:var(--gray-dark);"><i class="fas fa-link"></i> Vincular</span>'}
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        </div>
+                        <div style="margin-top:16px;display:flex;gap:10px;">
+                            <button onclick="this.closest('div[style]').parentElement.remove()" class="btn btn-secondary" style="flex:1;justify-content:center;">Fechar</button>
+                        </div>
+                    `;
+
+                    const modalContent = modal.querySelector('.modal-content') || modal;
+                    modalContent.innerHTML = html;
+                }
+            }
+
+            showToast(user.alunosVinculados.length > 0 ? '✅ Alunos vinculados com sucesso!' : '❌ Todos os vínculos removidos');
         }
 
         // ============================================================
@@ -5978,7 +6387,6 @@
                 excluirAlunos: document.getElementById('permEditExcluirAlunos').checked
             };
 
-            // Se for o próprio usuário, atualizar também currentUser
             if (currentUser && currentUser.id === userId) {
                 currentUser.permissoes = { ...user.permissoes };
             }
@@ -6006,7 +6414,88 @@
         }
 
         // ============================================================
-        //  INICIALIZAÇÃO - COM RESTAURAÇÃO DE SESSÃO
+        //  RECUPERAR SENHA
+        // ============================================================
+        async function handleRecuperarSenha(e) {
+            e.preventDefault();
+            const email = document.getElementById('recuperarEmail').value.trim();
+            const errorDiv = document.getElementById('recuperarError');
+            const successDiv = document.getElementById('recuperarSuccess');
+
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (!email) {
+                errorDiv.textContent = 'Digite seu e-mail';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!user) {
+                errorDiv.textContent = 'E-mail não encontrado no sistema';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'pendente') {
+                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            if (user.status === 'rejeitado') {
+                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
+                .toUpperCase();
+            user.senha = novaSenha;
+            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
+            saveData();
+
+            const config = data.config.emailjs || {};
+            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
+
+            if (emailEnviado) {
+                successDiv.innerHTML =
+                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
+                successDiv.style.display = 'block';
+                showToast('✅ Nova senha enviada para o e-mail!');
+                document.getElementById('recuperarEmail').value = '';
+            } else {
+                successDiv.innerHTML =
+                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
+                successDiv.style.display = 'block';
+                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
+            }
+            return false;
+        }
+
+        async function enviarEmailRecuperacao(email, nome, novaSenha) {
+            const config = data.config.emailjs || {};
+            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
+            try {
+                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
+                const templateParams = {
+                    to_email: email,
+                    to_name: nome || 'Usuário',
+                    nova_senha: novaSenha,
+                    sistema: 'Vila Real Futsal',
+                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
+                };
+                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
+                return true;
+            } catch (error) {
+                console.error('❌ Erro ao enviar e-mail:', error);
+                return false;
+            }
+        }
+
+        // ============================================================
+        //  INICIALIZAÇÃO
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Carregando sistema...');
@@ -6022,6 +6511,12 @@
                 data.config.whatsappNumero = '111946359524';
                 saveData();
             }
+
+            // Garantir que todos os usuários tenham status
+            data.usuarios.forEach(u => {
+                if (!u.status) u.status = 'aprovado';
+                if (!u.alunosVinculados) u.alunosVinculados = [];
+            });
 
             // Criar dados de exemplo se não houver alunos
             if (data.alunos.length === 0) {
@@ -6069,29 +6564,48 @@
             }
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
+            if (!data.solicitacoesPendentes) data.solicitacoesPendentes = [];
 
             // Tentar restaurar sessão
             const usuarioSessao = carregarSessao();
             if (usuarioSessao) {
-                currentUser = usuarioSessao;
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'block';
-                
-                document.getElementById('userName').textContent = currentUser.nome;
-                document.getElementById('userRole').textContent = currentUser.perfil;
-                document.getElementById('userAvatar').textContent = currentUser.nome.charAt(0).toUpperCase();
-                document.getElementById('whatsappFloat').style.display = 'flex';
-                document.getElementById('securityBadge').style.display = isAdmin() ? 'inline-flex' : 'none';
-                
-                atualizarWhatsAppBadge();
-                initEmailJS();
-                renderizarMenu();
-                initSystem();
-                aplicarPersonalizacaoCompleta();
-                atualizarBotoesPorPerfil();
-                
-                console.log('🔄 Sessão restaurada para:', currentUser.nome);
+                // Verificar se o usuário ainda está aprovado
+                if (usuarioSessao.status === 'aprovado') {
+                    currentUser = usuarioSessao;
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('sidebar').style.display = 'flex';
+                    document.getElementById('mainContent').style.display = 'block';
+
+                    document.getElementById('userName').textContent = currentUser.nome;
+                    document.getElementById('userRole').textContent = currentUser.perfil;
+                    document.getElementById('userAvatar').textContent = currentUser.nome.charAt(0).toUpperCase();
+                    document.getElementById('whatsappFloat').style.display = 'flex';
+                    document.getElementById('securityBadge').style.display = isAdmin() ? 'inline-flex' : 'none';
+
+                    atualizarWhatsAppBadge();
+                    initEmailJS();
+                    renderizarMenu();
+                    initSystem();
+                    aplicarPersonalizacaoCompleta();
+                    atualizarBotoesPorPerfil();
+
+                    console.log('🔄 Sessão restaurada para:', currentUser.nome);
+
+                    // Verificar solicitações pendentes (apenas admin)
+                    if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
+                        setTimeout(() => {
+                            showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`,
+                                'info');
+                        }, 1500);
+                    }
+                } else {
+                    // Usuário não está mais aprovado, limpar sessão
+                    limparSessao();
+                    document.getElementById('sidebar').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'none';
+                    showLogin();
+                    showToast('⚠️ Seu acesso foi revogado. Entre em contato com o administrador.', 'error');
+                }
             } else {
                 // Mostrar login
                 document.getElementById('sidebar').style.display = 'none';
@@ -6107,8 +6621,9 @@
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
             console.log('📱 Versão mobile otimizada!');
-            console.log('👨‍👦 Perfil Pai com vínculo a aluno implementado!');
+            console.log('👨‍👦 Perfil Pai com vínculo a múltiplos alunos!');
             console.log('🔄 Sessão persistente - não volta ao login ao atualizar a página!');
+            console.log('📋 Cadastro com aprovação do administrador!');
         });
     </script>
 
