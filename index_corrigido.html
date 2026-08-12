@@ -2424,12 +2424,21 @@
             <form id="recuperarSenhaForm" onsubmit="return handleRecuperarSenha(event)">
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> E-mail</label>
-                    <input type="email" id="recuperarEmail" placeholder="Digite seu e-mail" required>
+                    <input type="email" id="recuperarEmail" placeholder="Digite seu e-mail" required autocomplete="email">
                 </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Nova senha</label>
+                    <input type="password" id="recuperarNovaSenha" placeholder="Mínimo 6 caracteres" minlength="6" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Confirmar nova senha</label>
+                    <input type="password" id="recuperarConfirmarSenha" placeholder="Repita a nova senha" minlength="6" required autocomplete="new-password">
+                </div>
+                <div style="font-size:11px;color:var(--gray-dark);margin:-4px 0 12px;">A senha deve conter letra, número e caractere especial.</div>
                 <div id="recuperarError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
                 <div id="recuperarSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
                 <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;" id="btnRecuperar">
-                    <i class="fas fa-paper-plane"></i> Enviar Nova Senha
+                    <i class="fas fa-paper-plane"></i> Alterar Senha e Enviar por E-mail
                 </button>
             </form>
 
@@ -2878,6 +2887,15 @@
                                 <span class="config-label">Public Key</span>
                                 <input type="text" id="emailjsPublicKey" placeholder="public_xxxx" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;">
                             </div>
+                            <div class="config-item">
+                                <span class="config-label">Nome do remetente</span>
+                                <input type="text" id="emailjsFromName" placeholder="Vila Real Futsal" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;">
+                            </div>
+                            <div style="display:grid;gap:6px;margin-top:8px;">
+                                <label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" id="emailAutoCadastro" checked> Responder automaticamente ao cadastro</label>
+                                <label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" id="emailAutoAprovacao" checked> Enviar aprovação automaticamente</label>
+                                <label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" id="emailAutoRecuperacao" checked> Enviar recuperação de senha automaticamente</label>
+                            </div>
                             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                                 <button class="btn btn-secondary btn-sm" onclick="salvarConfigEmailJS()">
                                     <i class="fas fa-save"></i> Salvar Configurações
@@ -2887,6 +2905,14 @@
                                 </button>
                             </div>
                             <div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
+                            <div style="margin-top:18px;border-top:1px solid #e5e7eb;padding-top:16px;">
+                                <h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;"><i class="fas fa-reply"></i> Responder por E-mail</h4>
+                                <div class="config-item"><span class="config-label">Destinatário</span><input type="email" id="emailRespostaDestino" placeholder="destinatario@email.com" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;"></div>
+                                <div class="config-item"><span class="config-label">Assunto</span><input type="text" id="emailRespostaAssunto" placeholder="Resposta - Vila Real Futsal" style="padding:6px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;"></div>
+                                <div class="config-item" style="align-items:flex-start;"><span class="config-label">Mensagem</span><textarea id="emailRespostaMensagem" rows="5" placeholder="Digite a resposta..." style="padding:8px 12px;border:2px solid #e5e7eb;border-radius:6px;flex:1;resize:vertical;"></textarea></div>
+                                <button class="btn btn-primary btn-sm" onclick="enviarRespostaEmail()"><i class="fas fa-paper-plane"></i> Enviar Resposta</button>
+                                <div id="emailRespostaStatus" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
+                            </div>
                         </div>
 
                         <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;width:100%;">
@@ -3461,7 +3487,7 @@
                     loginLogoSize: 80,
                     loginTitle: 'VILA REAL',
                     loginSubtitle: 'Futsal · Gestão de Presenças',
-                    emailjs: { serviceId: '', templateId: '', publicKey: '' },
+                    emailjs: { serviceId: '', templateId: '', publicKey: '', fromName: 'Vila Real Futsal', autoCadastro: true, autoAprovacao: true, autoRecuperacao: true },
                     botoes: {
                         primaryBg: '#0f1b2d',
                         primaryColor: '#ffffff',
@@ -3503,49 +3529,54 @@
         function loadData() {
             try {
                 const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    const defaults = getDefaultData();
-                    for (let key in defaults) {
-                        if (!(key in parsed)) parsed[key] = defaults[key];
-                    }
-                    if (!parsed.config.botoes) parsed.config.botoes = defaults.config.botoes;
-                    if (!parsed.config.cores) parsed.config.cores = defaults.config.cores;
-                    if (!parsed.config.emailjs) parsed.config.emailjs = { serviceId: '', templateId: '', publicKey: '' };
-                    const adminExists = parsed.usuarios.some(u => u.id === 'admin');
-                    if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
-                    if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
-                    if (!parsed.whatsappMessages) parsed.whatsappMessages = [];
-                    if (!parsed.solicitacoesPendentes) parsed.solicitacoesPendentes = [];
-                    parsed.usuarios.forEach(u => {
-                        if (!u.permissoes) {
-                            u.permissoes = { alunos: true, presencas: true, carteirinhas: true, relatorios: true,
-                                notificacoes: true, backup: true, configuracoes: false, usuarios: false,
-                                excluirAlunos: true };
-                        }
-                        if (!('excluirAlunos' in u.permissoes)) u.permissoes.excluirAlunos = true;
-                        if (!('alunosVinculados' in u)) u.alunosVinculados = [];
-                        if (!('status' in u)) u.status = 'aprovado';
-                        if (!('senha' in u) && u.senhaInicial) {
-                            u.senha = u.senhaInicial;
-                            delete u.senhaInicial;
-                        }
-                    });
-                    return parsed;
-                }
-            } catch (e) { console.error('Erro ao carregar dados', e); }
-            return getDefaultData();
+                const defaults = getDefaultData();
+                if (!stored) return defaults;
+                const parsed = JSON.parse(stored);
+                const result = { ...defaults, ...parsed };
+                result.config = { ...defaults.config, ...(parsed.config || {}) };
+                result.config.botoes = { ...defaults.config.botoes, ...((parsed.config || {}).botoes || {}) };
+                result.config.cores = { ...defaults.config.cores, ...((parsed.config || {}).cores || {}) };
+                result.config.emailjs = { ...defaults.config.emailjs, ...((parsed.config || {}).emailjs || {}) };
+                result.config.categorias = Array.isArray(parsed.config?.categorias) ? parsed.config.categorias : defaults.config.categorias;
+                result.config.horariosCategoria = { ...defaults.config.horariosCategoria, ...((parsed.config || {}).horariosCategoria || {}) };
+                result.usuarios = Array.isArray(parsed.usuarios) ? parsed.usuarios : [];
+                result.alunos = Array.isArray(parsed.alunos) ? parsed.alunos : [];
+                result.presencas = Array.isArray(parsed.presencas) ? parsed.presencas : [];
+                result.notificacoes = Array.isArray(parsed.notificacoes) ? parsed.notificacoes : [];
+                result.whatsappMessages = Array.isArray(parsed.whatsappMessages) ? parsed.whatsappMessages : [];
+                result.solicitacoesPendentes = Array.isArray(parsed.solicitacoesPendentes) ? parsed.solicitacoesPendentes : [];
+                const adminIndex = result.usuarios.findIndex(u => u && u.id === 'admin');
+                if (adminIndex === -1) result.usuarios.unshift(JSON.parse(JSON.stringify(ADMIN_DATA)));
+                else result.usuarios[adminIndex] = { ...JSON.parse(JSON.stringify(ADMIN_DATA)), ...result.usuarios[adminIndex], permissoes: { ...ADMIN_DATA.permissoes, ...(result.usuarios[adminIndex].permissoes || {}) } };
+                const defaultPermissoes = { alunos:true, presencas:true, carteirinhas:true, relatorios:true, notificacoes:true, backup:true, configuracoes:false, usuarios:false, excluirAlunos:true };
+                result.usuarios.forEach(u => {
+                    if (!u || typeof u !== 'object') return;
+                    u.permissoes = { ...defaultPermissoes, ...(u.permissoes || {}) };
+                    if (u.id === 'admin') u.permissoes = { ...ADMIN_DATA.permissoes, ...u.permissoes };
+                    if (!Array.isArray(u.alunosVinculados)) u.alunosVinculados = [];
+                    if (!u.status) u.status = 'aprovado';
+                    if (!('senha' in u) && u.senhaInicial) { u.senha = u.senhaInicial; delete u.senhaInicial; }
+                });
+                result.proximoNumeroAluno = Number(result.proximoNumeroAluno) > 0 ? Number(result.proximoNumeroAluno) : 1;
+                result.proximoNumeroUsuario = Number(result.proximoNumeroUsuario) > 0 ? Number(result.proximoNumeroUsuario) : 2;
+                return result;
+            } catch (e) { console.error('Erro ao carregar dados', e); return getDefaultData(); }
         }
 
         function saveData() {
             try {
-                const adminExists = data.usuarios.some(u => u.id === 'admin');
-                if (!adminExists) data.usuarios.unshift(ADMIN_DATA);
+                if (!Array.isArray(data.usuarios)) data.usuarios = [];
+                if (!data.usuarios.some(u => u && u.id === 'admin')) data.usuarios.unshift(JSON.parse(JSON.stringify(ADMIN_DATA)));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            } catch (e) { console.error('Erro ao salvar dados', e); }
+                window.dispatchEvent(new CustomEvent('vilaReal:data-saved'));
+                return true;
+            } catch (e) {
+                console.error('Erro ao salvar dados', e);
+                showToast('Não foi possível salvar os dados neste navegador.', 'error');
+                return false;
+            }
         }
 
-        // ============================================================
         //  VALIDAR SENHA
         // ============================================================
         function validarSenha(senha) {
@@ -3584,19 +3615,21 @@
         }
 
         function getAlunosVinculados() {
+            if (!currentUser) return [];
             if (isAdmin()) return data.alunos;
-            if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
-                return data.alunos.filter(a => currentUser.alunosVinculados.includes(a.id));
+            if (isPai()) {
+                if (!temPermissao('alunos')) return [];
+                const vinculados = Array.isArray(currentUser.alunosVinculados) ? currentUser.alunosVinculados : [];
+                return data.alunos.filter(a => vinculados.includes(a.id));
             }
-            return [];
+            return temPermissao('alunos') ? data.alunos : [];
         }
 
         function podeEditarAluno(alunoId) {
+            if (!currentUser || !temPermissao('alunos')) return false;
             if (isAdmin()) return true;
-            if (isPai()) {
-                return currentUser.alunosVinculados && currentUser.alunosVinculados.includes(alunoId);
-            }
-            return false;
+            if (isPai()) return Array.isArray(currentUser.alunosVinculados) && currentUser.alunosVinculados.includes(alunoId);
+            return true;
         }
 
         // ============================================================
@@ -3810,6 +3843,18 @@
             // Tentar enviar e-mail para o administrador
             const emailEnviado = await enviarEmailAdminNovoUsuario(nome, email, perfil, usuarioGerado);
 
+            // Resposta automática ao solicitante, se habilitada
+            if (data.config.emailjs?.autoCadastro !== false) {
+                await enviarEmailSistema({
+                    to: email,
+                    nome,
+                    assunto: 'Solicitação de cadastro recebida - Vila Real Futsal',
+                    mensagem: `Olá ${nome},\n\nSua solicitação de cadastro foi recebida com sucesso e está aguardando análise do administrador.\n\nUsuário solicitado: ${usuarioGerado}\nPerfil: ${perfil}\n\nVocê receberá uma nova mensagem quando o cadastro for aprovado.`,
+                    tipo: 'cadastro_automatico',
+                    usuario: usuarioGerado
+                });
+            }
+
             if (emailEnviado) {
                 successDiv.innerHTML = `
                     ✅ <strong>Solicitação enviada com sucesso!</strong><br>
@@ -3888,40 +3933,21 @@
         //  ENVIAR E-MAIL PARA USUÁRIO APROVADO
         // ============================================================
         async function enviarEmailUsuarioAprovado(email, nome, usuario, senha) {
-            const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) {
-                console.warn('⚠️ EmailJS não configurado.');
-                return false;
-            }
-
-            try {
-                if (emailjs && typeof emailjs.init === 'function') {
-                    emailjs.init(config.publicKey);
-                }
-
-                const templateParams = {
-                    to_email: email,
-                    to_name: nome,
-                    usuario: usuario,
-                    senha: senha,
-                    sistema: 'Vila Real Futsal',
-                    mensagem: `Seu cadastro foi aprovado!\n\nUsuário: ${usuario}\nSenha: ${senha}\n\nAcesse o sistema no link abaixo:`,
-                    link_aprovacao: window.location.href
-                };
-
-                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                console.log('✅ E-mail de aprovação enviado para o usuário!');
-                return true;
-            } catch (error) {
-                console.error('❌ Erro ao enviar e-mail de aprovação:', error);
-                return false;
-            }
+            return await enviarEmailSistema({
+                to: email,
+                nome,
+                usuario,
+                senha,
+                assunto: 'Cadastro aprovado - Vila Real Futsal',
+                mensagem: `Seu cadastro foi aprovado!\n\nUsuário: ${usuario}\nSenha: ${senha}\n\nAcesse o sistema pelo link abaixo.`,
+                tipo: 'aprovacao'
+            });
         }
 
         // ============================================================
         //  APROVAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
-        function aprovarUsuario(userId) {
+        async function aprovarUsuario(userId) {
             console.log('📋 Aprovando usuário:', userId);
 
             if (!isAdmin()) {
@@ -3958,8 +3984,9 @@
 
             saveData();
 
-            // Enviar e-mail de aprovação
-            enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
+            // Enviar e-mail de aprovação automaticamente, se habilitado
+            const emailAutoAprovacao = data.config.emailjs?.autoAprovacao !== false;
+            if (emailAutoAprovacao) await enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
 
             // Adicionar notificação de sucesso
             data.notificacoes.push({
@@ -4201,7 +4228,7 @@
         // ============================================================
         function initEmailJS() {
             const config = data.config.emailjs || {};
-            if (config.publicKey && config.publicKey !== '') {
+            if (config.publicKey && config.publicKey !== '' && typeof emailjs !== 'undefined' && typeof emailjs.init === 'function') {
                 try {
                     emailjs.init(config.publicKey);
                     console.log('✅ EmailJS inicializado com sucesso!');
@@ -4623,28 +4650,18 @@
                 `;
             });
 
-            if (isAdmin) {
-                let hasAdminItems = false;
-                adminItems.forEach((item) => {
-                    if (item.isSeparator) {
-                        html += `<div class="menu-label">${item.label}</div>`;
-                        return;
-                    }
-
-                    if (!isAdmin && !permissoes[item.permissao]) return;
-
-                    hasAdminItems = true;
+            const visibleAdminItems = adminItems.filter(item => item.isSeparator || isAdmin || permissoes[item.permissao] === true);
+            if (visibleAdminItems.some(item => !item.isSeparator)) {
+                html += '<div class="menu-label">Administração</div>';
+                visibleAdminItems.forEach((item) => {
+                    if (item.isSeparator) return;
                     html += `
-                        <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
+                        <button type="button" class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
                             <i class="${item.icon}"></i>
                             <span>${item.label}</span>
                         </button>
                     `;
                 });
-
-                if (!hasAdminItems) {
-                    html = html.replace('<div class="menu-label">Administração</div>', '');
-                }
             }
 
             container.innerHTML = html;
@@ -4671,6 +4688,13 @@
         //  NAVEGAÇÃO
         // ============================================================
         function mudarPagina(page) {
+            if (!currentUser) return;
+            const acesso = { dashboard: true, alunos:'alunos', carteirinhas:'carteirinhas', presencas:'presencas', notificacoes:'notificacoes', relatorios:'relatorios', backup:'backup', usuarios:'usuarios', configuracoes:'configuracoes', personalizar:'personalizar' };
+            const required = acesso[page];
+            if (required === 'personalizar' ? !isAdmin() : (required && !temPermissao(required))) {
+                showToast('❌ Você não tem permissão para acessar este módulo.', 'error');
+                return;
+            }
             if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(page)) {
                 showToast('❌ Você não tem permissão para acessar esta página', 'error');
                 return;
@@ -5053,7 +5077,9 @@
         }
 
         function enviarWhatsApp(aluno, mensagem) {
-            const numero = aluno.whatsapp.replace(/\D/g, '');
+            let numero = aluno.whatsapp.replace(/\D/g, '');
+            if (numero.startsWith('55')) numero = numero.slice(2);
+            if (numero.length < 10 || numero.length > 11) { showToast('Número de WhatsApp inválido.', 'error'); return; }
             const msgEncoded = encodeURIComponent(mensagem);
 
             window.open(`https://wa.me/55${numero}?text=${msgEncoded}`, '_blank');
@@ -5185,49 +5211,17 @@
 
         function onScanSuccess(decodedText) {
             const status = document.getElementById('scannerStatus');
-            status.innerHTML = `<span style="color:#22c55e;">✅ QR Code identificado!</span>`;
-
+            if (!status || !decodedText) return;
+            status.innerHTML = '<span style="color:#22c55e;">✅ QR Code identificado!</span>';
+            let aluno = null;
             try {
-                const data = JSON.parse(decodedText);
-                const alunoId = data.id;
-                if (alunoId) {
-                    const aluno = data.alunos.find(a => a.id === alunoId);
-                    if (aluno) {
-                        confirmarPresenca(alunoId);
-                        setTimeout(() => {
-                            fecharScanner();
-                            mudarPagina('presencas');
-                        }, 1500);
-                    } else {
-                        status.innerHTML = `<span style="color:#ef4444;">❌ Aluno não encontrado!</span>`;
-                        setTimeout(() => fecharScanner(), 3000);
-                    }
-                } else {
-                    const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
-                    if (aluno) {
-                        confirmarPresenca(aluno.id);
-                        setTimeout(() => {
-                            fecharScanner();
-                            mudarPagina('presencas');
-                        }, 1500);
-                    } else {
-                        status.innerHTML = `<span style="color:#ef4444;">❌ Código inválido!</span>`;
-                        setTimeout(() => fecharScanner(), 3000);
-                    }
-                }
-            } catch (e) {
-                const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
-                if (aluno) {
-                    confirmarPresenca(aluno.id);
-                    setTimeout(() => {
-                        fecharScanner();
-                        mudarPagina('presencas');
-                    }, 1500);
-                } else {
-                    status.innerHTML = `<span style="color:#ef4444;">❌ Código não reconhecido!</span>`;
-                    setTimeout(() => fecharScanner(), 3000);
-                }
-            }
+                const qrPayload = JSON.parse(decodedText);
+                if (qrPayload?.id) aluno = data.alunos.find(a => a.id === qrPayload.id);
+                if (!aluno && qrPayload?.numero) aluno = data.alunos.find(a => a.numero === qrPayload.numero);
+            } catch (_) {}
+            if (!aluno) aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
+            if (!aluno) { status.innerHTML = '<span style="color:#ef4444;">❌ Código não reconhecido!</span>'; setTimeout(() => fecharScanner(), 3000); return; }
+            if (confirmarPresenca(aluno.id)) setTimeout(() => { fecharScanner(); mudarPagina('presencas'); }, 1200);
         }
 
         function onScanError(err) {}
@@ -6067,6 +6061,10 @@
                 document.getElementById('emailjsServiceId').disabled = true;
                 document.getElementById('emailjsTemplateId').disabled = true;
                 document.getElementById('emailjsPublicKey').disabled = true;
+                document.getElementById('emailjsFromName').disabled = true;
+                document.getElementById('emailAutoCadastro').disabled = true;
+                document.getElementById('emailAutoAprovacao').disabled = true;
+                document.getElementById('emailAutoRecuperacao').disabled = true;
                 return;
             }
 
@@ -6112,6 +6110,10 @@
             document.getElementById('emailjsServiceId').value = emailjsConfig.serviceId || '';
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
+            document.getElementById('emailjsFromName').value = emailjsConfig.fromName || 'Vila Real Futsal';
+            document.getElementById('emailAutoCadastro').checked = emailjsConfig.autoCadastro !== false;
+            document.getElementById('emailAutoAprovacao').checked = emailjsConfig.autoAprovacao !== false;
+            document.getElementById('emailAutoRecuperacao').checked = emailjsConfig.autoRecuperacao !== false;
 
             document.getElementById('diasTreino').disabled = false;
             document.getElementById('whatsappNumero').disabled = false;
@@ -6120,6 +6122,10 @@
             document.getElementById('emailjsServiceId').disabled = false;
             document.getElementById('emailjsTemplateId').disabled = false;
             document.getElementById('emailjsPublicKey').disabled = false;
+            document.getElementById('emailjsFromName').disabled = false;
+            document.getElementById('emailAutoCadastro').disabled = false;
+            document.getElementById('emailAutoAprovacao').disabled = false;
+            document.getElementById('emailAutoRecuperacao').disabled = false;
         }
 
         function adicionarCategoria() {
@@ -6154,6 +6160,23 @@
             showToast('Categoria removida');
         }
 
+        function salvarConfigEmailJS() {
+            if (!isAdmin()) { showToast('❌ Apenas administradores', 'error'); return; }
+            const serviceId = document.getElementById('emailjsServiceId').value.trim();
+            const templateId = document.getElementById('emailjsTemplateId').value.trim();
+            const publicKey = document.getElementById('emailjsPublicKey').value.trim();
+            const fromName = document.getElementById('emailjsFromName')?.value.trim() || 'Vila Real Futsal';
+            const autoCadastro = document.getElementById('emailAutoCadastro')?.checked !== false;
+            const autoAprovacao = document.getElementById('emailAutoAprovacao')?.checked !== false;
+            const autoRecuperacao = document.getElementById('emailAutoRecuperacao')?.checked !== false;
+            data.config.emailjs = { serviceId, templateId, publicKey, fromName, autoCadastro, autoAprovacao, autoRecuperacao };
+            saveData();
+            if (publicKey && typeof emailjs !== 'undefined' && typeof emailjs.init === 'function') {
+                try { emailjs.init(publicKey); } catch (e) { console.warn('Erro ao inicializar EmailJS:', e); }
+            }
+            showToast(serviceId && templateId && publicKey ? '✅ Configuração do EmailJS salva!' : '⚠️ Configuração do EmailJS limpa.');
+        }
+
         function salvarConfiguracoes() {
             if (!isAdmin()) {
                 showToast('❌ Apenas administradores', 'error');
@@ -6176,19 +6199,84 @@
             const templateId = document.getElementById('emailjsTemplateId').value.trim();
             const publicKey = document.getElementById('emailjsPublicKey').value.trim();
 
+            const fromName = document.getElementById('emailjsFromName')?.value.trim() || 'Vila Real Futsal';
+            const autoCadastro = document.getElementById('emailAutoCadastro')?.checked !== false;
+            const autoAprovacao = document.getElementById('emailAutoAprovacao')?.checked !== false;
+            const autoRecuperacao = document.getElementById('emailAutoRecuperacao')?.checked !== false;
+            data.config.emailjs = { serviceId, templateId, publicKey, fromName, autoCadastro, autoAprovacao, autoRecuperacao };
             if (serviceId && templateId && publicKey) {
-                data.config.emailjs = { serviceId, templateId, publicKey };
                 try {
-                    if (typeof emailjs !== 'undefined' && emailjs.init) {
-                        emailjs.init(publicKey);
-                    }
-                } catch (e) {
-                    console.warn('Erro ao inicializar EmailJS:', e);
-                }
+                    if (typeof emailjs !== 'undefined' && emailjs.init) emailjs.init(publicKey);
+                } catch (e) { console.warn('Erro ao inicializar EmailJS:', e); }
             }
 
             saveData();
             showToast('Configurações salvas!');
+        }
+
+        // ============================================================
+        //  MOTOR CENTRAL DE E-MAIL
+        // ============================================================
+        function emailConfigValida() {
+            const config = data.config.emailjs || {};
+            return !!(config.serviceId && config.templateId && config.publicKey && typeof emailjs !== 'undefined' && typeof emailjs.send === 'function');
+        }
+
+        async function enviarEmailSistema({ to, nome, assunto, mensagem, tipo = 'resposta', usuario = '', senha = '', link = window.location.href }) {
+            const config = data.config.emailjs || {};
+            if (!emailConfigValida()) {
+                console.warn('EmailJS não configurado ou biblioteca indisponível.');
+                return false;
+            }
+            if (!to) return false;
+            try {
+                emailjs.init(config.publicKey);
+                const templateParams = {
+                    to_email: to,
+                    to_name: nome || 'Usuário',
+                    from_name: config.fromName || 'Vila Real Futsal',
+                    subject: assunto || 'Vila Real Futsal',
+                    assunto: assunto || 'Vila Real Futsal',
+                    mensagem: mensagem || '',
+                    tipo_email: tipo,
+                    usuario: usuario || '',
+                    senha: senha || '',
+                    nova_senha: senha || '',
+                    sistema: 'Vila Real Futsal',
+                    link_aprovacao: link
+                };
+                await emailjs.send(config.serviceId, config.templateId, templateParams);
+                return true;
+            } catch (error) {
+                console.error('Erro ao enviar e-mail pelo sistema:', error);
+                return false;
+            }
+        }
+
+        async function enviarRespostaEmail() {
+            if (!isAdmin()) { showToast('❌ Apenas administradores podem enviar respostas por e-mail.', 'error'); return; }
+            const status = document.getElementById('emailRespostaStatus');
+            const to = document.getElementById('emailRespostaDestino').value.trim();
+            const assunto = document.getElementById('emailRespostaAssunto').value.trim();
+            const mensagem = document.getElementById('emailRespostaMensagem').value.trim();
+            status.style.display = 'block';
+            status.style.background = '#fef3c7';
+            status.textContent = 'Enviando e-mail...';
+            if (!to || !assunto || !mensagem) {
+                status.style.background = '#fee2e2';
+                status.textContent = '❌ Informe destinatário, assunto e mensagem.';
+                return false;
+            }
+            const ok = await enviarEmailSistema({ to, nome: '', assunto, mensagem, tipo: 'resposta_manual' });
+            status.style.background = ok ? '#dcfce7' : '#fee2e2';
+            status.textContent = ok ? '✅ Resposta enviada com sucesso.' : '❌ Não foi possível enviar. Verifique o EmailJS e o template.';
+            if (ok) {
+                document.getElementById('emailRespostaMensagem').value = '';
+                showToast('✅ Resposta de e-mail enviada!');
+            } else {
+                showToast('❌ Falha no envio do e-mail.', 'error');
+            }
+            return ok;
         }
 
         // ============================================================
@@ -6704,6 +6792,7 @@
 
         function salvarPermissoesUsuario(e) {
             e.preventDefault();
+            if (!isAdmin()) { showToast('Apenas administradores podem alterar permissões.', 'error'); return false; }
 
             const userId = document.getElementById('permissoesUsuarioId').value;
             const user = data.usuarios.find(u => u.id === userId);
@@ -6753,84 +6842,88 @@
         async function handleRecuperarSenha(e) {
             e.preventDefault();
             const email = document.getElementById('recuperarEmail').value.trim();
+            const novaSenha = document.getElementById('recuperarNovaSenha').value;
+            const confirmarSenha = document.getElementById('recuperarConfirmarSenha').value;
             const errorDiv = document.getElementById('recuperarError');
             const successDiv = document.getElementById('recuperarSuccess');
+            const btn = document.getElementById('btnRecuperar');
 
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
-            if (!email) {
-                errorDiv.textContent = 'Digite seu e-mail';
-                errorDiv.style.display = 'block';
-                return false;
-            }
+            if (!email) return mostrarErroRecuperacao('Digite seu e-mail');
+            if (!validarSenha(novaSenha)) return mostrarErroRecuperacao('A nova senha deve ter mínimo 6 caracteres, letra, número e caractere especial.');
+            if (novaSenha !== confirmarSenha) return mostrarErroRecuperacao('As senhas não coincidem.');
 
-            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
-            if (!user) {
-                errorDiv.textContent = 'E-mail não encontrado no sistema';
-                errorDiv.style.display = 'block';
-                return false;
-            }
+            const user = data.usuarios.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+            if (!user) return mostrarErroRecuperacao('E-mail não encontrado no sistema.');
+            if (user.status === 'pendente') return mostrarErroRecuperacao('⏳ Seu cadastro está aguardando aprovação do administrador.');
+            if (user.status === 'rejeitado') return mostrarErroRecuperacao('❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.');
+            if (data.config.emailjs?.autoRecuperacao === false) return mostrarErroRecuperacao('A recuperação automática por e-mail está desativada pelo administrador.');
+            if (!emailConfigValida()) return mostrarErroRecuperacao('O serviço de e-mail ainda não está configurado pelo administrador.');
 
-            if (user.status === 'pendente') {
-                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
+            const senhaAnterior = user.senha;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
-            if (user.status === 'rejeitado') {
-                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
+            try {
+                // Salva temporariamente a nova senha; se o e-mail falhar, restaura a anterior.
+                user.senha = novaSenha;
+                if (user.id === 'admin') data.config.senhaMaster = novaSenha;
+                saveData();
 
-            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
-                .toUpperCase();
-            user.senha = novaSenha;
-            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
-            saveData();
+                const ok = await enviarEmailRecuperacao(email, user.nome, novaSenha);
+                if (!ok) {
+                    user.senha = senhaAnterior;
+                    if (user.id === 'admin') data.config.senhaMaster = senhaAnterior;
+                    saveData();
+                    return mostrarErroRecuperacao('Não foi possível enviar o e-mail. A senha anterior foi mantida.');
+                }
 
-            const config = data.config.emailjs || {};
-            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
-
-            if (emailEnviado) {
-                successDiv.innerHTML =
-                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
+                successDiv.innerHTML = `✅ <strong>Senha alterada e enviada por e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada ou spam.</span>`;
                 successDiv.style.display = 'block';
-                showToast('✅ Nova senha enviada para o e-mail!');
                 document.getElementById('recuperarEmail').value = '';
-            } else {
-                successDiv.innerHTML =
-                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
-                successDiv.style.display = 'block';
-                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
+                document.getElementById('recuperarNovaSenha').value = '';
+                document.getElementById('recuperarConfirmarSenha').value = '';
+                showToast('✅ Senha alterada e enviada por e-mail!');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Alterar Senha e Enviar por E-mail';
             }
             return false;
+
+            function mostrarErroRecuperacao(msg) {
+                errorDiv.textContent = msg;
+                errorDiv.style.display = 'block';
+                return false;
+            }
         }
 
         async function enviarEmailRecuperacao(email, nome, novaSenha) {
-            const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
-            try {
-                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
-                const templateParams = {
-                    to_email: email,
-                    to_name: nome || 'Usuário',
-                    nova_senha: novaSenha,
-                    sistema: 'Vila Real Futsal',
-                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
-                };
-                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                return true;
-            } catch (error) {
-                console.error('❌ Erro ao enviar e-mail:', error);
-                return false;
-            }
+            return await enviarEmailSistema({
+                to: email,
+                nome: nome || 'Usuário',
+                senha: novaSenha,
+                assunto: 'Recuperação de senha - Vila Real Futsal',
+                mensagem: `Sua senha foi alterada com sucesso.\n\nNova senha: ${novaSenha}\n\nUtilize a nova senha para acessar o sistema.`,
+                tipo: 'recuperacao'
+            });
         }
 
         // ============================================================
         //  INICIALIZAÇÃO
         // ============================================================
+        window.addEventListener('storage', (event) => {
+            if (event.key !== STORAGE_KEY || !event.newValue) return;
+            try {
+                const idAtual = currentUser?.id || null;
+                data = loadData();
+                currentUser = idAtual ? (data.usuarios.find(u => u.id === idAtual) || null) : null;
+                aplicarPersonalizacaoCompleta();
+                if (currentUser) { renderizarMenu(); initSystem(); }
+            } catch (e) { console.error('Erro ao sincronizar dados entre abas:', e); }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Carregando sistema...');
 
