@@ -1,0 +1,9 @@
+{
+  "name": "vila-real-futsal",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Vila Real Futsal - gestão centralizada com autenticação segura e sincronização em tempo real",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
