@@ -2402,7 +2402,7 @@
                     <i class="fas fa-user-plus"></i> Solicitar Cadastro
                 </button>
                 <p style="font-size:12px;color:var(--gray-dark);text-align:center;margin-top:8px;">
-                    <i class="fas fa-info-circle"></i> Após o cadastro, aguarde a aprovação do administrador.
+                    <i class="fas fa-info-circle"></i> Após o cadastro, seu acesso será liberado imediatamente com o perfil básico.
                 </p>
             </form>
 
@@ -3271,14 +3271,6 @@
                     <small style="color:var(--gray-dark);font-size:12px;">Marque as áreas que este usuário poderá acessar</small>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select id="usuarioStatus" required>
-                        <option value="aprovado">Aprovado</option>
-                        <option value="pendente">Pendente (Aguardando aprovação)</option>
-                        <option value="rejeitado">Rejeitado</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>Senha</label>
                     <div class="password-wrapper">
                         <input type="password" id="usuarioSenha" placeholder="Deixe em branco para gerar">
@@ -3530,8 +3522,11 @@
                     if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
                     if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
                     if (!parsed.whatsappMessages) parsed.whatsappMessages = [];
-                    if (!parsed.solicitacoesPendentes) parsed.solicitacoesPendentes = [];
+                    // A aprovação manual foi removida: todos os usuários existentes
+                    // que ainda estiverem pendentes passam a ter acesso.
+                    parsed.solicitacoesPendentes = [];
                     parsed.usuarios.forEach(u => {
+                        if (u && u.status === 'pendente') u.status = 'aprovado';
                         if (!u.permissoes) {
                             u.permissoes = { alunos: true, presencas: true, carteirinhas: true, relatorios: true,
                                 notificacoes: true, backup: true, configuracoes: false, usuarios: false,
@@ -3725,338 +3720,43 @@
         // ============================================================
         async function handleRegistroUsuario(e) {
             e.preventDefault();
-
             const nome = document.getElementById('registroNome').value.trim();
-            const email = document.getElementById('registroEmail').value.trim();
+            const email = document.getElementById('registroEmail').value.trim().toLowerCase();
             const perfil = document.getElementById('registroPerfil').value;
             const senha = document.getElementById('registroSenha').value;
             const confirmarSenha = document.getElementById('registroConfirmarSenha').value;
             const errorDiv = document.getElementById('registroError');
             const successDiv = document.getElementById('registroSuccess');
             const btn = document.getElementById('btnRegistrar');
-
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            if (!nome || !email || !senha) {
-                errorDiv.textContent = 'Preencha todos os campos';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (senha !== confirmarSenha) {
-                errorDiv.textContent = 'As senhas não coincidem';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (!validarSenha(senha)) {
-                errorDiv.textContent = 'Senha deve ter mínimo 6 caracteres, com letra, número e caractere especial';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (data.usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-                errorDiv.textContent = 'Este e-mail já está cadastrado no sistema';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-            const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
-            const usuarioGerado = 'usuario' + numero;
-
-            const novoUsuario = {
-                id: 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-                nome: nome,
-                email: email,
-                perfil: perfil,
-                usuario: usuarioGerado,
-                status: 'pendente',
-                permissoes: {
-                    alunos: perfil === 'Pai' ? false : true,
-                    presencas: perfil === 'Pai' ? false : true,
-                    carteirinhas: perfil === 'Pai' ? false : true,
-                    relatorios: perfil === 'Pai' ? false : true,
-                    notificacoes: perfil === 'Pai' ? false : true,
-                    backup: false,
-                    configuracoes: false,
-                    usuarios: false,
-                    excluirAlunos: false
-                },
-                alunosVinculados: [],
-                criadoEm: new Date().toISOString(),
-                primeiroAcesso: true
+            errorDiv.style.display = 'none'; successDiv.style.display = 'none';
+            if (!nome || !email || !senha) { errorDiv.textContent='Preencha todos os campos'; errorDiv.style.display='block'; return false; }
+            if (senha !== confirmarSenha) { errorDiv.textContent='As senhas não coincidem'; errorDiv.style.display='block'; return false; }
+            if (!validarSenha(senha)) { errorDiv.textContent='Senha deve ter mínimo 6 caracteres, com letra, número e caractere especial'; errorDiv.style.display='block'; return false; }
+            if (data.usuarios.some(u => (u.email || '').toLowerCase() === email)) { errorDiv.textContent='Este e-mail já está cadastrado no sistema'; errorDiv.style.display='block'; return false; }
+            btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando conta...';
+            const numero=String(data.proximoNumeroUsuario++).padStart(4,'0');
+            const usuarioGerado='usuario'+numero;
+            const permissoesBasicas={
+                alunos: perfil==='Pai'?false:true, presencas: perfil==='Pai'?false:true,
+                carteirinhas: perfil==='Pai'?false:true, relatorios: perfil==='Pai'?false:true,
+                notificacoes:true, backup:false, configuracoes:false, usuarios:false, excluirAlunos:false
             };
-
+            const novoUsuario={id:'user_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),nome,email,perfil,usuario:usuarioGerado,senha,status:'aprovado',permissoes:permissoesBasicas,alunosVinculados:[],criadoEm:new Date().toISOString(),primeiroAcesso:true};
             data.usuarios.push(novoUsuario);
-            if (!Array.isArray(data.solicitacoesPendentes)) data.solicitacoesPendentes = [];
-            data.solicitacoesPendentes.push({
-                id: 'sol_' + Date.now(),
-                usuarioId: novoUsuario.id,
-                nome: nome,
-                email: email,
-                perfil: perfil,
-                data: new Date().toISOString()
-            });
-
-            // Criar notificação para o administrador
-            const admin = data.usuarios.find(u => u.perfil === 'Administrador');
-            if (admin) {
-                data.notificacoes.push({
-                    id: 'notif_' + Date.now(),
-                    tipo: 'nova_solicitacao',
-                    usuarioId: admin.id,
-                    usuarioNome: nome,
-                    mensagem: `📋 Nova solicitação de cadastro: ${nome} (${email})`,
-                    data: new Date().toISOString(),
-                    status: 'nao_lido',
-                    acao: 'aprovar_usuario',
-                    acaoId: novoUsuario.id,
-                    acaoNome: nome
-                });
-            }
-
+            data.solicitacoesPendentes=[];
             saveData();
-            atualizarBadgeSolicitacoes();
-
-            // Tentar enviar e-mail para o administrador
-            const emailEnviado = await enviarEmailAdminNovoUsuario(nome, email, perfil, usuarioGerado);
-
-            if (emailEnviado) {
-                successDiv.innerHTML = `
-                    ✅ <strong>Solicitação enviada com sucesso!</strong><br>
-                    <span style="font-size:12px;color:var(--gray-dark);">O administrador foi notificado por e-mail.</span>
-                    <br><br>
-                    <small style="color:var(--gray-dark);">Você receberá um e-mail quando seu cadastro for aprovado.</small>
-                `;
-                showToast('✅ Solicitação enviada! Administrador notificado por e-mail.');
-            } else {
-                successDiv.innerHTML = `
-                    ✅ <strong>Solicitação enviada com sucesso!</strong><br>
-                    <span style="font-size:12px;color:var(--gray-dark);">Aguarde a aprovação do administrador.</span>
-                    <br><br>
-                    <small style="color:var(--orange);">⚠️ Configure o EmailJS para receber notificações por e-mail.</small>
-                `;
-                showToast('✅ Solicitação enviada! Aguarde aprovação do administrador.');
-            }
-
-            successDiv.style.display = 'block';
-
-            document.getElementById('registroNome').value = '';
-            document.getElementById('registroEmail').value = '';
-            document.getElementById('registroSenha').value = '';
-            document.getElementById('registroConfirmarSenha').value = '';
-
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-user-plus"></i> Solicitar Cadastro';
-
-            setTimeout(() => {
-                showLogin();
-            }, 4000);
-
-            return false;
+            successDiv.innerHTML=`✅ <strong>Conta criada com sucesso!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Seu acesso já está liberado com o perfil básico.</span><br><br><small style="color:var(--gray-dark);">Usuário: <strong>${usuarioGerado}</strong><br>Você já pode entrar no sistema com a senha cadastrada.</small>`;
+            successDiv.style.display='block'; showToast('✅ Conta criada e acesso liberado!');
+            document.getElementById('registroNome').value=''; document.getElementById('registroEmail').value=''; document.getElementById('registroSenha').value=''; document.getElementById('registroConfirmarSenha').value='';
+            btn.disabled=false; btn.innerHTML='<i class="fas fa-user-plus"></i> Criar Conta';
+            setTimeout(()=>showLogin(),2500); return false;
         }
 
         // ============================================================
-        //  ENVIAR E-MAIL PARA ADMIN SOBRE NOVO USUÁRIO
+        //  APROVAÇÃO DE NOVOS USUÁRIOS REMOVIDA
         // ============================================================
-        async function enviarEmailAdminNovoUsuario(nome, email, perfil, usuario) {
-            const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) {
-                console.warn('⚠️ EmailJS não configurado.');
-                return false;
-            }
-
-            try {
-                if (emailjs && typeof emailjs.init === 'function') {
-                    emailjs.init(config.publicKey);
-                }
-
-                const admin = data.usuarios.find(u => u.perfil === 'Administrador');
-                const adminEmail = admin ? admin.email : 'admin@vilarealfutsal.com';
-
-                const templateParams = {
-                    to_email: adminEmail,
-                    to_name: admin ? admin.nome : 'Administrador',
-                    usuario_nome: nome,
-                    usuario_email: email,
-                    usuario_perfil: perfil,
-                    usuario_usuario: usuario,
-                    sistema: 'Vila Real Futsal',
-                    mensagem: `Um novo usuário solicitou cadastro no sistema.\n\nNome: ${nome}\nE-mail: ${email}\nPerfil: ${perfil}\nUsuário: ${usuario}\n\nAcesse o sistema para aprovar ou rejeitar a solicitação.`,
-                    link_aprovacao: window.location.href
-                };
-
-                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                console.log('✅ E-mail de notificação enviado para o administrador!');
-                return true;
-            } catch (error) {
-                console.error('❌ Erro ao enviar e-mail de notificação:', error);
-                return false;
-            }
-        }
-
-        // ============================================================
-        //  ENVIAR E-MAIL PARA USUÁRIO APROVADO
-        // ============================================================
-        async function enviarEmailUsuarioAprovado(email, nome, usuario, senha) {
-            const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) {
-                console.warn('⚠️ EmailJS não configurado.');
-                return false;
-            }
-
-            try {
-                if (emailjs && typeof emailjs.init === 'function') {
-                    emailjs.init(config.publicKey);
-                }
-
-                const templateParams = {
-                    to_email: email,
-                    to_name: nome,
-                    usuario: usuario,
-                    senha: senha,
-                    sistema: 'Vila Real Futsal',
-                    mensagem: `Seu cadastro foi aprovado!\n\nUsuário: ${usuario}\nSenha: ${senha}\n\nAcesse o sistema no link abaixo:`,
-                    link_aprovacao: window.location.href
-                };
-
-                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                console.log('✅ E-mail de aprovação enviado para o usuário!');
-                return true;
-            } catch (error) {
-                console.error('❌ Erro ao enviar e-mail de aprovação:', error);
-                return false;
-            }
-        }
-
-        // ============================================================
-        //  APROVAR USUÁRIO - FUNÇÃO CORRIGIDA
-        // ============================================================
-        async function aprovarUsuario(userId) {
-            console.log('📋 Aprovando usuário:', userId);
-
-            if (!isAdmin()) {
-                showToast('Apenas administradores', 'error');
-                return;
-            }
-
-            const user = data.usuarios.find(u => u.id === userId);
-            if (!user) {
-                showToast('Usuário não encontrado', 'error');
-                return;
-            }
-
-            if (user.status === 'aprovado') {
-                showToast('Usuário já está aprovado', 'warning');
-                return;
-            }
-
-            // Atualizar status sem apagar uma senha eventualmente cadastrada.
-            user.status = 'aprovado';
-            user.primeiroAcesso = true;
-
-            // Gerar senha apenas se o usuário ainda não possuir uma.
-            if (!user.senha || user.senha === '') {
-                user.senha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
-                    .toUpperCase();
-            }
-
-            // Remover da lista de pendentes
-            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
-
-            // Remover notificações pendentes deste usuário
-            data.notificacoes = data.notificacoes.filter(n => !(n.acao === 'aprovar_usuario' && n.acaoId === userId));
-
-            saveData();
-
-            // Enviar e-mail de aprovação
-            enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
-
-            // Adicionar notificação de sucesso
-            data.notificacoes.push({
-                id: 'notif_' + Date.now(),
-                tipo: 'aprovacao',
-                usuarioId: user.id,
-                usuarioNome: user.nome,
-                mensagem: `✅ Usuário ${user.nome} foi aprovado com sucesso!`,
-                data: new Date().toISOString(),
-                status: 'lido'
-            });
-            saveData();
-
-            // Atualizar interface
-            renderUsuarios();
-            renderNotificacoes();
-            atualizarBadgeSolicitacoes();
-
-            showToast(`✅ Usuário ${user.nome} aprovado! E-mail enviado.`);
-
-            // Recarregar a lista de usuários e notificações
-            if (currentUser && currentUser.id === 'admin') {
-                setTimeout(() => {
-                    renderUsuarios();
-                    renderNotificacoes();
-                }, 500);
-            }
-        }
-
-        // ============================================================
-        //  REJEITAR USUÁRIO - FUNÇÃO CORRIGIDA
-        // ============================================================
-        async function rejeitarUsuario(userId) {
-            console.log('📋 Rejeitando usuário:', userId);
-
-            if (!isAdmin()) {
-                showToast('Apenas administradores', 'error');
-                return;
-            }
-
-            const user = data.usuarios.find(u => u.id === userId);
-            if (!user) {
-                showToast('Usuário não encontrado', 'error');
-                return;
-            }
-
-            if (!confirm(`Tem certeza que deseja rejeitar o usuário ${user.nome}?`)) return;
-
-            user.status='rejeitado'; delete user.senha;
-
-            // Remover da lista de pendentes
-            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
-
-            // Remover notificações pendentes deste usuário
-            data.notificacoes = data.notificacoes.filter(n => !(n.acao === 'aprovar_usuario' && n.acaoId === userId));
-
-            // Adicionar notificação de rejeição
-            data.notificacoes.push({
-                id: 'notif_' + Date.now(),
-                tipo: 'rejeicao',
-                usuarioId: user.id,
-                usuarioNome: user.nome,
-                mensagem: `❌ Usuário ${user.nome} foi rejeitado.`,
-                data: new Date().toISOString(),
-                status: 'lido'
-            });
-
-            saveData();
-
-            renderUsuarios();
-            renderNotificacoes();
-            atualizarBadgeSolicitacoes();
-
-            showToast(`❌ Usuário ${user.nome} rejeitado`);
-
-            if (currentUser && currentUser.id === 'admin') {
-                setTimeout(() => {
-                    renderUsuarios();
-                    renderNotificacoes();
-                }, 500);
-            }
-        }
+        // O cadastro público cria o usuário com status aprovado imediatamente.
+        // O administrador controla as permissões pelo painel de usuários.
 
         // ============================================================
         //  ATUALIZAR BADGE DE SOLICITAÇÕES
@@ -4065,14 +3765,8 @@
             const badge = document.getElementById('solicitacoesBadge');
             if (!badge) return;
 
-            const pendentes = data.usuarios.filter(u => u && u.status === 'pendente').length;
-
-            if (pendentes > 0 && isAdmin()) {
-                badge.textContent = pendentes;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+            // Aprovação manual de usuários removida.
+            badge.style.display = 'none';
         }
 
         // ============================================================
@@ -4087,7 +3781,6 @@
             if(!loginUser||!loginPass){err.textContent='Preencha todos os campos';err.style.display='block';return false;}
             const lu=data.usuarios.find(u => (u.usuario||'').toLowerCase()===loginUser.toLowerCase() || (u.email||'').toLowerCase()===loginUser.toLowerCase());
             if(!lu || lu.senha !== loginPass){err.textContent='Usuário/e-mail ou senha inválidos';err.style.display='block';return false;}
-            if(lu.status==='pendente'){err.textContent='Seu cadastro está aguardando aprovação do administrador.';err.style.display='block';return false;}
             if(lu.status==='rejeitado'){err.textContent='Seu cadastro foi rejeitado. Entre em contato com o administrador.';err.style.display='block';return false;}
             currentUser={...lu};
             salvarSessao();
@@ -4102,46 +3795,25 @@
         //  ATUALIZAR BOTÕES POR PERFIL POR PERFIL
         // ============================================================
         function atualizarBotoesPorPerfil() {
-            const isAdminUser = isAdmin();
-            const isPaiUser = isPai();
+            const admin = isAdmin();
+            const pai = isPai();
+            const p = currentUser?.permissoes || {};
+            const pode = chave => admin || p[chave] === true;
 
-            const botoesNovoAluno = document.querySelectorAll('#btnNovoAluno, #alunosNovoAluno, #quickNovoAluno');
-            botoesNovoAluno.forEach(btn => {
-                btn.style.display = isAdminUser ? 'inline-flex' : 'none';
+            document.querySelectorAll('#btnNovoAluno, #alunosNovoAluno, #quickNovoAluno').forEach(btn => {
+                btn.style.display = pode('alunos') ? 'inline-flex' : 'none';
             });
-
-            const botoesPresenca = document.querySelectorAll('#btnAbrirScanner, #btnConfirmarPresenca, .btn-scan, .btn-success');
-            botoesPresenca.forEach(btn => {
-                if (isPaiUser) {
-                    btn.style.display = 'none';
-                } else {
-                    btn.style.display = 'inline-flex';
-                }
+            document.querySelectorAll('#btnAbrirScanner, #btnConfirmarPresenca, .btn-scan').forEach(btn => {
+                btn.style.display = pode('presencas') && !pai ? 'inline-flex' : 'none';
             });
-
-            document.querySelectorAll('.aluno-card .actions .btn-primary, .aluno-card .actions .btn-danger').forEach(btn => {
-                if (isAdminUser) {
-                    btn.style.display = 'inline-flex';
-                } else if (isPaiUser) {
-                    const card = btn.closest('.aluno-card');
-                    if (card) {
-                        const alunoId = card.dataset?.alunoId || '';
-                        if (currentUser.alunosVinculados && currentUser.alunosVinculados.includes(alunoId)) {
-                            btn.style.display = 'inline-flex';
-                        } else {
-                            btn.style.display = 'none';
-                        }
-                    }
-                } else {
-                    btn.style.display = 'none';
-                }
+            document.querySelectorAll('.aluno-card .actions .btn-primary').forEach(btn => {
+                if (admin) { btn.style.display='inline-flex'; return; }
+                const card=btn.closest('.aluno-card'); const id=card?.dataset?.alunoId || '';
+                btn.style.display=(pai && currentUser?.alunosVinculados?.includes(id)) ? 'inline-flex' : (pode('alunos') ? 'inline-flex' : 'none');
             });
-
-            if (isPaiUser) {
-                document.querySelectorAll('.aluno-card .actions .btn-danger').forEach(btn => {
-                    btn.style.display = 'none';
-                });
-            }
+            document.querySelectorAll('.aluno-card .actions .btn-danger').forEach(btn => {
+                btn.style.display = admin || (pode('excluirAlunos') && !pai) ? 'inline-flex' : 'none';
+            });
         }
 
         // ============================================================
@@ -4619,6 +4291,12 @@
         //  NAVEGAÇÃO
         // ============================================================
         function mudarPagina(page) {
+            const permissoes = currentUser?.permissoes || {};
+            const mapaPermissao = { alunos:'alunos', carteirinhas:'carteirinhas', presencas:'presencas', notificacoes:'notificacoes', relatorios:'relatorios', backup:'backup', usuarios:'usuarios', configuracoes:'configuracoes' };
+            if (!isAdmin() && page !== 'dashboard' && mapaPermissao[page] && permissoes[mapaPermissao[page]] !== true) {
+                showToast('❌ Você não tem permissão para acessar esta página', 'error');
+                return;
+            }
             if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'notificacoes'].includes(page)) {
                 showToast('❌ Você não tem permissão para acessar esta página', 'error');
                 return;
@@ -5647,7 +5325,7 @@
         function renderNotificacoes() {
             const container = document.getElementById('listaNotificacoes');
 
-            let notificacoes = data.notificacoes;
+            let notificacoes = (data.notificacoes || []).filter(n => !['nova_solicitacao','aprovacao','rejeicao'].includes(n.tipo));
             if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
                 notificacoes = notificacoes.filter(n => {
                     if (n.tipo === 'nova_solicitacao' || n.tipo === 'aprovacao' || n.tipo === 'rejeicao') return false;
@@ -5675,21 +5353,8 @@
                 if (n.canal === 'whatsapp') { icon = 'fab fa-whatsapp';
                     color = '#25D366'; }
                 if (n.tipo === 'nova_solicitacao') {
-                    icon = 'fas fa-user-plus';
-                    color = '#1d4ed8';
-                    // Botões de aprovação dentro da notificação
-                    if (isAdmin() && n.acao === 'aprovar_usuario' && n.acaoId) {
-                        acaoHtml = `
-                            <div class="notif-actions">
-                                <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${n.acaoId}')">
-                                    <i class="fas fa-check"></i> Aprovar
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${n.acaoId}')">
-                                    <i class="fas fa-times"></i> Rejeitar
-                                </button>
-                            </div>
-                        `;
-                    }
+                    // Notificações antigas de aprovação são ignoradas.
+                    return '';
                 }
                 if (n.tipo === 'aprovacao') { icon = 'fas fa-check-circle';
                     color = '#22c55e'; }
@@ -5895,7 +5560,8 @@
                     data.presencas = importedData.presencas || [];
                     data.notificacoes = importedData.notificacoes || [];
                     data.whatsappMessages = importedData.whatsappMessages || [];
-                    data.solicitacoesPendentes = importedData.solicitacoesPendentes || [];
+                    data.solicitacoesPendentes = [];
+                    data.usuarios.forEach(u => { if (u && u.status === 'pendente') u.status = 'aprovado'; });
                     data.config = importedData.config || data.config;
                     data.proximoNumeroAluno = importedData.proximoNumeroAluno || 1;
                     data.proximoNumeroUsuario = importedData.proximoNumeroUsuario || 2;
@@ -6202,143 +5868,34 @@
         // ============================================================
         function renderUsuarios() {
             const container = document.getElementById('listaUsuarios');
-
+            if (!container) return;
             if (!isAdmin()) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>`;
+                container.innerHTML='<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>';
                 return;
             }
-
-            if (data.usuarios.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum usuário</h3></div>`;
+            const usuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
+            if (!usuarios.length) {
+                container.innerHTML='<div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum usuário cadastrado</h3></div>';
                 return;
             }
-
-            // Solicitações pendentes com destaque
-            // A lista de solicitações é reconstruída a partir dos usuários com
-            // status pendente. Isso evita que uma solicitação desapareça do
-            // painel caso a lista auxiliar tenha sido perdida/limpa.
-            if (!Array.isArray(data.solicitacoesPendentes)) {
-                data.solicitacoesPendentes = [];
-            }
-
-            const usuariosPendentes = data.usuarios.filter(u => u && u.status === 'pendente');
-            const idsPendentes = new Set(data.solicitacoesPendentes.map(s => s.usuarioId));
-
-            usuariosPendentes.forEach(user => {
-                if (!idsPendentes.has(user.id)) {
-                    data.solicitacoesPendentes.push({
-                        id: 'sol_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-                        usuarioId: user.id,
-                        nome: user.nome,
-                        email: user.email,
-                        perfil: user.perfil,
-                        data: user.criadoEm || new Date().toISOString()
-                    });
-                }
-            });
-
-            // Remove referências antigas que não possuem mais usuário pendente.
-            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => {
-                const user = data.usuarios.find(u => u.id === s.usuarioId);
-                return user && user.status === 'pendente';
-            });
-
-            // Mantém a persistência da correção.
-            saveData();
-
-            const pendentes = data.solicitacoesPendentes;
-
-            let html = '';
-
-            if (pendentes.length > 0) {
-                html += `
-                    <div style="background:#dbeafe;border-radius:12px;padding:16px;margin-bottom:16px;border-left:4px solid #1d4ed8;">
-                        <h4 style="color:#1d4ed8;margin-bottom:12px;">
-                            <i class="fas fa-clock"></i> Solicitações Pendentes (${pendentes.length})
-                            <span style="font-size:12px;font-weight:400;color:var(--gray-dark);margin-left:8px;">
-                                <i class="fas fa-info-circle"></i> Clique em "Aprovar" para liberar o acesso
-                            </span>
-                        </h4>
-                        ${pendentes.map(s => {
-                            const user = data.usuarios.find(u => u.id === s.usuarioId);
-                            if (!user) return '';
-                            return `
-                            <div class="solicitacao-item">
-                                <div class="solicitacao-info">
-                                    <div class="avatar">${user.nome.charAt(0).toUpperCase()}</div>
-                                    <div class="dados">
-                                        <div class="nome">${user.nome}</div>
-                                        <div class="email">${user.email} • ${user.usuario || user.email}</div>
-                                        <div class="perfil">${user.perfil}</div>
-                                    </div>
-                                </div>
-                                <div class="solicitacao-badge">⏳ Aguardando</div>
-                                <div class="solicitacao-actions">
-                                    <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${user.id}')">
-                                        <i class="fas fa-check"></i> Aprovar
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${user.id}')">
-                                        <i class="fas fa-times"></i> Rejeitar
-                                    </button>
-                                </div>
-                            </div>
-                        `}).join('')}
+            const lista = usuarios.map(u => {
+                const alunoVinculado = u.alunosVinculados?.length ? data.alunos.filter(a=>u.alunosVinculados.includes(a.id)).map(a=>a.nome).join(', ') : 'Nenhum';
+                const admin = u.id === 'admin';
+                const status = admin ? '👑 Administrador' : (u.status === 'rejeitado' ? '❌ Bloqueado' : '✅ Ativo');
+                return `<div class="usuario-item">
+                    <div class="usuario-info"><div class="usuario-avatar">${(u.nome||'?').charAt(0).toUpperCase()}</div>
+                        <div class="usuario-dados"><div class="nome">${u.nome||'Sem nome'} ${admin?'👑':''}</div>
+                        <div class="email">${u.email||''} • ${u.usuario||u.email||''}</div>
+                        ${u.perfil==='Pai'?`<div style="font-size:12px;color:var(--secondary);">👨‍👦 Alunos vinculados: ${alunoVinculado}</div>`:''}</div>
                     </div>
-                `;
-            }
-
-            // Usuários aprovados
-            const aprovados = data.usuarios.filter(u => u.status === 'aprovado' || u.id === 'admin');
-            if (aprovados.length > 0) {
-                html += `<div style="margin-top:8px;">`;
-                html += aprovados.map(u => {
-                    const alunoVinculado = u.alunosVinculados && u.alunosVinculados.length > 0 ?
-                        data.alunos.filter(a => u.alunosVinculados.includes(a.id)).map(a => a.nome).join(', ') :
-                        'Nenhum';
-                    return `
-                    <div class="usuario-item">
-                        <div class="usuario-info">
-                            <div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}</div>
-                            <div class="usuario-dados">
-                                <div class="nome">${u.nome} ${u.id === 'admin' ? '👑' : ''}</div>
-                                <div class="email">${u.email} • ${u.usuario || u.email}</div>
-                                ${u.perfil === 'Pai' ? `<div style="font-size:12px;color:var(--secondary);">👨‍👦 Alunos vinculados: ${alunoVinculado}</div>` : ''}
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            <span class="usuario-perfil">${u.perfil}</span>
-                            <span class="usuario-status ${u.status === 'aprovado' || u.id === 'admin' ? 'ativo' : 'pendente'}">
-                                ${u.id === 'admin' ? '👑 Admin' : (u.status === 'aprovado' ? '✅ Aprovado' : '⏳ Pendente')}
-                            </span>
-                        </div>
-                        <div class="usuario-actions">
-                            ${u.id !== 'admin' ? `
-                                <button class="btn btn-permissoes btn-sm" onclick="abrirPermissoesUsuario('${u.id}')" title="Gerenciar Permissões">
-                                    <i class="fas fa-user-lock"></i>
-                                </button>
-                                <button class="btn btn-primary btn-sm" onclick="abrirAlterarSenhaUsuario('${u.id}')" title="Alterar Senha">
-                                    <i class="fas fa-key"></i>
-                                </button>
-                                ${u.perfil === 'Pai' ? `
-                                    <button class="btn btn-secondary btn-sm" onclick="vincularAlunoPai('${u.id}')" title="Vincular Alunos">
-                                        <i class="fas fa-link"></i>
-                                    </button>
-                                ` : ''}
-                                <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : `
-                                <span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>
-                            `}
-                        </div>
-                    </div>
-                `}).join('');
-                html += `</div>`;
-            }
-
-            container.innerHTML = html;
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="usuario-perfil">${u.perfil||'Usuário'}</span><span class="usuario-status ${admin||u.status!=='rejeitado'?'ativo':'pendente'}">${status}</span></div>
+                    <div class="usuario-actions">${!admin?`<button class="btn btn-permissoes btn-sm" onclick="abrirPermissoesUsuario('${u.id}')" title="Gerenciar Permissões"><i class="fas fa-user-lock"></i> Permissões</button>
+                        <button class="btn btn-primary btn-sm" onclick="abrirAlterarSenhaUsuario('${u.id}')" title="Alterar Senha"><i class="fas fa-key"></i></button>
+                        ${u.perfil==='Pai'?`<button class="btn btn-secondary btn-sm" onclick="vincularAlunoPai('${u.id}')" title="Vincular Alunos"><i class="fas fa-link"></i></button>`:''}
+                        <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')" title="Excluir usuário"><i class="fas fa-trash"></i></button>`:`<span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>`}</div>
+                </div>`;
+            }).join('');
+            container.innerHTML=lista;
         }
 
         function openModalUsuario() {
@@ -6351,7 +5908,6 @@
             document.getElementById('usuarioEditId').value = '';
             document.getElementById('usuarioForm').reset();
             document.getElementById('usuarioSenha').placeholder = 'Deixe em branco para gerar';
-            document.getElementById('usuarioStatus').value = 'aprovado';
 
             document.getElementById('permAlunos').checked = true;
             document.getElementById('permPresencas').checked = true;
@@ -6374,7 +5930,7 @@
             const nome = document.getElementById('usuarioNome').value.trim();
             const email = document.getElementById('usuarioEmail').value.trim();
             const perfil = document.getElementById('usuarioPerfil').value;
-            const status = document.getElementById('usuarioStatus').value;
+            const status = 'aprovado';
             const senhaInput = document.getElementById('usuarioSenha').value.trim();
 
             const permissoes = {
@@ -6420,45 +5976,16 @@
 
             data.usuarios.push(novoUsuario);
 
-            // Se for pendente, adicionar à lista de solicitações
-            if (status === 'pendente') {
-                data.solicitacoesPendentes.push({
-                    id: 'sol_' + Date.now(),
-                    usuarioId: novoUsuario.id,
-                    nome: nome,
-                    email: email,
-                    perfil: perfil,
-                    data: new Date().toISOString()
-                });
-
-                // Notificar admin
-                const admin = data.usuarios.find(u => u.perfil === 'Administrador');
-                if (admin) {
-                    data.notificacoes.push({
-                        id: 'notif_' + Date.now(),
-                        tipo: 'nova_solicitacao',
-                        usuarioId: admin.id,
-                        usuarioNome: nome,
-                        mensagem: `📋 Nova solicitação de cadastro: ${nome} (${email})`,
-                        data: new Date().toISOString(),
-                        status: 'nao_lido',
-                        acao: 'aprovar_usuario',
-                        acaoId: novoUsuario.id,
-                        acaoNome: nome
-                    });
-                }
-            }
+            // Não existe mais fluxo de aprovação. Todo usuário criado pelo
+            // administrador também entra imediatamente como aprovado.
+            data.solicitacoesPendentes = [];
 
             saveData();
             closeModal('modalUsuario');
             renderUsuarios();
             atualizarBadgeSolicitacoes();
 
-            if (status === 'pendente') {
-                showToast(`✅ Usuário criado com status PENDENTE! Aguardando aprovação.`);
-            } else {
-                showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
-            }
+            showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
 
             return false;
         }
@@ -6762,7 +6289,6 @@
             const user=data.usuarios.find(u=>(u.email||'').toLowerCase()===email);
             if(!email){err.textContent='Digite seu e-mail';err.style.display='block';return;}
             if(!user){err.textContent='Não foi possível localizar este e-mail.';err.style.display='block';return;}
-            if(user.status==='pendente'){err.textContent='Seu cadastro ainda aguarda aprovação.';err.style.display='block';return;}
             if(user.status==='rejeitado'){err.textContent='Seu cadastro foi rejeitado.';err.style.display='block';return;}
             btn.disabled=true;
             try{
@@ -6902,25 +6428,8 @@
             if (!data.whatsappMessages) data.whatsappMessages = [];
             if (!Array.isArray(data.solicitacoesPendentes)) data.solicitacoesPendentes = [];
 
-            // Reconstruir solicitações pendentes a partir do status dos usuários.
-            const pendentesAtuais = data.usuarios.filter(u => u && u.status === 'pendente');
-            const idsSolicitacoes = new Set(data.solicitacoesPendentes.map(s => s.usuarioId));
-            pendentesAtuais.forEach(user => {
-                if (!idsSolicitacoes.has(user.id)) {
-                    data.solicitacoesPendentes.push({
-                        id: 'sol_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-                        usuarioId: user.id,
-                        nome: user.nome,
-                        email: user.email,
-                        perfil: user.perfil,
-                        data: user.criadoEm || new Date().toISOString()
-                    });
-                }
-            });
-            data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => {
-                const user = data.usuarios.find(u => u.id === s.usuarioId);
-                return user && user.status === 'pendente';
-            });
+            // A fila de aprovação foi removida. Não reconstruir solicitações pendentes.
+            data.solicitacoesPendentes = [];
             saveData();
 
             const usuarioSessao = carregarSessao();
@@ -6945,14 +6454,6 @@
                     atualizarBotoesPorPerfil();
 
                     console.log('🔄 Sessão restaurada para:', currentUser.nome);
-
-                    if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
-                        setTimeout(() => {
-                            showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`,
-                                'info');
-                            atualizarBadgeSolicitacoes();
-                        }, 1500);
-                    }
                 } else {
                     limparSessao();
                     document.getElementById('sidebar').style.display = 'none';
@@ -6976,8 +6477,8 @@
             console.log('📱 Versão mobile otimizada!');
             console.log('👨‍👦 Perfil Pai com vínculo a múltiplos alunos!');
             console.log('🔄 Sessão persistente - não volta ao login ao atualizar a página!');
-            console.log('📋 Cadastro com aprovação do administrador e notificações por e-mail!');
-            console.log('✅ Sistema de aprovação de usuários totalmente funcional!');
+            console.log('📋 Cadastro automático com perfil básico e permissões gerenciadas pelo administrador!');
+            console.log('✅ Cadastro automático de usuários e gerenciamento de permissões ativos!');
         });
     </script>
 
