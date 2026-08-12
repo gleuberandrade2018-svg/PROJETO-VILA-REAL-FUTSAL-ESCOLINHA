@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== TODOS OS ESTILOS (mantidos) ===== */
+        /* ===== ESTILOS COMPLETOS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -91,10 +91,6 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
-        }
-
-        .sidebar-mobile-toggle:hover {
-            transform: scale(1.05);
         }
 
         .sidebar-overlay {
@@ -413,10 +409,6 @@
             font-weight: 600;
             background: none;
             border: none;
-        }
-
-        .card-header .card-action:hover {
-            color: #f5d060;
         }
 
         /* ===== BOTÕES ===== */
@@ -1051,17 +1043,6 @@
             overflow: hidden;
             border: 2px solid var(--secondary);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .carteirinha::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(212, 160, 32, 0.08), transparent);
-            border-radius: 50%;
         }
 
         .carteirinha .crt-header {
@@ -1734,6 +1715,9 @@
             .main-content {
                 padding: 20px 24px 24px 24px;
             }
+            .permissoes-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1752,6 +1736,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                padding: 8px 12px;
+                font-size: 18px;
             }
 
             .sidebar-overlay.active {
@@ -1762,7 +1748,7 @@
                 margin-left: 0;
                 width: 100%;
                 padding: 16px 16px 80px 16px;
-                padding-top: 70px;
+                padding-top: 65px;
             }
 
             .top-header {
@@ -1787,6 +1773,8 @@
             .top-header .header-actions .search-box input {
                 min-width: 80px;
                 width: 100%;
+                font-size: 14px;
+                padding: 8px 4px;
             }
 
             .stats-grid {
@@ -1823,6 +1811,7 @@
             .login-box {
                 padding: 28px 24px;
                 margin: 10px;
+                max-width: 95%;
             }
 
             .alunos-grid {
@@ -1865,7 +1854,7 @@
             }
 
             .carteirinha-alunos-list {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
 
             .btn-preview-grid {
@@ -1876,10 +1865,68 @@
                 padding: 20px;
                 margin: 10px;
                 max-height: 85vh;
+                max-width: 95%;
             }
 
             .modal-header h2 {
                 font-size: 17px;
+            }
+
+            .modal-close {
+                font-size: 24px;
+                padding: 5px;
+            }
+
+            .btn {
+                font-size: calc(var(--btn-font-size, 13px) - 1px);
+                padding: 8px 14px;
+                min-height: 44px;
+            }
+
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: calc(var(--btn-font-size, 13px) - 2px);
+                min-height: 36px;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-size: 16px;
+                padding: 12px 14px;
+            }
+
+            .config-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .config-item input[type="text"],
+            .config-item input[type="tel"] {
+                width: 100%;
+            }
+
+            .usuario-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .usuario-item .usuario-actions {
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
+
+            .usuario-item .usuario-info {
+                flex-wrap: wrap;
+            }
+
+            .toast {
+                bottom: 80px;
+                right: 16px;
+                left: 16px;
+                max-width: 100%;
+                font-size: 14px;
+                padding: 12px 16px;
             }
         }
 
@@ -1913,18 +1960,6 @@
             .top-header .header-actions .search-box input {
                 min-width: 60px;
             }
-            .btn {
-                font-size: calc(var(--btn-font-size, 13px) - 1px);
-                padding: 8px 14px;
-            }
-            .btn-sm {
-                padding: 4px 10px;
-                font-size: calc(var(--btn-font-size, 13px) - 2px);
-            }
-            .btn-scan {
-                font-size: 14px;
-                padding: 12px 20px;
-            }
             .carteirinha {
                 padding: 20px 18px;
             }
@@ -1938,6 +1973,28 @@
             }
             .carteirinha .crt-title {
                 font-size: 15px;
+            }
+            .carteirinha-alunos-list {
+                grid-template-columns: 1fr;
+            }
+            .btn-preview-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .usuario-item .usuario-actions .btn {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .usuario-item .usuario-actions .btn-sm {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+            .permissoes-grid .perm-item {
+                font-size: 14px;
+            }
+            .permissoes-grid .perm-item input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                min-width: 20px;
             }
         }
 
@@ -2053,6 +2110,28 @@
             font-size: 32px;
             margin-bottom: 10px;
             color: var(--secondary);
+        }
+
+        /* Correção para toque em dispositivos móveis */
+        .btn,
+        .menu-item,
+        .quick-action,
+        .carteirinha-aluno-item,
+        .stat-card,
+        .sidebar-mobile-toggle {
+            -webkit-touch-callout: none;
+        }
+
+        /* Melhorar visualização de checkboxes em mobile */
+        .permissoes-grid .perm-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+        }
+
+        .permissoes-grid .perm-item {
+            font-size: 15px;
+            padding: 4px 0;
         }
     </style>
 </head>
@@ -2191,7 +2270,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Buscar aluno..." id="searchInput" oninput="buscarAluno(this.value)">
                 </div>
-                <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')">
+                <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')" id="btnNovoAluno">
                     <i class="fas fa-plus"></i> Novo Aluno
                 </button>
                 <span class="security-badge" id="securityBadge" style="display:none;">
@@ -2202,7 +2281,7 @@
 
         <!-- ===== DASHBOARD ===== -->
         <div class="page active" id="page-dashboard">
-            <div class="stats-grid">
+            <div class="stats-grid" id="statsGrid">
                 <div class="stat-card" onclick="mudarPagina('alunos')">
                     <div class="stat-top">
                         <div class="number" id="totalAlunos">0</div>
@@ -2287,8 +2366,8 @@
                     <div class="card-header">
                         <h3><i class="fas fa-bolt"></i> Acessos Rápidos</h3>
                     </div>
-                    <div class="quick-actions">
-                        <button class="quick-action" onclick="openModal('modalAluno')">
+                    <div class="quick-actions" id="quickActions">
+                        <button class="quick-action" onclick="openModal('modalAluno')" id="quickNovoAluno">
                             <i class="fas fa-user-plus"></i> Novo Aluno
                         </button>
                         <button class="quick-action" onclick="mudarPagina('presencas')">
@@ -2326,7 +2405,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-users"></i> Alunos Cadastrados</h3>
-                    <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')">
+                    <button class="btn btn-secondary btn-sm" onclick="openModal('modalAluno')" id="alunosNovoAluno">
                         <i class="fas fa-plus"></i> Novo Aluno
                     </button>
                 </div>
@@ -3093,13 +3172,14 @@
     </div>
 
     <!-- ============================================================
-    SCRIPT COMPLETO
+    SCRIPT COMPLETO CORRIGIDO
     ============================================================ -->
     <script>
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v28';
+        const STORAGE_KEY = 'vilaRealFutsalData_v30';
+        const SESSION_KEY = 'vilaRealFutsalSession';
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3107,8 +3187,9 @@
             email: 'gleuber.andrade@outlook.com',
             perfil: 'Administrador',
             usuario: 'gleuber',
-            senha: '',
+            senha: 'Opala77@2056',
             primeiroAcesso: false,
+            alunoVinculado: null, // ID do aluno vinculado (apenas para perfil Pai)
             permissoes: {
                 alunos: true,
                 presencas: true,
@@ -3142,7 +3223,7 @@
                     diasTreino: 'Segunda, Terça, Quarta, Quinta, Sexta',
                     notifAutomatica: true,
                     mensagemPadrao: 'Prezado(a) responsável, seu filho(a) esteve presente no treino do Vila Real Futsal hoje!',
-                    senhaMaster: '',
+                    senhaMaster: 'Opala77@2056',
                     whatsappNumero: '111946359524',
                     loginLogo: '',
                     loginBg: '',
@@ -3186,306 +3267,82 @@
         let mostrarSenhaFlag = false;
         let categoriaSelecionadaCarteirinha = 'todos';
         let abaAtualPersonalizacao = 'login';
+        let scannerFechadoAutomaticamente = false;
 
         // ============================================================
-        //  UTILITÁRIOS
-        // ============================================================
-        function parseDataLocal(valor) {
-            if (!valor) return null;
-            if (valor instanceof Date) return valor;
-            if (/^\d{4}-\d{2}-\d{2}$/.test(String(valor))) {
-                const [ano, mes, dia] = String(valor).split('-').map(Number);
-                return new Date(ano, mes - 1, dia);
-            }
-            const dataLocal = new Date(valor);
-            return Number.isNaN(dataLocal.getTime()) ? null : dataLocal;
-        }
-
-        function escaparHtml(valor) {
-            return String(valor ?? '').replace(/[&<>\"']/g, char => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;'
-            }[char]));
-        }
-
-        function escaparCsv(valor) {
-            return `\"${String(valor ?? '').replace(/\"/g, '\"\"')}\"`;
-        }
-
-        function parseCsvLinha(linha) {
-            const valores = [];
-            let atual = '';
-            let entreAspas = false;
-            for (let i = 0; i < linha.length; i++) {
-                const char = linha[i];
-                if (char === '\"') {
-                    if (entreAspas && linha[i + 1] === '\"') {
-                        atual += '\"';
-                        i++;
-                    } else {
-                        entreAspas = !entreAspas;
-                    }
-                } else if (char === ',' && !entreAspas) {
-                    valores.push(atual.trim());
-                    atual = '';
-                } else {
-                    atual += char;
-                }
-            }
-            valores.push(atual.trim());
-            return valores;
-        }
-
-        function criarUrlDownload(blob, nomeArquivo) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = nomeArquivo;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
-
-        // ============================================================
-        //  CARREGAR DADOS
+        //  CARREGAR DADOS COM PERSISTÊNCIA DE SESSÃO
         // ============================================================
         function loadData() {
-            const defaults = getDefaultData();
             try {
+                // Tentar carregar dados
                 const stored = localStorage.getItem(STORAGE_KEY);
-                if (!stored) return defaults;
-
-                const parsed = JSON.parse(stored);
-                if (!parsed || typeof parsed !== 'object') return defaults;
-
-                const result = {
-                    ...defaults,
-                    ...parsed,
-                    usuarios: Array.isArray(parsed.usuarios) ? parsed.usuarios : defaults.usuarios,
-                    alunos: Array.isArray(parsed.alunos) ? parsed.alunos : [],
-                    presencas: Array.isArray(parsed.presencas) ? parsed.presencas : [],
-                    notificacoes: Array.isArray(parsed.notificacoes) ? parsed.notificacoes : [],
-                    whatsappMessages: Array.isArray(parsed.whatsappMessages) ? parsed.whatsappMessages : [],
-                    config: {
-                        ...defaults.config,
-                        ...(parsed.config && typeof parsed.config === 'object' ? parsed.config : {}),
-                        categorias: Array.isArray(parsed.config?.categorias) && parsed.config.categorias.length
-                            ? parsed.config.categorias : defaults.config.categorias,
-                        horariosCategoria: parsed.config?.horariosCategoria && typeof parsed.config.horariosCategoria === 'object'
-                            ? parsed.config.horariosCategoria : {},
-                        emailjs: { ...defaults.config.emailjs, ...(parsed.config?.emailjs || {}) },
-                        botoes: { ...defaults.config.botoes, ...(parsed.config?.botoes || {}) },
-                        cores: { ...defaults.config.cores, ...(parsed.config?.cores || {}) }
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    const defaults = getDefaultData();
+                    for (let key in defaults) {
+                        if (!(key in parsed)) parsed[key] = defaults[key];
                     }
-                };
-
-                const adminExists = result.usuarios.some(u => u && u.id === 'admin');
-                if (!adminExists) result.usuarios.unshift({ ...ADMIN_DATA, permissoes: { ...ADMIN_DATA.permissoes } });
-
-                result.usuarios = result.usuarios.filter(Boolean);
-                result.usuarios.forEach(normalizarPermissoesUsuario);
-
-                return result;
-            } catch (e) {
-                console.error('Erro ao carregar dados:', e);
-                return defaults;
-            }
-        }
-
-        // ============================================================
-        //  SINCRONIZAÇÃO CENTRAL (BANCO/SERVIDOR)
-        //  Mantém dados, permissões e layout sincronizados entre dispositivos.
-        // ============================================================
-        const API_BASE = window.VILA_REAL_API_BASE || '';
-        let sessaoServidor = false;
-
-        async function requisicaoServidor(path, options = {}) {
-            const headers = { ...(options.headers || {}) };
-            if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
-            return fetch(API_BASE + path, { ...options, headers, credentials: 'include', cache: 'no-store' });
-        }
-
-        async function carregarConfiguracaoPublica() {
-            try {
-                const response = await requisicaoServidor('/api/public-config');
-                if (!response.ok) return false;
-                const result = await response.json();
-                if (result.config) {
-                    data.config = { ...data.config, ...result.config,
-                        botoes: { ...(data.config.botoes || {}), ...(result.config.botoes || {}) },
-                        cores: { ...(data.config.cores || {}), ...(result.config.cores || {}) },
-                        emailjs: { ...(data.config.emailjs || {}), ...(result.config.emailjs || {}) }
-                    };
-                    aplicarPersonalizacaoCompleta();
-                    return true;
-                }
-            } catch (e) { console.warn('Configuração pública indisponível:', e.message); }
-            return false;
-        }
-
-        const LAYOUT_CHANNEL_NAME = 'vilaRealFutsal_layout_sync_v2';
-        let layoutChannel = null;
-        let ultimoLayoutRecebido = 0;
-        let sincronizacaoEmAndamento = false;
-        let eventosSSE = null;
-
-        function obterLayoutGlobal() {
-            return {
-                loginLogo: data.config.loginLogo || '',
-                loginBg: data.config.loginBg || '',
-                loginPrimaryColor: data.config.loginPrimaryColor || '#d4a020',
-                loginTextColor: data.config.loginTextColor || '#0f1b2d',
-                loginBoxBg: data.config.loginBoxBg || '#ffffff',
-                loginLogoSize: data.config.loginLogoSize || 80,
-                loginTitle: data.config.loginTitle || 'VILA REAL',
-                loginSubtitle: data.config.loginSubtitle || 'Futsal · Gestão de Presenças',
-                botoes: { ...(data.config.botoes || {}) },
-                cores: { ...(data.config.cores || {}) }
-            };
-        }
-
-        function aplicarLayoutRecebido(payload) {
-            if (!payload || !payload.config) return;
-            const versao = Number(payload.version || Date.now());
-            if (versao <= ultimoLayoutRecebido) return;
-            ultimoLayoutRecebido = versao;
-            const cfg = payload.config;
-            data.config = {
-                ...data.config,
-                ...cfg,
-                botoes: { ...(data.config.botoes || {}), ...(cfg.botoes || {}) },
-                cores: { ...(data.config.cores || {}), ...(cfg.cores || {}) }
-            };
-            aplicarPersonalizacaoCompleta();
-            if (typeof carregarPersonalizacao === 'function' && document.getElementById('page-personalizar')?.classList.contains('active')) carregarPersonalizacao();
-            if (typeof carregarPersonalizacaoBotoes === 'function' && document.getElementById('page-personalizar')?.classList.contains('active')) carregarPersonalizacaoBotoes();
-            if (typeof carregarCoresSistema === 'function' && document.getElementById('page-personalizar')?.classList.contains('active')) carregarCoresSistema();
-            console.log('🔄 Layout global atualizado pelo servidor.');
-        }
-
-        async function obterEstadoServidor() {
-            const response = await requisicaoServidor('/api/state');
-            if (!response.ok) throw new Error('Servidor indisponível (' + response.status + ')');
-            return await response.json();
-        }
-
-        async function sincronizarDadosCentral() {
-            try {
-                sincronizacaoEmAndamento = true;
-                const resposta = await obterEstadoServidor();
-                const servidor = resposta.data || resposta;
-                if (!servidor || typeof servidor !== 'object' || !Array.isArray(servidor.usuarios)) throw new Error('Estado do servidor inválido');
-
-                const localTemDados = data.alunos.length || data.presencas.length || data.usuarios.length > 1;
-                const servidorVazio = resposta.initialized === false;
-                if (servidorVazio && localTemDados) {
-                    await salvarDadosNoServidor(false);
-                } else {
-                    data = servidor;
-                    if (typeof normalizarEstadoCompleto === 'function') normalizarEstadoCompleto();
-                    aplicarPersonalizacaoCompleta();
-                }
-                return true;
-            } catch (e) {
-                console.warn('⚠️ Backend central indisponível. Usando dados locais:', e.message);
-                return false;
-            } finally {
-                sincronizacaoEmAndamento = false;
-            }
-        }
-
-        async function salvarDadosNoServidor(syncLayout = false) {
-            try {
-                const adminExists = data.usuarios.some(u => u && u.id === 'admin');
-                if (!adminExists) data.usuarios.unshift({ ...ADMIN_DATA, permissoes: { ...ADMIN_DATA.permissoes } });
-                const payload = JSON.parse(JSON.stringify(data));
-                const response = await requisicaoServidor('/api/state', {
-                    method: 'PUT',
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error('Falha ao salvar no servidor (' + response.status + ')');
-                const result = await response.json();
-                if (result.data) data = result.data;
-                if (syncLayout) publicarLayoutGlobal();
-                return true;
-            } catch (e) {
-                console.error('Erro ao salvar no servidor:', e);
-                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (_) {}
-                if (syncLayout) publicarLayoutGlobal();
-                return false;
-            }
-        }
-
-        function publicarLayoutGlobal() {
-            const payload = { version: Date.now(), config: obterLayoutGlobal() };
-            ultimoLayoutRecebido = payload.version;
-            try { layoutChannel?.postMessage({ type: 'layout-updated', payload }); } catch (_) {}
-        }
-
-        function iniciarSincronizacaoTempoReal() {
-            try {
-                if ('BroadcastChannel' in window) {
-                    layoutChannel = new BroadcastChannel(LAYOUT_CHANNEL_NAME);
-                    layoutChannel.addEventListener('message', event => {
-                        if (event.data?.type === 'layout-updated') aplicarLayoutRecebido(event.data.payload);
+                    if (!parsed.config.botoes) parsed.config.botoes = defaults.config.botoes;
+                    if (!parsed.config.cores) parsed.config.cores = defaults.config.cores;
+                    if (!parsed.config.emailjs) parsed.config.emailjs = { serviceId: '', templateId: '', publicKey: '' };
+                    const adminExists = parsed.usuarios.some(u => u.id === 'admin');
+                    if (!adminExists) parsed.usuarios.unshift(ADMIN_DATA);
+                    if (!parsed.config.horariosCategoria) parsed.config.horariosCategoria = {};
+                    if (!parsed.whatsappMessages) parsed.whatsappMessages = [];
+                    parsed.usuarios.forEach(u => {
+                        if (!u.permissoes) {
+                            u.permissoes = { alunos: true, presencas: true, carteirinhas: true, relatorios: true,
+                                notificacoes: true, backup: true, configuracoes: false, usuarios: false,
+                                excluirAlunos: true };
+                        }
+                        if (!('excluirAlunos' in u.permissoes)) u.permissoes.excluirAlunos = true;
+                        if (!('alunoVinculado' in u)) u.alunoVinculado = null;
                     });
+                    return parsed;
                 }
-            } catch (e) { console.warn('BroadcastChannel indisponível:', e); }
+            } catch (e) { console.error('Erro ao carregar dados', e); }
+            return getDefaultData();
+        }
 
-            if (typeof EventSource !== 'undefined') {
+        function saveData() {
+            try {
+                const adminExists = data.usuarios.some(u => u.id === 'admin');
+                if (!adminExists) data.usuarios.unshift(ADMIN_DATA);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) { console.error('Erro ao salvar dados', e); }
+        }
+
+        // ============================================================
+        //  GERENCIAMENTO DE SESSÃO
+        // ============================================================
+        function salvarSessao() {
+            if (currentUser) {
                 try {
-                    eventosSSE = new EventSource(API_BASE + '/api/events');
-                    eventosSSE.onmessage = async function(event) {
-                        try {
-                            const msg = JSON.parse(event.data);
-                            if (msg.type !== 'state-updated' || !msg.data) return;
-                            const currentId = currentUser?.id;
-                            data = msg.data;
-                            if (typeof normalizarEstadoCompleto === 'function') normalizarEstadoCompleto();
-                            if (currentId) currentUser = data.usuarios.find(u => u.id === currentId) || currentUser;
-                            aplicarPersonalizacaoCompleta();
-                            if (currentUser) {
-                                renderizarMenu();
-                                if (typeof atualizarInterfaceUsuario === 'function') atualizarInterfaceUsuario();
-                            }
-                            console.log('🔄 Dados e layout atualizados automaticamente.');
-                        } catch (e) { console.warn('Evento do servidor inválido:', e); }
+                    const sessao = {
+                        userId: currentUser.id,
+                        data: new Date().toISOString()
                     };
-                    eventosSSE.onerror = () => console.warn('Conexão de atualização em tempo real perdida; tentando reconectar...');
-                } catch (e) { console.warn('SSE indisponível:', e); }
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
+                } catch (e) {}
             }
         }
 
-        function normalizarEstadoCompleto() {
-            const defaults = getDefaultData();
-            data = {
-                ...defaults,
-                ...data,
-                usuarios: Array.isArray(data.usuarios) ? data.usuarios : defaults.usuarios,
-                alunos: Array.isArray(data.alunos) ? data.alunos : [],
-                presencas: Array.isArray(data.presencas) ? data.presencas : [],
-                notificacoes: Array.isArray(data.notificacoes) ? data.notificacoes : [],
-                whatsappMessages: Array.isArray(data.whatsappMessages) ? data.whatsappMessages : [],
-                config: { ...defaults.config, ...(data.config || {}),
-                    botoes: { ...defaults.config.botoes, ...(data.config?.botoes || {}) },
-                    cores: { ...defaults.config.cores, ...(data.config?.cores || {}) },
-                    emailjs: { ...defaults.config.emailjs, ...(data.config?.emailjs || {}) }
-                }
-            };
-            data.usuarios.forEach(normalizarPermissoesUsuario);
-            if (!data.usuarios.some(u => u.id === 'admin')) data.usuarios.unshift({ ...ADMIN_DATA, permissoes: { ...ADMIN_DATA.permissoes } });
-        }
-
-        function saveData(syncLayout = false) {
+        function carregarSessao() {
             try {
-                normalizarEstadoCompleto();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                // O servidor é a fonte central quando disponível.
-                salvarDadosNoServidor(syncLayout);
-            } catch (e) { console.error('Erro ao salvar dados:', e); }
+                const sessaoStr = localStorage.getItem(SESSION_KEY);
+                if (!sessaoStr) return null;
+                const sessao = JSON.parse(sessaoStr);
+                if (!sessao.userId) return null;
+                const user = data.usuarios.find(u => u.id === sessao.userId);
+                return user || null;
+            } catch (e) { return null; }
         }
 
-        const sincronizacaoInicial = carregarConfiguracaoPublica();
+        function limparSessao() {
+            try {
+                localStorage.removeItem(SESSION_KEY);
+            } catch (e) {}
+        }
 
         // ============================================================
         //  VALIDAR SENHA
@@ -3498,36 +3355,11 @@
         // ============================================================
         //  VERIFICAR PERMISSÃO
         // ============================================================
-        const PERMISSOES_PAGINAS = {
-            alunos: 'alunos', carteirinhas: 'carteirinhas', presencas: 'presencas',
-            notificacoes: 'notificacoes', relatorios: 'relatorios', backup: 'backup',
-            configuracoes: 'configuracoes', usuarios: 'usuarios'
-        };
-
         function temPermissao(permissao) {
-            if (!currentUser || !permissao) return false;
-            if (currentUser.perfil === 'Administrador') return true;
-            return currentUser.permissoes?.[permissao] === true;
-        }
-
-        function normalizarPermissoesUsuario(user) {
-            if (!user) return;
-            const padrao = { alunos:false, presencas:false, carteirinhas:false, relatorios:false,
-                notificacoes:false, backup:false, configuracoes:false, usuarios:false,
-                excluirAlunos:false };
-            user.permissoes = { ...padrao, ...(user.permissoes || {}) };
-            delete user.permissoes.personalizar;
-        }
-
-        function verificarPermissaoPagina(page) {
             if (!currentUser) return false;
-            if (currentUser.perfil === 'Administrador' || page === 'dashboard') return true;
-            const permissao = PERMISSOES_PAGINAS[page];
-            if (!permissao || !temPermissao(permissao)) {
-                showToast('❌ Você não tem permissão para acessar esta página', 'error');
-                return false;
-            }
-            return true;
+            if (currentUser.perfil === 'Administrador') return true;
+            const p = currentUser.permissoes || {};
+            return p[permissao] === true;
         }
 
         function podeExcluirAlunos() {
@@ -3540,6 +3372,27 @@
 
         function isAdmin() {
             return currentUser && currentUser.perfil === 'Administrador';
+        }
+
+        function isPai() {
+            return currentUser && currentUser.perfil === 'Pai';
+        }
+
+        function getAlunosVinculados() {
+            if (isAdmin()) return data.alunos;
+            if (isPai() && currentUser.alunoVinculado) {
+                const aluno = data.alunos.find(a => a.id === currentUser.alunoVinculado);
+                return aluno ? [aluno] : [];
+            }
+            return [];
+        }
+
+        function podeEditarAluno(alunoId) {
+            if (isAdmin()) return true;
+            if (isPai()) {
+                return currentUser.alunoVinculado === alunoId;
+            }
+            return false;
         }
 
         // ============================================================
@@ -3631,8 +3484,8 @@
 
             const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
                 .toUpperCase();
-            user.senha = '';
-            user.senhaInicial = novaSenha;
+            user.senha = novaSenha;
+            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
             saveData();
 
             const config = data.config.emailjs || {};
@@ -3657,7 +3510,7 @@
             const config = data.config.emailjs || {};
             if (!config.serviceId || !config.templateId || !config.publicKey) return false;
             try {
-                if (typeof emailjs !== 'undefined' && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
+                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
                 const templateParams = {
                     to_email: email,
                     to_name: nome || 'Usuário',
@@ -3729,13 +3582,15 @@
         }
 
         // ============================================================
-        //  HANDLE LOGIN - CORRIGIDO
+        //  HANDLE LOGIN - COM PERSISTÊNCIA DE SESSÃO
         // ============================================================
-        async function handleLogin(e) {
+        function handleLogin(e) {
             e.preventDefault();
+
             const loginUser = document.getElementById('loginUser').value.trim();
             const loginPass = document.getElementById('loginPassword').value.trim();
             const errorDiv = document.getElementById('loginError');
+
             errorDiv.style.display = 'none';
 
             if (!loginUser || !loginPass) {
@@ -3744,46 +3599,109 @@
                 return false;
             }
 
-            try {
-                const response = await requisicaoServidor('/api/login', {
-                    method: 'POST',
-                    body: JSON.stringify({ login: loginUser, senha: loginPass })
-                });
-                const result = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(result.error || 'Falha na autenticação');
+            const user = data.usuarios.find(u =>
+                u.usuario.toLowerCase() === loginUser.toLowerCase() ||
+                u.email.toLowerCase() === loginUser.toLowerCase()
+            );
 
-                sessaoServidor = true;
-                data = result.data || data;
-                normalizarEstadoCompleto();
-                currentUser = result.user || null;
-                if (!currentUser) throw new Error('Usuário autenticado não retornado pelo servidor');
-
-                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (_) {}
-                aplicarPersonalizacaoCompleta();
-
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'block';
-                document.getElementById('userName').textContent = currentUser.nome;
-                document.getElementById('userRole').textContent = currentUser.perfil;
-                document.getElementById('userAvatar').textContent = currentUser.nome.charAt(0).toUpperCase();
-                document.getElementById('whatsappFloat').style.display = 'flex';
-                atualizarWhatsAppBadge();
-                document.getElementById('securityBadge').style.display = isAdmin() ? 'inline-flex' : 'none';
-                initEmailJS();
-                renderizarMenu();
-                initSystem();
-                closeSidebar();
-                iniciarSincronizacaoTempoReal();
-                showToast(`✅ Bem-vindo, ${currentUser.nome}!`);
-                return false;
-            } catch (error) {
-                console.error('Erro no login:', error);
-                errorDiv.textContent = error.message === 'Failed to fetch'
-                    ? 'Não foi possível conectar ao servidor. Inicie o servidor do sistema.'
-                    : error.message;
+            if (!user) {
+                errorDiv.textContent = 'Usuário não encontrado';
                 errorDiv.style.display = 'block';
                 return false;
+            }
+
+            if (user.senha !== loginPass) {
+                errorDiv.textContent = 'Senha incorreta';
+                errorDiv.style.display = 'block';
+                return false;
+            }
+
+            currentUser = user;
+
+            if (user.primeiroAcesso) {
+                user.primeiroAcesso = false;
+                saveData();
+            }
+
+            // Salvar sessão
+            salvarSessao();
+
+            // Mostrar interface
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+
+            // Atualizar informações do usuário
+            document.getElementById('userName').textContent = user.nome;
+            document.getElementById('userRole').textContent = user.perfil;
+            document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
+
+            // Mostrar WhatsApp
+            document.getElementById('whatsappFloat').style.display = 'flex';
+            atualizarWhatsAppBadge();
+
+            // Badge de admin
+            const securityBadge = document.getElementById('securityBadge');
+            securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
+
+            // Ocultar botões de edição para perfil Pai
+            atualizarBotoesPorPerfil();
+
+            // Inicializar EmailJS
+            initEmailJS();
+
+            // Renderizar menu e sistema
+            renderizarMenu();
+            initSystem();
+
+            // Aplicar personalização
+            aplicarPersonalizacaoCompleta();
+
+            // Fechar sidebar mobile
+            closeSidebar();
+
+            showToast(`✅ Bem-vindo, ${user.nome}!`);
+            return false;
+        }
+
+        // ============================================================
+        //  ATUALIZAR BOTÕES POR PERFIL
+        // ============================================================
+        function atualizarBotoesPorPerfil() {
+            const isAdminUser = isAdmin();
+            const isPaiUser = isPai();
+
+            // Botões de criação de aluno
+            const botoesNovoAluno = document.querySelectorAll('#btnNovoAluno, #alunosNovoAluno, #quickNovoAluno');
+            botoesNovoAluno.forEach(btn => {
+                btn.style.display = isAdminUser ? 'inline-flex' : 'none';
+            });
+
+            // Botões de edição e exclusão em cards de aluno
+            document.querySelectorAll('.aluno-card .actions .btn-primary, .aluno-card .actions .btn-danger').forEach(btn => {
+                if (isAdminUser) {
+                    btn.style.display = 'inline-flex';
+                } else if (isPaiUser) {
+                    // Para pais, mostrar apenas se for o aluno vinculado
+                    const card = btn.closest('.aluno-card');
+                    if (card) {
+                        const alunoId = card.dataset?.alunoId || '';
+                        if (alunoId === currentUser?.alunoVinculado) {
+                            btn.style.display = 'inline-flex';
+                        } else {
+                            btn.style.display = 'none';
+                        }
+                    }
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+
+            // Para pais, ocultar botões de exclusão
+            if (isPaiUser) {
+                document.querySelectorAll('.aluno-card .actions .btn-danger').forEach(btn => {
+                    btn.style.display = 'none';
+                });
             }
         }
 
@@ -3802,10 +3720,9 @@
             }
         }
 
-        async function logout() {
-            try { await requisicaoServidor('/api/logout', { method: 'POST' }); } catch (_) {}
-            sessaoServidor = false;
+        function logout() {
             currentUser = null;
+            limparSessao();
             fecharScanner();
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
@@ -3886,7 +3803,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 data.config.loginLogo = e.target.result;
-                saveData(true);
+                saveData();
                 aplicarPersonalizacaoCompleta();
                 showToast('Logo atualizado!');
             };
@@ -3895,7 +3812,7 @@
 
         function resetarLoginLogo() {
             data.config.loginLogo = '';
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('Logo restaurado!');
         }
@@ -3909,7 +3826,7 @@
                 document.getElementById('loginBgPreview').style.background = `url(${dataUrl}) center/cover no-repeat`;
                 document.getElementById('loginBgPreview').textContent = '';
                 data.config.loginBg = dataUrl;
-                saveData(true);
+                saveData();
                 aplicarPersonalizacaoCompleta();
                 showToast('Fundo atualizado!');
             };
@@ -3921,7 +3838,7 @@
             preview.style.background = 'linear-gradient(135deg, #0f1b2d, #1a2d4a)';
             preview.textContent = 'Fundo padrão';
             data.config.loginBg = '';
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('Fundo restaurado!');
         }
@@ -3931,14 +3848,14 @@
             data.config.loginTextColor = document.getElementById('loginTextColor').value;
             data.config.loginBoxBg = document.getElementById('loginBoxBgColor').value;
             data.config.loginLogoSize = parseInt(document.getElementById('loginLogoSize').value) || 80;
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
         }
 
         function atualizarLoginTextos() {
             data.config.loginTitle = document.getElementById('loginPageTitle').value.trim() || 'VILA REAL';
             data.config.loginSubtitle = document.getElementById('loginPageSubtitle').value.trim() || 'Futsal · Gestão de Presenças';
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
         }
 
@@ -3998,7 +3915,7 @@
                 paddingY: parseInt(document.getElementById('btnPaddingY').value) || 10,
                 borderRadius: parseInt(document.getElementById('btnBorderRadius').value) || 10
             };
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('✅ Personalização dos botões salva!');
         }
@@ -4030,7 +3947,7 @@
                 fundo: document.getElementById('corFundo').value,
                 texto: document.getElementById('corTexto').value
             };
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('✅ Cores do sistema salvas!');
         }
@@ -4041,7 +3958,7 @@
             document.getElementById('corFundo').value = '#eef1f5';
             document.getElementById('corTexto').value = '#0f1b2d';
             data.config.cores = { primaria: '#0f1b2d', secundaria: '#d4a020', fundo: '#eef1f5', texto: '#0f1b2d' };
-            saveData(true);
+            saveData();
             aplicarCoresSistema();
             showToast('✅ Cores restauradas!');
         }
@@ -4076,7 +3993,7 @@
         function salvarPersonalizacaoCompleta() {
             salvarPersonalizacaoBotoes();
             salvarCoresSistema();
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('✅ Todas as personalizações foram salvas!');
         }
@@ -4121,7 +4038,7 @@
             data.config.loginTitle = 'VILA REAL';
             data.config.loginSubtitle = 'Futsal · Gestão de Presenças';
 
-            saveData(true);
+            saveData();
             aplicarPersonalizacaoCompleta();
             showToast('✅ Todas as personalizações foram restauradas!');
         }
@@ -4143,7 +4060,7 @@
         }
 
         // ============================================================
-        //  RENDERIZAR MENU - CORREÇÃO COMPLETA
+        //  RENDERIZAR MENU
         // ============================================================
         function renderizarMenu() {
             const container = document.getElementById('sidebarMenu');
@@ -4163,6 +4080,7 @@
 
             const isAdmin = currentUser.perfil === 'Administrador';
             const permissoes = currentUser.permissoes || {};
+            const isPaiUser = isPai();
 
             let html = '';
 
@@ -4183,11 +4101,18 @@
                 { id: 'usuarios', label: 'Usuários', icon: 'fas fa-users-cog', page: 'usuarios', permissao: 'usuarios' },
                 { id: 'configuracoes', label: 'Configurações', icon: 'fas fa-cog', page: 'configuracoes',
                     permissao: 'configuracoes' },
-                { id: 'personalizar', label: 'Personalizar', icon: 'fas fa-paint-brush', page: 'personalizar', adminOnly: true }
+                { id: 'personalizar', label: 'Personalizar', icon: 'fas fa-paint-brush', page: 'personalizar',
+                    permissao: 'personalizar' }
             ];
 
             // Renderizar itens principais
             mainItems.forEach((item) => {
+                // Para perfil Pai, mostrar apenas Dashboard, Alunos, Carteirinhas, Presenças
+                if (isPaiUser && !['dashboard', 'alunos', 'carteirinhas', 'presencas', 'notificacoes'].includes(item
+                    .page)) {
+                    return;
+                }
+
                 if (!isAdmin && item.page !== 'dashboard') {
                     const mapa = {
                         'alunos': 'alunos',
@@ -4212,35 +4137,40 @@
                 `;
             });
 
-            // Renderizar itens administrativos
-            let hasAdminItems = false;
-            adminItems.forEach((item) => {
-                if (item.isSeparator) {
-                    html += `<div class="menu-label">${item.label}</div>`;
-                    return;
+            // Renderizar itens administrativos (apenas para Admin)
+            if (isAdmin) {
+                let hasAdminItems = false;
+                adminItems.forEach((item) => {
+                    if (item.isSeparator) {
+                        html += `<div class="menu-label">${item.label}</div>`;
+                        return;
+                    }
+
+                    if (!isAdmin && !permissoes[item.permissao]) return;
+
+                    hasAdminItems = true;
+                    html += `
+                        <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
+                            <i class="${item.icon}"></i>
+                            <span>${item.label}</span>
+                        </button>
+                    `;
+                });
+
+                if (!hasAdminItems) {
+                    html = html.replace('<div class="menu-label">Administração</div>', '');
                 }
-
-                if (item.adminOnly && !isAdmin) return;
-                if (!item.adminOnly && !isAdmin && item.permissao && !permissoes[item.permissao]) return;
-
-                hasAdminItems = true;
-                html += `
-                    <button class="menu-item" data-page="${item.page}" onclick="mudarPagina('${item.page}')">
-                        <i class="${item.icon}"></i>
-                        <span>${item.label}</span>
-                    </button>
-                `;
-            });
-
-            if (!hasAdminItems) {
-                html = html.replace('<div class="menu-label">Administração</div>', '');
             }
 
             container.innerHTML = html;
 
             // Atualizar badges
             const badgeAlunos = document.getElementById('badge_alunos');
-            if (badgeAlunos) badgeAlunos.textContent = data.alunos.length || '';
+            if (badgeAlunos) {
+                const alunosVisiveis = isPaiUser && currentUser.alunoVinculado ? 
+                    data.alunos.filter(a => a.id === currentUser.alunoVinculado).length : data.alunos.length;
+                badgeAlunos.textContent = alunosVisiveis || '';
+            }
 
             const badgeNotif = document.getElementById('badge_notificacoes');
             if (badgeNotif) badgeNotif.textContent = data.notificacoes.length || '';
@@ -4258,7 +4188,12 @@
         //  NAVEGAÇÃO
         // ============================================================
         function mudarPagina(page) {
-            if (!verificarPermissaoPagina(page)) return false;
+            // Verificar permissão para perfil Pai
+            if (isPai() && !['dashboard', 'alunos', 'carteirinhas', 'presencas', 'notificacoes'].includes(page)) {
+                showToast('❌ Você não tem permissão para acessar esta página', 'error');
+                return;
+            }
+
             fecharScanner();
 
             document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
@@ -4269,7 +4204,7 @@
             if (targetPage) targetPage.classList.add('active');
 
             if (page === 'personalizar') {
-                if (!podePersonalizar() && !isAdmin()) {
+                if (!isAdmin()) {
                     showToast('❌ Você não tem permissão para personalizar o sistema', 'error');
                     mudarPagina('dashboard');
                     return;
@@ -4306,6 +4241,9 @@
             if (page === 'usuarios') renderUsuarios();
             if (page === 'configuracoes') renderConfiguracoes();
 
+            // Atualizar botões por perfil
+            atualizarBotoesPorPerfil();
+
             closeSidebar();
         }
 
@@ -4334,7 +4272,8 @@
         // ============================================================
         function carregarCarteirinhas() {
             const select = document.getElementById('carteirinhaSelect');
-            const categorias = [...new Set(data.alunos.map(a => a.categoria))];
+            const alunos = getAlunosVinculados();
+            const categorias = [...new Set(alunos.map(a => a.categoria))];
 
             select.innerHTML = '<option value="">-- Selecione uma categoria --</option>';
             categorias.forEach(cat => {
@@ -4365,9 +4304,9 @@
             empty.style.display = 'none';
             alunosDiv.style.display = 'block';
 
-            let alunosFiltrados = data.alunos;
+            let alunosFiltrados = getAlunosVinculados();
             if (categoria !== 'todos') {
-                alunosFiltrados = data.alunos.filter(a => a.categoria === categoria);
+                alunosFiltrados = alunosFiltrados.filter(a => a.categoria === categoria);
             }
 
             const listContainer = document.getElementById('carteirinhaAlunosList');
@@ -4384,14 +4323,14 @@
 
             listContainer.innerHTML = alunosFiltrados.map(aluno => {
                 const fotoHtml = aluno.foto ?
-                    `<img src="${aluno.foto}" alt="${escaparHtml(aluno.nome)}">` :
+                    `<img src="${aluno.foto}" alt="${aluno.nome}">` :
                     `<span style="font-size:14px;font-weight:700;">${aluno.nome.charAt(0).toUpperCase()}</span>`;
 
                 return `
                     <div class="carteirinha-aluno-item" data-id="${aluno.id}" onclick="selecionarAlunoCarteirinha('${aluno.id}')">
                         <div class="aluno-avatar">${fotoHtml}</div>
-                        <div class="aluno-nome">${escaparHtml(aluno.nome)}</div>
-                        <div class="aluno-numero">${escaparHtml(aluno.numero)}</div>
+                        <div class="aluno-nome">${aluno.nome}</div>
+                        <div class="aluno-numero">${aluno.numero}</div>
                         <span class="aluno-categoria-badge">${aluno.categoria}</span>
                     </div>
                 `;
@@ -4427,7 +4366,7 @@
             container.style.display = 'block';
 
             const fotoHtml = aluno.foto ?
-                `<img src="${aluno.foto}" alt="${escaparHtml(aluno.nome)}">` :
+                `<img src="${aluno.foto}" alt="${aluno.nome}">` :
                 `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>`;
 
             container.innerHTML = `
@@ -4482,6 +4421,11 @@
         }
 
         function editarFotoCarteirinha(alunoId) {
+            if (!podeEditarAluno(alunoId)) {
+                showToast('❌ Você não tem permissão para editar este aluno', 'error');
+                return;
+            }
+
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -4494,11 +4438,11 @@
                     const aluno = data.alunos.find(a => a.id === alunoId);
                     if (aluno) {
                         aluno.foto = dataUrl;
-                        saveData(true);
+                        saveData();
                         const fotoElement = document.querySelector('#carteirinhaImpressao .crt-foto');
                         if (fotoElement) {
                             fotoElement.innerHTML = `
-                                <img src="${dataUrl}" alt="${escaparHtml(aluno.nome)}">
+                                <img src="${dataUrl}" alt="${aluno.nome}">
                                 <div class="edit-overlay" onclick="event.stopPropagation();editarFotoCarteirinha('${aluno.id}')">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -4518,7 +4462,7 @@
             if (!aluno) return;
             const win = window.open('', '_blank');
             const fotoHtml = aluno.foto ?
-                `<img src="${aluno.foto}" alt="${escaparHtml(aluno.nome)}">` :
+                `<img src="${aluno.foto}" alt="${aluno.nome}">` :
                 `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e5e7eb;color:#6b7280;font-size:24px;">📷</div>`;
 
             win.document.write(`<html><head><title>Carteirinha - ${aluno.nome}</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#0f1b2d;font-family:'Segoe UI',sans-serif;}.carteirinha{background:linear-gradient(135deg,#0f1b2d,#1a2d4a);border-radius:16px;padding:32px 36px;color:white;max-width:480px;width:100%;border:2px solid #d4a020;box-shadow:0 8px 40px rgba(0,0,0,0.5);}.crt-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}.crt-foto{width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #f5d060;flex-shrink:0;background:white;}.crt-foto img{width:100%;height:100%;object-fit:cover;}.crt-title{font-size:18px;font-weight:800;letter-spacing:1px;}.crt-title span{color:#d4a020;}.crt-title small{display:block;font-size:10px;opacity:0.6;font-weight:400;letter-spacing:2px;text-transform:uppercase;}.crt-body{display:flex;gap:20px;}.crt-info{flex:1;}.info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);}.info-row .label{opacity:0.5;font-size:10px;text-transform:uppercase;letter-spacing:1px;}.info-row .value{font-weight:600;}.crt-qr{flex-shrink:0;background:white;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;}.crt-qr canvas{width:110px !important;height:110px !important;}.crt-footer{text-align:center;font-size:9px;opacity:0.4;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:14px;letter-spacing:1px;}.btn-print{margin-top:16px;padding:10px 30px;background:#d4a020;border:none;border-radius:10px;font-weight:700;color:#0f1b2d;cursor:pointer;font-size:14px;}.btn-print:hover{background:#f5d060;}@media print{body{background:white;}.carteirinha{box-shadow:none;border-color:#ccc;}.btn-print{display:none;}}</style></head><body><div style="display:flex;flex-direction:column;align-items:center;"><div class="carteirinha" id="carteirinhaPrint"><div class="crt-header"><div class="crt-foto">${fotoHtml}</div><div class="crt-title">VILA <span>REAL</span><small>Futsal · Carteirinha</small></div></div><div class="crt-body"><div class="crt-info"><div class="info-row"><span class="label">Nº</span><span class="value">${aluno.numero}</span></div><div class="info-row"><span class="label">Nome</span><span class="value">${aluno.nome}</span></div><div class="info-row"><span class="label">Pai</span><span class="value">${aluno.pai}</span></div><div class="info-row"><span class="label">Telefone</span><span class="value">${aluno.telefone}</span></div><div class="info-row"><span class="label">Idade</span><span class="value">${aluno.idade} anos</span></div><div class="info-row"><span class="label">Categoria</span><span class="value">${aluno.categoria}</span></div></div><div class="crt-qr" id="qrPrintContainer"></div></div><div class="crt-footer">Válido para o ano letivo atual · Vila Real Futsal</div></div><button class="btn-print" onclick="window.print()">🖨️ Imprimir Carteirinha</button></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{const c=document.getElementById('qrPrintContainer');c.innerHTML='';try{new QRCode(c,{text:JSON.stringify({id:'${aluno.id}',numero:'${aluno.numero}'}),width:110,height:110,colorDark:'#0f1b2d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});}catch(e){c.innerHTML='<div style="padding:12px;background:#fff;border-radius:6px;color:#333;">QR</div>';}},200);<\/script></body></html>`);
@@ -4541,7 +4485,8 @@
 
             const select = document.getElementById('whatsappAlunoSelect');
             select.innerHTML = '<option value="">-- Selecione um aluno --</option>';
-            data.alunos.forEach(aluno => {
+            const alunos = getAlunosVinculados();
+            alunos.forEach(aluno => {
                 if (aluno.whatsapp) {
                     select.innerHTML += `<option value="${aluno.id}">${aluno.nome} (${aluno.whatsapp})</option>`;
                 }
@@ -4644,7 +4589,7 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
             data.whatsappMessages.push(registro);
-            saveData(true);
+            saveData();
 
             data.notificacoes.push({
                 id: 'notif_' + Date.now(),
@@ -4658,7 +4603,7 @@
                 status: 'enviado',
                 enviadoPor: currentUser ? currentUser.nome : 'Sistema'
             });
-            saveData(true);
+            saveData();
 
             renderNotificacoes();
             carregarMensagensWhatsApp();
@@ -4709,12 +4654,15 @@
         }
 
         // ============================================================
-        //  SCANNER QR CODE
+        //  SCANNER QR CODE - CORRIGIDO COM FECHAMENTO AUTOMÁTICO
         // ============================================================
         async function abrirScanner() {
             const container = document.getElementById('scannerContainer');
             const status = document.getElementById('scannerStatus');
             if (!container || !status) return;
+
+            // Fechar scanner anterior se existir
+            await fecharScanner();
 
             container.style.display = 'block';
             status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inicializando câmera...';
@@ -4725,27 +4673,33 @@
             }
 
             try {
-                if (html5QrCode) {
-                    try { await html5QrCode.stop(); } catch (_) {}
-                    try { html5QrCode.clear(); } catch (_) {}
-                    html5QrCode = null;
-                }
                 html5QrCode = new Html5Qrcode('qr-reader');
-                const config = { fps: 15, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
-                await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
+                const config = { 
+                    fps: 15, 
+                    qrbox: { width: 250, height: 250 }, 
+                    aspectRatio: 1.0,
+                    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+                };
+                await html5QrCode.start(
+                    { facingMode: 'environment' }, 
+                    config, 
+                    onScanSuccess, 
+                    onScanError
+                );
                 scannerAtivo = true;
-                status.innerHTML = '<span style="color:#22c55e;">Aponte a câmera para o QR Code.</span>';
+                scannerFechadoAutomaticamente = false;
+                status.innerHTML = '<span style="color:#22c55e;">📷 Aponte a câmera para o QR Code.</span>';
             } catch (err) {
                 scannerAtivo = false;
                 try { html5QrCode?.clear(); } catch (_) {}
                 html5QrCode = null;
-                status.innerHTML = `<span style="color:#ef4444;">Não foi possível iniciar a câmera: ${escaparHtml(err?.message || 'erro desconhecido')}</span>`;
+                status.innerHTML = `<span style="color:#ef4444;">❌ Não foi possível iniciar a câmera: ${err?.message || 'erro desconhecido'}</span>`;
             }
         }
 
         function onScanSuccess(decodedText) {
             const status = document.getElementById('scannerStatus');
-            status.innerHTML = `<span style="color:#22c55e;">QR Code identificado!</span>`;
+            status.innerHTML = `<span style="color:#22c55e;">✅ QR Code identificado!</span>`;
 
             try {
                 const data = JSON.parse(decodedText);
@@ -4754,53 +4708,67 @@
                     const aluno = data.alunos.find(a => a.id === alunoId);
                     if (aluno) {
                         confirmarPresenca(alunoId);
-                        setTimeout(() => { fecharScanner();
-                            mudarPagina('presencas'); }, 1500);
+                        // Fechar scanner automaticamente após 1.5s
+                        setTimeout(() => {
+                            fecharScanner();
+                            mudarPagina('presencas');
+                        }, 1500);
                     } else {
-                        status.innerHTML = `<span style="color:#ef4444;">Aluno não encontrado!</span>`;
+                        status.innerHTML = `<span style="color:#ef4444;">❌ Aluno não encontrado!</span>`;
+                        setTimeout(() => fecharScanner(), 3000);
                     }
                 } else {
                     const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
                     if (aluno) {
                         confirmarPresenca(aluno.id);
-                        setTimeout(() => { fecharScanner();
-                            mudarPagina('presencas'); }, 1500);
+                        setTimeout(() => {
+                            fecharScanner();
+                            mudarPagina('presencas');
+                        }, 1500);
                     } else {
-                        status.innerHTML = `<span style="color:#ef4444;">Código inválido!</span>`;
+                        status.innerHTML = `<span style="color:#ef4444;">❌ Código inválido!</span>`;
+                        setTimeout(() => fecharScanner(), 3000);
                     }
                 }
             } catch (e) {
                 const aluno = data.alunos.find(a => a.numero === decodedText || a.id === decodedText);
                 if (aluno) {
                     confirmarPresenca(aluno.id);
-                    setTimeout(() => { fecharScanner();
-                        mudarPagina('presencas'); }, 1500);
+                    setTimeout(() => {
+                        fecharScanner();
+                        mudarPagina('presencas');
+                    }, 1500);
                 } else {
-                    status.innerHTML = `<span style="color:#ef4444;">Código não reconhecido!</span>`;
+                    status.innerHTML = `<span style="color:#ef4444;">❌ Código não reconhecido!</span>`;
+                    setTimeout(() => fecharScanner(), 3000);
                 }
             }
         }
 
-        function onScanError(err) {}
-
-        function fecharScanner() {
-            if (html5QrCode && scannerAtivo) {
-                try {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        scannerAtivo = false;
-                        document.getElementById('scannerContainer').style.display = 'none';
-                    }).catch(() => { scannerAtivo = false;
-                        document.getElementById('scannerContainer').style.display = 'none'; });
-                } catch (e) { scannerAtivo = false;
-                    document.getElementById('scannerContainer').style.display = 'none'; }
-            } else {
-                document.getElementById('scannerContainer').style.display = 'none';
-            }
+        function onScanError(err) {
+            // Ignorar erros de leitura (são normais)
         }
 
-        function reiniciarScanner() { fecharScanner();
-            setTimeout(() => abrirScanner(), 500); }
+        async function fecharScanner() {
+            scannerFechadoAutomaticamente = true;
+            if (html5QrCode && scannerAtivo) {
+                try {
+                    await html5QrCode.stop();
+                    await html5QrCode.clear();
+                } catch (e) {
+                    console.warn('Erro ao fechar scanner:', e);
+                }
+            }
+            scannerAtivo = false;
+            html5QrCode = null;
+            const container = document.getElementById('scannerContainer');
+            if (container) container.style.display = 'none';
+        }
+
+        function reiniciarScanner() { 
+            fecharScanner();
+            setTimeout(() => abrirScanner(), 500); 
+        }
 
         // ============================================================
         //  INICIALIZAÇÃO DO SISTEMA
@@ -4808,7 +4776,6 @@
         function initSystem() {
             console.log('🚀 Inicializando sistema...');
 
-            // O menu já foi renderizado no handleLogin, mas vamos garantir
             renderizarMenu();
 
             renderDashboard();
@@ -4851,33 +4818,50 @@
             document.getElementById('whatsappFloat').style.display = 'flex';
 
             const pagePersonalizar = document.getElementById('page-personalizar');
-            if (podePersonalizar() || isAdmin()) {
+            if (isAdmin()) {
                 pagePersonalizar.classList.add('visible');
             } else {
                 pagePersonalizar.classList.remove('visible');
             }
 
+            // Atualizar botões por perfil
+            atualizarBotoesPorPerfil();
+
             console.log('✅ Sistema inicializado!');
             console.log('📊 Alunos:', data.alunos.length);
             console.log('👥 Usuários:', data.usuarios.length);
+            console.log('👤 Perfil:', currentUser ? currentUser.perfil : 'Nenhum');
         }
 
         // ============================================================
         //  DASHBOARD
         // ============================================================
         function renderDashboard() {
-            document.getElementById('totalAlunos').textContent = data.alunos.length;
-            document.getElementById('totalCategorias').textContent = new Set(data.alunos.map(a => a.categoria)).size;
+            const alunos = getAlunosVinculados();
+            document.getElementById('totalAlunos').textContent = alunos.length;
+            document.getElementById('totalCategorias').textContent = new Set(alunos.map(a => a.categoria)).size;
 
             const hoje = new Date().toDateString();
-            const presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
+            const presencasHoje = data.presencas.filter(p => {
+                const aluno = data.alunos.find(a => a.id === p.alunoId);
+                if (!aluno) return false;
+                if (isPai() && currentUser.alunoVinculado && aluno.id !== currentUser.alunoVinculado) return false;
+                return new Date(p.data).toDateString() === hoje;
+            });
             document.getElementById('presencasHoje').textContent = presencasHoje.length;
 
-            const totalPresencas = data.presencas.length;
-            document.getElementById('frequenciaMedia').textContent = data.alunos.length > 0 ?
-                Math.round((totalPresencas / (data.alunos.length * 30)) * 100) + '%' : '0%';
+            const totalPresencas = data.presencas.filter(p => {
+                const aluno = data.alunos.find(a => a.id === p.alunoId);
+                return aluno && (isAdmin() || (isPai() && aluno.id === currentUser.alunoVinculado));
+            }).length;
+            
+            document.getElementById('frequenciaMedia').textContent = alunos.length > 0 ?
+                Math.round((totalPresencas / (alunos.length * 30)) * 100) + '%' : '0%';
 
-            const ultimas = data.presencas.slice(-5).reverse();
+            const ultimas = data.presencas.slice(-5).reverse().filter(p => {
+                const aluno = data.alunos.find(a => a.id === p.alunoId);
+                return aluno && (isAdmin() || (isPai() && aluno.id === currentUser.alunoVinculado));
+            });
             const container = document.getElementById('ultimasPresencas');
             if (ultimas.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="padding:20px;"><p>Nenhuma presença</p></div>';
@@ -4887,8 +4871,8 @@
                         <div class="item-info">
                             <div class="item-avatar">${p.alunoNome.charAt(0)}</div>
                             <div class="item-text">
-                                <div class="name">${escaparHtml(p.alunoNome)}</div>
-                                <div class="sub">${escaparHtml(p.alunoNumero)} · ${escaparHtml(p.categoria)}</div>
+                                <div class="name">${p.alunoNome}</div>
+                                <div class="sub">${p.alunoNumero} · ${p.categoria}</div>
                             </div>
                         </div>
                         <span class="item-badge presente">Presente</span>
@@ -4897,13 +4881,13 @@
             }
 
             const containerChart = document.getElementById('categoriaChartContainer');
-            if (data.alunos.length === 0) {
+            if (alunos.length === 0) {
                 containerChart.innerHTML = '<div class="empty-state" style="padding:20px;"><p>Nenhum dado</p></div>';
                 return;
             }
 
             const catCount = {};
-            data.alunos.forEach(a => { catCount[a.categoria] = (catCount[a.categoria] || 0) + 1; });
+            alunos.forEach(a => { catCount[a.categoria] = (catCount[a.categoria] || 0) + 1; });
             const catLabels = Object.keys(catCount);
             const catData = Object.values(catCount);
             const maxVal = Math.max(...catData, 1);
@@ -4924,17 +4908,18 @@
         }
 
         // ============================================================
-        //  ALUNOS - CRUD
+        //  ALUNOS - CRUD COM CONTROLE DE PERFIL
         // ============================================================
         function renderAlunos() {
             const container = document.getElementById('alunosList');
+            const alunos = getAlunosVinculados();
 
-            if (data.alunos.length === 0) {
+            if (alunos.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column:1/-1;">
                         <i class="fas fa-user-graduate"></i>
-                        <h3>Nenhum aluno</h3>
-                        <p>Clique em "Novo Aluno" para começar.</p>
+                        <h3>${isPai() ? 'Nenhum aluno vinculado à sua conta' : 'Nenhum aluno cadastrado'}</h3>
+                        <p>${isPai() ? 'Entre em contato com a administração para vincular seu aluno.' : 'Clique em "Novo Aluno" para começar.'}</p>
                     </div>
                 `;
                 return;
@@ -4942,30 +4927,29 @@
 
             const podeExcluir = podeExcluirAlunos();
 
-            container.innerHTML = data.alunos.map(aluno => {
+            container.innerHTML = alunos.map(aluno => {
                 const foto = aluno.foto || '';
+                const podeEditar = podeEditarAluno(aluno.id);
                 return `
-                <div class="aluno-card">
-                    <span class="badge-categoria">${escaparHtml(aluno.categoria)}</span>
-                    ${foto ? `<img src="${foto}" alt="${escaparHtml(aluno.nome)}" class="aluno-foto">` : `<div class="aluno-foto" style="display:flex;align-items:center;justify-content:center;background:var(--gray);font-size:24px;border-radius:50%;border:2px solid var(--secondary);">📷</div>`}
-                    <div class="aluno-nome">${escaparHtml(aluno.nome)}</div>
-                    <div class="aluno-info"><i class="fas fa-hashtag"></i> ${escaparHtml(aluno.numero)}</div>
-                    <div class="aluno-info"><i class="fas fa-calendar-alt"></i> ${escaparHtml(aluno.idade)} anos</div>
-                    <div class="aluno-info"><i class="fas fa-user-friends"></i> ${escaparHtml(aluno.pai)}</div>
-                    <div class="aluno-info"><i class="fas fa-phone"></i> ${escaparHtml(aluno.telefone)}</div>
-                    ${aluno.whatsapp ? `<div class="aluno-info"><i class="fab fa-whatsapp"></i> ${escaparHtml(aluno.whatsapp)}</div>` : ''}
+                <div class="aluno-card" data-aluno-id="${aluno.id}">
+                    <span class="badge-categoria">${aluno.categoria}</span>
+                    ${foto ? `<img src="${foto}" alt="${aluno.nome}" class="aluno-foto">` : `<div class="aluno-foto" style="display:flex;align-items:center;justify-content:center;background:var(--gray);font-size:24px;border-radius:50%;border:2px solid var(--secondary);">📷</div>`}
+                    <div class="aluno-nome">${aluno.nome}</div>
+                    <div class="aluno-info"><i class="fas fa-hashtag"></i> ${aluno.numero}</div>
+                    <div class="aluno-info"><i class="fas fa-calendar-alt"></i> ${aluno.idade} anos</div>
+                    <div class="aluno-info"><i class="fas fa-user-friends"></i> ${aluno.pai}</div>
+                    <div class="aluno-info"><i class="fas fa-phone"></i> ${aluno.telefone}</div>
+                    ${aluno.whatsapp ? `<div class="aluno-info"><i class="fab fa-whatsapp"></i> ${aluno.whatsapp}</div>` : ''}
                     <div class="actions">
                         <button class="btn btn-secondary btn-sm" onclick="verCarteirinha('${aluno.id}')">
                             <i class="fas fa-id-card"></i>
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="editarAluno('${aluno.id}')">
+                        ${podeEditar ? `<button class="btn btn-primary btn-sm" onclick="editarAluno('${aluno.id}')">
                             <i class="fas fa-edit"></i>
-                        </button>
-                        ${podeExcluir ? `<button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
+                        </button>` : ''}
+                        ${podeExcluir && isAdmin() ? `<button class="btn btn-danger btn-sm" onclick="excluirAluno('${aluno.id}')">
                             <i class="fas fa-trash"></i>
-                        </button>` : `<button class="btn btn-danger btn-sm" disabled title="Sem permissão para excluir" style="opacity:0.5;cursor:not-allowed;">
-                            <i class="fas fa-lock"></i>
-                        </button>`}
+                        </button>` : ''}
                         <button class="btn btn-success btn-sm" onclick="confirmarPresenca('${aluno.id}')">
                             <i class="fas fa-check"></i> Presença
                         </button>
@@ -4976,6 +4960,10 @@
         }
 
         function openModal(id) {
+            if (id === 'modalAluno' && isPai()) {
+                showToast('❌ Pais não podem criar novos alunos', 'error');
+                return;
+            }
             document.getElementById(id).classList.add('active');
             if (id === 'modalAluno') {
                 document.getElementById('modalAlunoTitle').textContent = 'Novo Aluno';
@@ -4999,7 +4987,7 @@
             const nasc = document.getElementById('alunoNascimento').value;
             if (!nasc) return;
             const hoje = new Date();
-            const nascDate = parseDataLocal(nasc);
+            const nascDate = new Date(nasc);
             let idade = hoje.getFullYear() - nascDate.getFullYear();
             const mes = hoje.getMonth() - nascDate.getMonth();
             if (mes < 0 || (mes === 0 && hoje.getDate() < nascDate.getDate())) idade--;
@@ -5011,6 +4999,11 @@
 
         function salvarAluno(e) {
             e.preventDefault();
+
+            if (isPai()) {
+                showToast('❌ Pais não podem criar ou editar alunos', 'error');
+                return false;
+            }
 
             const id = document.getElementById('alunoEditId').value;
             const numero = document.getElementById('alunoNumero').value;
@@ -5071,6 +5064,11 @@
         }
 
         function editarAluno(id) {
+            if (!podeEditarAluno(id)) {
+                showToast('❌ Você não tem permissão para editar este aluno', 'error');
+                return;
+            }
+
             const aluno = data.alunos.find(a => a.id === id);
             if (!aluno) return;
             openModal('modalAluno');
@@ -5095,6 +5093,11 @@
         }
 
         function excluirAluno(id) {
+            if (!isAdmin()) {
+                showToast('❌ Apenas administradores podem excluir alunos', 'error');
+                return;
+            }
+
             if (!podeExcluirAlunos()) {
                 showToast('❌ Você não tem permissão para excluir alunos', 'error');
                 return;
@@ -5104,6 +5107,14 @@
 
             const aluno = data.alunos.find(a => a.id === id);
             data.alunos = data.alunos.filter(a => a.id !== id);
+            
+            // Verificar se algum pai está vinculado a este aluno
+            data.usuarios.forEach(u => {
+                if (u.alunoVinculado === id) {
+                    u.alunoVinculado = null;
+                }
+            });
+            
             saveData();
             renderAlunos();
             renderDashboard();
@@ -5144,6 +5155,12 @@
             if (!alunoId) return;
             const aluno = data.alunos.find(a => a.id === alunoId);
             if (!aluno) { showToast('Aluno não encontrado', 'error'); return; }
+
+            // Verificar se o pai pode marcar presença do aluno
+            if (isPai() && currentUser.alunoVinculado !== alunoId) {
+                showToast('❌ Você só pode marcar presença do seu aluno vinculado', 'error');
+                return;
+            }
 
             const hoje = new Date().toISOString();
             const jaMarcou = data.presencas.some(p => p.alunoId === alunoId && new Date(p.data).toDateString() === new Date()
@@ -5191,12 +5208,18 @@
         // ============================================================
         function renderNotificacoes() {
             const container = document.getElementById('listaNotificacoes');
-            if (data.notificacoes.length === 0) {
+            
+            let notificacoes = data.notificacoes;
+            if (isPai() && currentUser.alunoVinculado) {
+                notificacoes = notificacoes.filter(n => n.alunoId === currentUser.alunoVinculado);
+            }
+            
+            if (notificacoes.length === 0) {
                 container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>Nenhuma notificação</h3></div>`;
                 return;
             }
-            const notifs = [...data.notificacoes].reverse();
+            const notifs = [...notificacoes].reverse();
             container.innerHTML = notifs.slice(0, 50).map(n =>
                 `<div class="notificacao-item" style="padding:8px 0;border-bottom:1px solid #f0f2f5;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;"><div class="notif-msg"><i class="${n.canal === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-envelope'}" style="color:${n.canal === 'whatsapp' ? '#25D366' : '#ea4335'};"></i> <strong>${n.alunoNome}</strong> - ${n.destinatario}</div><span class="notif-time" style="font-size:12px;color:var(--gray-dark);">${new Date(n.data).toLocaleString('pt-BR')}</span></div><div style="font-size:13px;color:var(--gray-dark);margin-top:4px;padding-left:24px;">${n.mensagem.length > 100 ? n.mensagem.substring(0,100)+'...' : n.mensagem}</div></div>`
                 ).join('');
@@ -5204,11 +5227,17 @@
 
         function limparNotificacoes() {
             if (!confirm('Limpar histórico?')) return;
-            data.notificacoes = [];
+            
+            if (isPai() && currentUser.alunoVinculado) {
+                data.notificacoes = data.notificacoes.filter(n => n.alunoId !== currentUser.alunoVinculado);
+            } else {
+                data.notificacoes = [];
+            }
+            
             saveData();
             renderNotificacoes();
             const badgeNotif = document.getElementById('badge_notificacoes');
-            if (badgeNotif) badgeNotif.textContent = 0;
+            if (badgeNotif) badgeNotif.textContent = data.notificacoes.length;
             showToast('Histórico limpo');
         }
 
@@ -5218,7 +5247,12 @@
         function carregarPresencasHoje() {
             const container = document.getElementById('presencasList');
             const hoje = new Date().toDateString();
-            const presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
+            
+            let presencasHoje = data.presencas.filter(p => new Date(p.data).toDateString() === hoje);
+            
+            if (isPai() && currentUser.alunoVinculado) {
+                presencasHoje = presencasHoje.filter(p => p.alunoId === currentUser.alunoVinculado);
+            }
 
             if (presencasHoje.length === 0) {
                 container.innerHTML =
@@ -5227,7 +5261,7 @@
             }
 
             container.innerHTML = presencasHoje.map(p =>
-                `<div class="list-item"><div class="item-info"><div class="item-avatar">${p.alunoNome.charAt(0)}</div><div class="item-text"><div class="name">${escaparHtml(p.alunoNome)}</div><div class="sub">${escaparHtml(p.alunoNumero)} · ${escaparHtml(p.categoria)}</div></div></div><div style="display:flex;gap:8px;"><span class="item-badge presente">Presente</span><span style="font-size:12px;color:var(--gray-dark);">${new Date(p.data).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span></div></div>`
+                `<div class="list-item"><div class="item-info"><div class="item-avatar">${p.alunoNome.charAt(0)}</div><div class="item-text"><div class="name">${p.alunoNome}</div><div class="sub">${p.alunoNumero} · ${p.categoria}</div></div></div><div style="display:flex;gap:8px;"><span class="item-badge presente">Presente</span><span style="font-size:12px;color:var(--gray-dark);">${new Date(p.data).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span></div></div>`
                 ).join('');
         }
 
@@ -5238,7 +5272,7 @@
             const container = document.getElementById('relatorioContainer');
             const filtro = document.getElementById('filtroCategoria').value;
 
-            let alunos = data.alunos;
+            let alunos = getAlunosVinculados();
             if (filtro) alunos = alunos.filter(a => a.categoria === filtro);
 
             if (alunos.length === 0) {
@@ -5261,7 +5295,7 @@
                     <tr style="border-bottom:1px solid #e5e7eb;">
                         <td style="padding:10px 12px;font-weight:600;">${aluno.numero}</td>
                         <td style="padding:10px 12px;">${aluno.nome}</td>
-                        <td style="padding:10px 12px;"><span class="badge-categoria">${escaparHtml(aluno.categoria)}</span></td>
+                        <td style="padding:10px 12px;"><span class="badge-categoria">${aluno.categoria}</span></td>
                         <td style="padding:10px 12px;text-align:center;font-weight:600;">${total}</td>
                         <td style="padding:10px 12px;text-align:center;">
                             <div style="background:#e5e7eb;border-radius:10px;height:6px;width:80px;overflow:hidden;display:inline-block;">
@@ -5279,7 +5313,7 @@
 
         function exportarCSV() {
             const filtro = document.getElementById('filtroCategoria').value;
-            let alunos = data.alunos;
+            let alunos = getAlunosVinculados();
             if (filtro) alunos = alunos.filter(a => a.categoria === filtro);
 
             if (alunos.length === 0) { showToast('Nenhum dado', 'error'); return; }
@@ -5291,11 +5325,14 @@
                 const diasDesde = Math.max(1, Math.floor((new Date() - new Date(aluno.criadoEm)) / (1000 * 60 * 60 * 24)) ||
                     1);
                 const freq = Math.min(100, Math.round((total / diasDesde) * 100));
-                csv += [escaparCsv(aluno.numero), escaparCsv(aluno.nome), escaparCsv(aluno.categoria), total, `${freq}%`].join(',') + '\n';
+                csv += `${aluno.numero},"${aluno.nome}",${aluno.categoria},${total},${freq}%\n`;
             });
 
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            criarUrlDownload(blob, `relatorio_${new Date().toISOString().slice(0,10)}.csv`);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `relatorio_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
             showToast('Relatório exportado!');
         }
 
@@ -5303,27 +5340,46 @@
         //  BACKUP
         // ============================================================
         function exportarBackup() {
+            if (isPai()) {
+                showToast('❌ Pais não podem acessar backups', 'error');
+                return;
+            }
             const dados = { usuarios: data.usuarios, alunos: data.alunos, presencas: data.presencas,
                 notificacoes: data.notificacoes, whatsappMessages: data.whatsappMessages, config: data.config,
                 proximoNumeroAluno: data.proximoNumeroAluno, proximoNumeroUsuario: data.proximoNumeroUsuario,
                 exportadoEm: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-            criarUrlDownload(blob, `backup_vila_real_${new Date().toISOString().slice(0,10)}.json`);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_vila_real_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
             showToast('Backup exportado!');
         }
 
         function exportarBackupCSV() {
+            if (isPai()) {
+                showToast('❌ Pais não podem acessar backups', 'error');
+                return;
+            }
             if (data.alunos.length === 0) { showToast('Nenhum aluno', 'error'); return; }
             let csv = 'Número,Nome,Pai,Telefone,WhatsApp,Email,Nascimento,Idade,Categoria\n';
             data.alunos.forEach(aluno => {
-                csv += [escaparCsv(aluno.numero), escaparCsv(aluno.nome), escaparCsv(aluno.pai), escaparCsv(aluno.telefone), escaparCsv(aluno.whatsapp || ''), escaparCsv(aluno.email || ''), escaparCsv(aluno.nascimento), aluno.idade, escaparCsv(aluno.categoria)].join(',') + '\n';
+                csv +=
+                    `${aluno.numero},"${aluno.nome}","${aluno.pai}","${aluno.telefone}","${aluno.whatsapp || ''}","${aluno.email || ''}","${aluno.nascimento}",${aluno.idade},"${aluno.categoria}"\n`;
             });
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            criarUrlDownload(blob, `backup_alunos_${new Date().toISOString().slice(0,10)}.csv`);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_alunos_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
             showToast('Backup CSV exportado!');
         }
 
         function importarBackup(event) {
+            if (isPai()) {
+                showToast('❌ Pais não podem importar backups', 'error');
+                return;
+            }
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -5344,19 +5400,9 @@
                     data.presencas = importedData.presencas || [];
                     data.notificacoes = importedData.notificacoes || [];
                     data.whatsappMessages = importedData.whatsappMessages || [];
-                    const defaults = getDefaultData();
-                    data.config = {
-                        ...defaults.config,
-                        ...(importedData.config || {}),
-                        categorias: Array.isArray(importedData.config?.categorias) && importedData.config.categorias.length
-                            ? importedData.config.categorias : defaults.config.categorias,
-                        horariosCategoria: importedData.config?.horariosCategoria || {},
-                        emailjs: { ...defaults.config.emailjs, ...(importedData.config?.emailjs || {}) },
-                        botoes: { ...defaults.config.botoes, ...(importedData.config?.botoes || {}) },
-                        cores: { ...defaults.config.cores, ...(importedData.config?.cores || {}) }
-                    };
-                    data.proximoNumeroAluno = Number(importedData.proximoNumeroAluno) > 0 ? Number(importedData.proximoNumeroAluno) : 1;
-                    data.proximoNumeroUsuario = Number(importedData.proximoNumeroUsuario) > 0 ? Number(importedData.proximoNumeroUsuario) : 2;
+                    data.config = importedData.config || data.config;
+                    data.proximoNumeroAluno = importedData.proximoNumeroAluno || 1;
+                    data.proximoNumeroUsuario = importedData.proximoNumeroUsuario || 2;
 
                     saveData();
                     showToast('✅ Backup restaurado!');
@@ -5378,18 +5424,22 @@
         //  IMPORTAR ALUNOS CSV
         // ============================================================
         function importarAlunosCSV(event) {
+            if (isPai()) {
+                showToast('❌ Pais não podem importar alunos', 'error');
+                return;
+            }
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const text = e.target.result;
-                    const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(line => line.trim());
+                    const lines = text.split('\n').filter(line => line.trim());
                     let importados = 0,
                         erros = 0;
 
                     for (let i = 1; i < lines.length; i++) {
-                        const values = parseCsvLinha(lines[i]);
+                        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
                         if (values.length < 4) continue;
                         try {
                             const nome = values[0] || '';
@@ -5406,7 +5456,7 @@
                             let categoriaFinal = categoria;
                             if (nascimento) {
                                 const hoje = new Date();
-                                const nascDate = parseDataLocal(nascimento);
+                                const nascDate = new Date(nascimento);
                                 idade = hoje.getFullYear() - nascDate.getFullYear();
                                 const mes = hoje.getMonth() - nascDate.getMonth();
                                 if (mes < 0 || (mes === 0 && hoje.getDate() < nascDate.getDate())) idade--;
@@ -5458,6 +5508,20 @@
         //  CONFIGURAÇÕES
         // ============================================================
         function renderConfiguracoes() {
+            if (isPai()) {
+                document.getElementById('configCategorias').innerHTML = 
+                    `<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>`;
+                document.getElementById('configHorariosCategoria').innerHTML = '';
+                document.getElementById('diasTreino').disabled = true;
+                document.getElementById('whatsappNumero').disabled = true;
+                document.getElementById('mensagemPadrao').disabled = true;
+                document.getElementById('notifAutomatica').disabled = true;
+                document.getElementById('emailjsServiceId').disabled = true;
+                document.getElementById('emailjsTemplateId').disabled = true;
+                document.getElementById('emailjsPublicKey').disabled = true;
+                return;
+            }
+
             const container = document.getElementById('configCategorias');
             container.innerHTML = data.config.categorias.map((cat, index) => `
                 <div class="config-item">
@@ -5500,9 +5564,22 @@
             document.getElementById('emailjsServiceId').value = emailjsConfig.serviceId || '';
             document.getElementById('emailjsTemplateId').value = emailjsConfig.templateId || '';
             document.getElementById('emailjsPublicKey').value = emailjsConfig.publicKey || '';
+            
+            // Reativar campos
+            document.getElementById('diasTreino').disabled = false;
+            document.getElementById('whatsappNumero').disabled = false;
+            document.getElementById('mensagemPadrao').disabled = false;
+            document.getElementById('notifAutomatica').disabled = false;
+            document.getElementById('emailjsServiceId').disabled = false;
+            document.getElementById('emailjsTemplateId').disabled = false;
+            document.getElementById('emailjsPublicKey').disabled = false;
         }
 
         function adicionarCategoria() {
+            if (isPai()) {
+                showToast('❌ Apenas administradores', 'error');
+                return;
+            }
             const nome = document.getElementById('novaCatNome').value.trim();
             const min = parseInt(document.getElementById('novaCatMin').value);
             const max = parseInt(document.getElementById('novaCatMax').value);
@@ -5517,6 +5594,10 @@
         }
 
         function removerCategoria(index) {
+            if (isPai()) {
+                showToast('❌ Apenas administradores', 'error');
+                return;
+            }
             if (data.config.categorias.length <= 1) { showToast('Deve haver pelo menos uma', 'error'); return; }
             if (!confirm('Remover?')) return;
             data.config.categorias.splice(index, 1);
@@ -5527,6 +5608,10 @@
         }
 
         function salvarConfiguracoes() {
+            if (isPai()) {
+                showToast('❌ Apenas administradores', 'error');
+                return;
+            }
             data.config.diasTreino = document.getElementById('diasTreino').value.trim();
             data.config.whatsappNumero = document.getElementById('whatsappNumero').value.trim();
             data.config.mensagemPadrao = document.getElementById('mensagemPadrao').value.trim();
@@ -5564,13 +5649,20 @@
         // ============================================================
         function renderUsuarios() {
             const container = document.getElementById('listaUsuarios');
+            
+            if (isPai()) {
+                container.innerHTML = 
+                    `<div class="empty-state"><i class="fas fa-lock"></i><h3>Acesso restrito a administradores</h3></div>`;
+                return;
+            }
+            
             if (data.usuarios.length === 0) {
                 container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-users"></i><h3>Nenhum usuário</h3></div>`;
                 return;
             }
 
-            const isAdmin = currentUser && currentUser.perfil === 'Administrador';
+            const isAdminUser = isAdmin();
 
             container.innerHTML = data.usuarios.map(u => {
                 return `
@@ -5580,6 +5672,8 @@
                             <div class="usuario-dados">
                                 <div class="nome">${u.nome} ${u.id === 'admin' ? '👑' : ''}</div>
                                 <div class="email">${u.email} • ${u.usuario || u.email}</div>
+                                ${u.perfil === 'Pai' && u.alunoVinculado ? 
+                                    `<div style="font-size:12px;color:var(--secondary);">👨‍👦 Vinculado a: ${data.alunos.find(a => a.id === u.alunoVinculado)?.nome || 'Aluno não encontrado'}</div>` : ''}
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -5589,18 +5683,23 @@
                             </span>
                         </div>
                         <div class="usuario-actions">
-                            ${u.id !== 'admin' ? `
+                            ${u.id !== 'admin' && isAdminUser ? `
                                 <button class="btn btn-permissoes btn-sm" onclick="abrirPermissoesUsuario('${u.id}')" title="Gerenciar Permissões">
                                     <i class="fas fa-user-lock"></i>
                                 </button>
                                 <button class="btn btn-primary btn-sm" onclick="abrirAlterarSenhaUsuario('${u.id}')" title="Alterar Senha">
                                     <i class="fas fa-key"></i>
                                 </button>
+                                ${u.perfil === 'Pai' ? `
+                                    <button class="btn btn-secondary btn-sm" onclick="vincularAlunoPai('${u.id}')" title="Vincular Aluno">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                ` : ''}
                                 <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             ` : `
-                                <span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>
+                                ${u.id === 'admin' && isAdminUser ? '<span style="font-size:12px;color:var(--secondary);font-weight:600;padding:4px 12px;background:#fef3c7;border-radius:20px;">Administrador</span>' : ''}
                             `}
                         </div>
                     </div>
@@ -5669,19 +5768,20 @@
             const senha = senhaInput || Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36)
                 .slice(-4).toUpperCase();
 
-            data.usuarios.push({
+            const novoUsuario = {
                 id: 'user_' + Date.now(),
                 nome: nome,
                 email: email,
                 perfil: perfil,
                 usuario: usuarioGerado,
-                senha: '',
-                senhaInicial: senha,
+                senha: senha,
                 permissoes: permissoes,
                 criadoEm: new Date().toISOString(),
-                primeiroAcesso: true
-            });
+                primeiroAcesso: true,
+                alunoVinculado: null
+            };
 
+            data.usuarios.push(novoUsuario);
             saveData();
             closeModal('modalUsuario');
             renderUsuarios();
@@ -5739,14 +5839,94 @@
             const user = data.usuarios.find(u => u.id === userId);
             if (!user) { showToast('Usuário não encontrado', 'error'); return false; }
 
-            user.senha = '';
-            user.senhaInicial = novaSenha;
+            user.senha = novaSenha;
             user.primeiroAcesso = false;
             saveData();
             renderUsuarios();
             closeModal('modalAlterarSenhaUsuario');
             showToast(`✅ Senha de ${user.nome} alterada com sucesso!`);
             return false;
+        }
+
+        // ============================================================
+        //  VINCULAR ALUNO AO PERFIL PAI
+        // ============================================================
+        function vincularAlunoPai(userId) {
+            if (!isAdmin()) {
+                showToast('Apenas administradores', 'error');
+                return;
+            }
+
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+
+            if (user.perfil !== 'Pai') {
+                showToast('Este usuário não é do perfil Pai', 'error');
+                return;
+            }
+
+            // Criar modal simples para selecionar aluno
+            const alunos = data.alunos;
+            if (alunos.length === 0) {
+                showToast('Nenhum aluno cadastrado para vincular', 'error');
+                return;
+            }
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'background:white;border-radius:16px;max-width:500px;width:100%;padding:30px;max-height:80vh;overflow-y:auto;';
+            
+            let html = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h2 style="color:var(--primary);font-size:20px;"><i class="fas fa-link"></i> Vincular Aluno a ${user.nome}</h2>
+                    <button onclick="this.closest('div[style]').parentElement.remove()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#6b7280;">&times;</button>
+                </div>
+                <p style="color:var(--gray-dark);margin-bottom:16px;">Selecione o aluno que será vinculado a este pai:</p>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+            `;
+
+            alunos.forEach(aluno => {
+                const isSelected = user.alunoVinculado === aluno.id;
+                html += `
+                    <div onclick="selecionarAlunoPai('${userId}', '${aluno.id}')" style="padding:12px 16px;background:${isSelected ? 'var(--secondary)' : 'var(--gray)'};border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border:2px solid ${isSelected ? 'var(--secondary)' : 'transparent'};">
+                        <div>
+                            <strong>${aluno.nome}</strong>
+                            <div style="font-size:12px;color:var(--gray-dark);">${aluno.numero} • ${aluno.categoria}</div>
+                        </div>
+                        ${isSelected ? '<span style="color:var(--primary);"><i class="fas fa-check-circle"></i> Vinculado</span>' : '<span style="color:var(--gray-dark);"><i class="fas fa-link"></i> Vincular</span>'}
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <div style="margin-top:16px;display:flex;gap:10px;">
+                    <button onclick="this.closest('div[style]').parentElement.remove()" class="btn btn-secondary" style="flex:1;justify-content:center;">Fechar</button>
+                </div>
+            `;
+
+            modal.innerHTML = html;
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        function selecionarAlunoPai(userId, alunoId) {
+            const user = data.usuarios.find(u => u.id === userId);
+            if (!user) return;
+
+            user.alunoVinculado = user.alunoVinculado === alunoId ? null : alunoId;
+            saveData();
+            
+            // Atualizar lista de usuários
+            renderUsuarios();
+            
+            // Fechar modal de seleção
+            const overlay = document.querySelector('div[style*="position:fixed"][style*="background:rgba(0,0,0,0.7)"]');
+            if (overlay) overlay.remove();
+            
+            showToast(user.alunoVinculado ? '✅ Aluno vinculado com sucesso!' : '❌ Vínculo removido');
         }
 
         // ============================================================
@@ -5765,17 +5945,16 @@
             document.getElementById('permissoesUsuarioNome').value = user.nome;
             document.getElementById('permissoesUsuarioPerfil').value = user.perfil;
 
-            normalizarPermissoesUsuario(user);
-            const p = user.permissoes;
-            document.getElementById('permEditAlunos').checked = p.alunos === true;
-            document.getElementById('permEditPresencas').checked = p.presencas === true;
-            document.getElementById('permEditCarteirinhas').checked = p.carteirinhas === true;
-            document.getElementById('permEditRelatorios').checked = p.relatorios === true;
-            document.getElementById('permEditNotificacoes').checked = p.notificacoes === true;
-            document.getElementById('permEditBackup').checked = p.backup === true;
+            const p = user.permissoes || {};
+            document.getElementById('permEditAlunos').checked = p.alunos !== false;
+            document.getElementById('permEditPresencas').checked = p.presencas !== false;
+            document.getElementById('permEditCarteirinhas').checked = p.carteirinhas !== false;
+            document.getElementById('permEditRelatorios').checked = p.relatorios !== false;
+            document.getElementById('permEditNotificacoes').checked = p.notificacoes !== false;
+            document.getElementById('permEditBackup').checked = p.backup !== false;
             document.getElementById('permEditConfiguracoes').checked = p.configuracoes === true;
             document.getElementById('permEditUsuarios').checked = p.usuarios === true;
-            document.getElementById('permEditExcluirAlunos').checked = p.excluirAlunos === true;
+            document.getElementById('permEditExcluirAlunos').checked = p.excluirAlunos !== false;
 
             document.getElementById('modalPermissoesUsuario').classList.add('active');
         }
@@ -5799,9 +5978,11 @@
                 excluirAlunos: document.getElementById('permEditExcluirAlunos').checked
             };
 
-            if (currentUser && currentUser.id === user.id) {
+            // Se for o próprio usuário, atualizar também currentUser
+            if (currentUser && currentUser.id === userId) {
                 currentUser.permissoes = { ...user.permissoes };
             }
+
             saveData();
             renderizarMenu();
             closeModal('modalPermissoesUsuario');
@@ -5819,25 +6000,30 @@
                 display.textContent = '••••••••';
                 mostrarSenhaFlag = false;
             } else {
-                display.textContent = 'Gerenciada pelo servidor';
+                display.textContent = data.config.senhaMaster || 'Nenhuma';
                 mostrarSenhaFlag = true;
             }
         }
 
         // ============================================================
-        //  INICIALIZAÇÃO
+        //  INICIALIZAÇÃO - COM RESTAURAÇÃO DE SESSÃO
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Carregando sistema...');
+
+            // Aplicar personalização
             aplicarPersonalizacaoCompleta();
+
+            // Garantir que admin existe
             const adminExists = data.usuarios.some(u => u.id === 'admin');
             if (!adminExists) {
                 data.usuarios.unshift(ADMIN_DATA);
-                data.config.senhaMaster = '';
+                data.config.senhaMaster = ADMIN_DATA.senha;
                 data.config.whatsappNumero = '111946359524';
                 saveData();
             }
 
+            // Criar dados de exemplo se não houver alunos
             if (data.alunos.length === 0) {
                 const exemplos = [
                     { nome: 'João Pedro Silva', pai: 'Carlos Silva', telefone: '(11) 99999-1111',
@@ -5884,20 +6070,45 @@
 
             if (!data.whatsappMessages) data.whatsappMessages = [];
 
-            aplicarPersonalizacaoCompleta();
-
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-            showLogin();
+            // Tentar restaurar sessão
+            const usuarioSessao = carregarSessao();
+            if (usuarioSessao) {
+                currentUser = usuarioSessao;
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                document.getElementById('userName').textContent = currentUser.nome;
+                document.getElementById('userRole').textContent = currentUser.perfil;
+                document.getElementById('userAvatar').textContent = currentUser.nome.charAt(0).toUpperCase();
+                document.getElementById('whatsappFloat').style.display = 'flex';
+                document.getElementById('securityBadge').style.display = isAdmin() ? 'inline-flex' : 'none';
+                
+                atualizarWhatsAppBadge();
+                initEmailJS();
+                renderizarMenu();
+                initSystem();
+                aplicarPersonalizacaoCompleta();
+                atualizarBotoesPorPerfil();
+                
+                console.log('🔄 Sessão restaurada para:', currentUser.nome);
+            } else {
+                // Mostrar login
+                document.getElementById('sidebar').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+                showLogin();
+            }
 
             console.log('🏆 Vila Real Futsal - Sistema de Gestão');
             console.log('👑 Administrador:', ADMIN_DATA.nome);
             console.log('📊 Alunos:', data.alunos.length);
             console.log('📋 Sistema pronto!');
-            console.log('🔐 Autenticação protegida pelo servidor.');
+            console.log('💡 Use o usuário: gleuber | Senha: Opala77@2056');
             console.log('📱 WhatsApp integrado com botão flutuante!');
             console.log('🔒 Personalização disponível apenas para administradores!');
             console.log('📱 Versão mobile otimizada!');
+            console.log('👨‍👦 Perfil Pai com vínculo a aluno implementado!');
+            console.log('🔄 Sessão persistente - não volta ao login ao atualizar a página!');
         });
     </script>
 
