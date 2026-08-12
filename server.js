@@ -1,228 +1,173 @@
 const http = require('http');
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
 const PORT = Number(process.env.PORT || 3000);
-const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, 'data');
-const STATE_FILE = path.join(DATA_DIR, 'state.json');
-const INDEX_FILE = path.join(ROOT, 'index_corrigido.html');
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
-const SSL_KEY = process.env.SSL_KEY_FILE;
-const SSL_CERT = process.env.SSL_CERT_FILE;
-const sessions = new Map();
-const clients = new Set();
+const HOST = process.env.HOST || '0.0.0.0';
+const DATA_DIR = path.join(__dirname, 'server-data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
+const RESET_FILE = path.join(DATA_DIR, 'resets.json');
+const HTML_FILE = path.join(__dirname, 'index_corrigido(5).html');
+const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID || '';
+const EMAILJS_TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID || '';
+const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY || '';
+const EMAILJS_FROM_NAME = process.env.EMAILJS_FROM_NAME || 'Vila Real Futsal';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'gleuber.andrade@outlook.com';
+const ADMIN_USER = process.env.ADMIN_USER || 'gleuber';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const MIGRATION_KEY = process.env.MIGRATION_KEY || '';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-
-const ADMIN_DEFAULT_PASSWORD = process.env.ADMIN_INITIAL_PASSWORD || 'Opala77@2056';
+function readJson(file, fallback) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return fallback; } }
+function writeJson(file, value) { fs.writeFileSync(file, JSON.stringify(value, null, 2), 'utf8'); }
+let users = readJson(USERS_FILE, []);
+if (ADMIN_PASSWORD && !users.some(u => u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
+  users.unshift({id:'admin',nome:'Administrador',email:ADMIN_EMAIL.toLowerCase(),perfil:'Administrador',usuario:ADMIN_USER,passwordHash:hashPassword(ADMIN_PASSWORD),status:'aprovado',criadoEm:new Date().toISOString()});
+  writeJson(USERS_FILE, users);
+}
+let sessions = readJson(SESSIONS_FILE, {});
+let resets = readJson(RESET_FILE, {});
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
-  const hash = crypto.scryptSync(String(password), salt, 64).toString('hex');
-  return `scrypt:${salt}:${hash}`;
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
 }
 function verifyPassword(password, stored) {
-  if (!stored || !stored.startsWith('scrypt:')) return false;
-  const [, salt, expected] = stored.split(':');
-  const actual = crypto.scryptSync(String(password), salt, 64).toString('hex');
+  if (!stored || !stored.includes(':')) return false;
+  const [salt, expected] = stored.split(':');
+  const actual = crypto.scryptSync(password, salt, 64).toString('hex');
   return crypto.timingSafeEqual(Buffer.from(actual, 'hex'), Buffer.from(expected, 'hex'));
 }
-function publicUser(u) {
-  if (!u) return null;
-  const { senha, senhaHash, senhaInicial, ...safe } = u;
+function sanitizeUser(u) {
+  const { passwordHash, ...safe } = u;
   return safe;
 }
-function sanitizeState(state) {
-  return {
-    ...state,
-    usuarios: (state.usuarios || []).map(publicUser)
-  };
+function json(res, status, body) { res.writeHead(status, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(body)); }
+function body(req) { return new Promise((resolve, reject) => { let s=''; req.on('data', c => { s += c; if (s.length > 1e6) req.destroy(); }); req.on('end', () => { try { resolve(s ? JSON.parse(s) : {}); } catch(e) { reject(e); } }); req.on('error', reject); }); }
+function token() { return crypto.randomBytes(32).toString('hex'); }
+function code() { return String(crypto.randomInt(100000, 1000000)); }
+function authUser(req) {
+  const h = req.headers.authorization || '';
+  if (!h.startsWith('Bearer ')) return null;
+  const t = h.slice(7); const s = sessions[t];
+  if (!s || s.expiresAt < Date.now()) { if (s) { delete sessions[t]; writeJson(SESSIONS_FILE, sessions); } return null; }
+  return users.find(u => u.id === s.userId) || null;
 }
-function defaultState() {
-  return {
-    usuarios: [{
-      id: 'admin', nome: 'Gleuber Andrade', email: 'gleuber.andrade@outlook.com', perfil: 'Administrador',
-      usuario: 'gleuber', senhaHash: hashPassword(ADMIN_DEFAULT_PASSWORD), primeiroAcesso: false,
-      permissoes: { alunos:true, presencas:true, carteirinhas:true, relatorios:true, notificacoes:true, backup:true, configuracoes:true, usuarios:true, excluirAlunos:true }
-    }],
-    alunos: [], presencas: [], notificacoes: [], whatsappMessages: [],
-    config: {
-      categorias:[{nome:'Sub-8',idadeMin:6,idadeMax:7},{nome:'Sub-10',idadeMin:8,idadeMax:9},{nome:'Sub-12',idadeMin:10,idadeMax:11},{nome:'Sub-14',idadeMin:12,idadeMax:13},{nome:'Sub-16',idadeMin:14,idadeMax:15},{nome:'Sub-18',idadeMin:16,idadeMax:17}],
-      horariosCategoria:{}, diasTreino:'Segunda, Terça, Quarta, Quinta, Sexta', notifAutomatica:true,
-      mensagemPadrao:'Prezado(a) responsável, seu filho(a) esteve presente no treino do Vila Real Futsal hoje!',
-      senhaMaster:'', whatsappNumero:'111946359524', loginLogo:'', loginBg:'',
-      loginPrimaryColor:'#d4a020', loginTextColor:'#0f1b2d', loginBoxBg:'#ffffff', loginLogoSize:80,
-      loginTitle:'VILA REAL', loginSubtitle:'Futsal · Gestão de Presenças', emailjs:{serviceId:'',templateId:'',publicKey:''},
-      botoes:{primaryBg:'#0f1b2d',primaryColor:'#ffffff',secondaryBg:'#d4a020',secondaryColor:'#0f1b2d',successBg:'#22c55e',successColor:'#ffffff',dangerBg:'#ef4444',dangerColor:'#ffffff',fontSize:13,paddingX:22,paddingY:10,borderRadius:10},
-      cores:{primaria:'#0f1b2d',secundaria:'#d4a020',fundo:'#eef1f5',texto:'#0f1b2d'}
-    }, proximoNumeroAluno:1, proximoNumeroUsuario:2
-  };
-}
-function readState() {
-  if (!fs.existsSync(STATE_FILE)) return null;
-  try { return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); } catch { return null; }
-}
-function migrateState(state) {
-  if (!state) return defaultState();
-  state.usuarios = Array.isArray(state.usuarios) ? state.usuarios : [];
-  for (const u of state.usuarios) {
-    if (!u.permissoes) u.permissoes = {};
-    delete u.permissoes.personalizar;
-    if (!u.senhaHash && u.senha) {
-      u.senhaHash = hashPassword(u.senha);
-      delete u.senha;
+async function sendEmail({to, name, subject, message, type='sistema', usuario='', resetCode=''}) {
+  if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) return false;
+  const payload = {
+    service_id: EMAILJS_SERVICE_ID,
+    template_id: EMAILJS_TEMPLATE_ID,
+    user_id: EMAILJS_PUBLIC_KEY,
+    template_params: {
+      to_email: to, to_name: name || 'Usuário', from_name: EMAILJS_FROM_NAME,
+      subject, assunto: subject, mensagem: message, tipo_email: type,
+      usuario, nova_senha: '', senha: '', codigo_recuperacao: resetCode,
+      sistema: 'Vila Real Futsal'
     }
-    if (!u.senhaHash && u.senhaInicial) {
-      u.senhaHash = hashPassword(u.senhaInicial);
-      delete u.senhaInicial;
-    }
-  }
-  let admin = state.usuarios.find(u => u.id === 'admin');
-  if (!admin) {
-    const d = defaultState().usuarios[0];
-    state.usuarios.unshift(d);
-  }
-  state.config = { ...defaultState().config, ...(state.config || {}), botoes:{...defaultState().config.botoes,...(state.config?.botoes||{})}, cores:{...defaultState().config.cores,...(state.config?.cores||{})} };
-  return state;
-}
-function writeState(state) {
-  const tmp = STATE_FILE + '.' + crypto.randomBytes(4).toString('hex') + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
-  fs.renameSync(tmp, STATE_FILE);
-}
-function ensureState() {
-  let state = migrateState(readState());
-  const exists = fs.existsSync(STATE_FILE);
-  if (!exists) writeState(state); else writeState(state); // also persists legacy migration
-  return { state, initialized: exists };
-}
-function sendJSON(res, status, obj) {
-  const body = JSON.stringify(obj);
-  res.writeHead(status, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Access-Control-Allow-Origin':'*','Access-Control-Allow-Credentials':'true'});
-  res.end(body);
-}
-function parseCookies(req) {
-  const out = {};
-  for (const part of (req.headers.cookie || '').split(';')) {
-    const i = part.indexOf('=');
-    if (i > -1) out[part.slice(0,i).trim()] = decodeURIComponent(part.slice(i+1).trim());
-  }
-  return out;
-}
-function sessionUser(req) {
-  const sid = parseCookies(req).vila_real_sid;
-  if (!sid) return null;
-  const session = sessions.get(sid);
-  if (!session || session.expires < Date.now()) { sessions.delete(sid); return null; }
-  session.expires = Date.now() + SESSION_TTL_MS;
-  const state = migrateState(readState());
-  return state.usuarios.find(u => u.id === session.userId) || null;
-}
-function requireAuth(req,res) { const user = sessionUser(req); if (!user) { sendJSON(res,401,{error:'Sessão expirada ou não autenticada'}); return null; } return user; }
-function requireAdmin(req,res) { const user = requireAuth(req,res); if (!user) return null; if (user.perfil !== 'Administrador') { sendJSON(res,403,{error:'Acesso restrito ao administrador'}); return null; } return user; }
-function aplicarEstadoConformePermissao(incoming, existing, user) {
-  if (user.perfil === 'Administrador') return mergeIncomingState(incoming, existing);
-  const next = JSON.parse(JSON.stringify(existing));
-  const permissoes = user.permissoes || {};
-  const colecoes = {
-    alunos:'alunos', presencas:'presencas', notificacoes:'notificacoes', whatsappMessages:'whatsappMessages'
   };
-  for (const [permissao,chave] of Object.entries(colecoes)) {
-    if (permissoes[permissao] === true && Array.isArray(incoming[chave])) next[chave] = incoming[chave];
-  }
-  if (permissoes.configuracoes === true && incoming.config) {
-    // Configurações operacionais podem ser alteradas por quem recebeu essa permissão,
-    // mas o layout global continua sob controle exclusivo do Administrador.
-    const layoutKeys = new Set(['loginLogo','loginBg','loginPrimaryColor','loginTextColor','loginBoxBg','loginLogoSize','loginTitle','loginSubtitle','botoes','cores']);
-    next.config = { ...next.config, ...incoming.config,
-      botoes: next.config.botoes, cores: next.config.cores };
-    for (const key of layoutKeys) next.config[key] = existing.config?.[key];
-  }
-  next.proximoNumeroAluno = Math.max(Number(existing.proximoNumeroAluno||1), Number(incoming.proximoNumeroAluno||1));
-  next.proximoNumeroUsuario = Math.max(Number(existing.proximoNumeroUsuario||2), Number(incoming.proximoNumeroUsuario||2));
-  return mergeIncomingState(next, existing);
+  const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  return r.ok;
 }
-function broadcast(state) {
-  const msg = `data: ${JSON.stringify({type:'state-updated', data:sanitizeState(state), version:Date.now()})}\n\n`;
-  for (const res of clients) { try { res.write(msg); } catch { clients.delete(res); } }
-}
-function readBody(req) {
-  return new Promise((resolve,reject)=>{
-    let body='';
-    req.on('data', c => { body += c; if (body.length > 20*1024*1024) req.destroy(); });
-    req.on('end', ()=>{ try { resolve(JSON.parse(body || '{}')); } catch(e){ reject(e); } });
-    req.on('error', reject);
-  });
-}
-function mergeIncomingState(incoming, existing) {
-  const next = JSON.parse(JSON.stringify(incoming));
-  next.usuarios = Array.isArray(next.usuarios) ? next.usuarios : [];
-  const oldById = new Map((existing.usuarios || []).map(u => [u.id, u]));
-  for (const u of next.usuarios) {
-    const old = oldById.get(u.id);
-    delete u.senha;
-    if (u.senhaInicial) { u.senhaHash = hashPassword(u.senhaInicial); delete u.senhaInicial; }
-    else if (old?.senhaHash) u.senhaHash = old.senhaHash;
-    else if (u.senhaHash) u.senhaHash = u.senhaHash;
-    else if (u.id === 'admin') u.senhaHash = hashPassword(ADMIN_DEFAULT_PASSWORD);
-    delete u.permissoes?.personalizar;
-  }
-  return migrateState(next);
+function nextUsername() { let n = users.reduce((m,u) => Math.max(m, Number(String(u.usuario||'').replace(/\D/g,'')) || 0), 1) + 1; return 'user' + String(n).padStart(4,'0'); }
+
+async function api(req, res, pathname) {
+  try {
+    if (req.method === 'GET' && pathname === '/api/health') return json(res, 200, {ok:true, service:'Vila Real Auth', emailConfigured:!!(EMAILJS_SERVICE_ID&&EMAILJS_TEMPLATE_ID&&EMAILJS_PUBLIC_KEY)});
+
+    if (req.method === 'POST' && pathname === '/api/auth/register') {
+      const b = await body(req); const {nome,email,perfil,senha} = b;
+      if (!nome || !email || !perfil || !senha) return json(res,400,{ok:false,error:'Dados obrigatórios ausentes.'});
+      if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/.test(senha)) return json(res,400,{ok:false,error:'Senha deve ter mínimo 6 caracteres, letra, número e caractere especial.'});
+      if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) return json(res,409,{ok:false,error:'Este e-mail já está cadastrado.'});
+      const u = {id:'user_'+crypto.randomUUID(), nome, email:email.toLowerCase(), perfil, usuario:nextUsername(), passwordHash:hashPassword(senha), status:'pendente', criadoEm:new Date().toISOString()};
+      users.push(u); writeJson(USERS_FILE, users);
+      if (process.env.AUTO_EMAIL_REGISTER !== 'false') await sendEmail({to:email,name:nome,subject:'Solicitação de cadastro recebida - Vila Real Futsal',message:`Olá ${nome},\n\nSua solicitação foi recebida e aguarda aprovação do administrador.\n\nUsuário: ${u.usuario}\nPerfil: ${perfil}`,type:'cadastro_automatico',usuario:u.usuario});
+      if (ADMIN_EMAIL && process.env.AUTO_EMAIL_ADMIN !== 'false') await sendEmail({to:ADMIN_EMAIL,name:'Administrador',subject:'Nova solicitação de cadastro - Vila Real Futsal',message:`Nova solicitação de cadastro.\n\nNome: ${nome}\nE-mail: ${email}\nPerfil: ${perfil}\nUsuário: ${u.usuario}`,type:'nova_solicitacao',usuario:u.usuario});
+      return json(res,201,{ok:true,user:sanitizeUser(u)});
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/login') {
+      const b = await body(req); const login = String(b.login||'').toLowerCase(); const senha = String(b.senha||'');
+      const u = users.find(x => x.usuario.toLowerCase()===login || x.email.toLowerCase()===login);
+      if (!u) return json(res,401,{ok:false,error:'Usuário ou senha inválidos.'});
+      if (u.status !== 'aprovado') return json(res,403,{ok:false,error:u.status==='pendente'?'Cadastro aguardando aprovação.':'Cadastro rejeitado.'});
+      if (!verifyPassword(senha,u.passwordHash)) return json(res,401,{ok:false,error:'Usuário ou senha inválidos.'});
+      const t = token(); sessions[t]={userId:u.id,expiresAt:Date.now()+1000*60*60*12}; writeJson(SESSIONS_FILE,sessions);
+      return json(res,200,{ok:true,token:t,user:sanitizeUser(u)});
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/recovery/request') {
+      const b = await body(req); const email = String(b.email||'').trim().toLowerCase();
+      const u = users.find(x=>x.email.toLowerCase()===email);
+      // Resposta genérica para não revelar se o e-mail existe.
+      if (!u || u.status !== 'aprovado') return json(res,200,{ok:true,message:'Se o e-mail estiver cadastrado, um código de recuperação será enviado.'});
+      const c = code(); const salt = crypto.randomBytes(16).toString('hex'); const codeHash = crypto.scryptSync(c,salt,32).toString('hex');
+      resets[email]={salt,codeHash,expiresAt:Date.now()+15*60*1000,attempts:0}; writeJson(RESET_FILE,resets);
+      const sent = await sendEmail({to:u.email,name:u.nome,subject:'Código de recuperação de senha - Vila Real Futsal',message:`Olá ${u.nome},\n\nSeu código de recuperação é: ${c}\n\nEle expira em 15 minutos. Se você não solicitou esta recuperação, ignore esta mensagem.`,type:'recuperacao_codigo',resetCode:c});
+      if (!sent) return json(res,503,{ok:false,error:'Não foi possível enviar o e-mail de recuperação. Verifique a configuração de e-mail do servidor.'});
+      return json(res,200,{ok:true,message:'Código de recuperação enviado para o e-mail cadastrado.'});
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/recovery/reset') {
+      const b = await body(req); const email=String(b.email||'').trim().toLowerCase(); const c=String(b.codigo||'').trim(); const senha=String(b.novaSenha||'');
+      if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/.test(senha)) return json(res,400,{ok:false,error:'Nova senha inválida.'});
+      const r=resets[email]; const u=users.find(x=>x.email.toLowerCase()===email);
+      if (!u || !r || r.expiresAt<Date.now()) return json(res,400,{ok:false,error:'Código inválido ou expirado.'});
+      if (++r.attempts > 5) { delete resets[email]; writeJson(RESET_FILE,resets); return json(res,429,{ok:false,error:'Muitas tentativas. Solicite um novo código.'}); }
+      const actual=crypto.scryptSync(c,r.salt,32).toString('hex');
+      if (!crypto.timingSafeEqual(Buffer.from(actual,'hex'),Buffer.from(r.codeHash,'hex'))) { writeJson(RESET_FILE,resets); return json(res,400,{ok:false,error:'Código inválido ou expirado.'}); }
+      u.passwordHash=hashPassword(senha); writeJson(USERS_FILE,users); delete resets[email]; writeJson(RESET_FILE,resets);
+      await sendEmail({to:u.email,name:u.nome,subject:'Senha alterada - Vila Real Futsal',message:`Olá ${u.nome},\n\nSua senha foi alterada com sucesso.\n\nSe você não realizou esta alteração, entre em contato com o administrador imediatamente.`,type:'recuperacao_confirmacao'});
+      return json(res,200,{ok:true,message:'Senha alterada com sucesso.'});
+    }
+
+    const me = authUser(req);
+    if (req.method === 'POST' && pathname === '/api/auth/approve') {
+      if (!me || me.perfil !== 'Administrador') return json(res,403,{ok:false,error:'Acesso negado.'});
+      const b=await body(req); const u=users.find(x=>x.id===b.userId); if(!u) return json(res,404,{ok:false,error:'Usuário não encontrado.'});
+      u.status='aprovado'; writeJson(USERS_FILE,users);
+      if (process.env.AUTO_EMAIL_APPROVAL !== 'false') await sendEmail({to:u.email,name:u.nome,subject:'Cadastro aprovado - Vila Real Futsal',message:`Olá ${u.nome},\n\nSeu cadastro foi aprovado.\n\nUsuário: ${u.usuario}\nAcesse o sistema e utilize a senha criada no cadastro.`,type:'aprovacao',usuario:u.usuario});
+      return json(res,200,{ok:true,user:sanitizeUser(u)});
+    }
+    if (req.method === 'POST' && pathname === '/api/auth/reject') {
+      if (!me || me.perfil !== 'Administrador') return json(res,403,{ok:false,error:'Acesso negado.'});
+      const b=await body(req); const u=users.find(x=>x.id===b.userId); if(!u) return json(res,404,{ok:false,error:'Usuário não encontrado.'});
+      u.status='rejeitado'; writeJson(USERS_FILE,users);
+      return json(res,200,{ok:true,user:sanitizeUser(u)});
+    }
+
+    if (req.method === 'POST' && pathname === '/api/email/send') {
+      if (!me || me.perfil !== 'Administrador') return json(res,403,{ok:false,error:'Acesso negado.'});
+      const b=await body(req); if(!b.to||!b.subject||!b.message) return json(res,400,{ok:false,error:'Destinatário, assunto e mensagem são obrigatórios.'});
+      const sent=await sendEmail({to:b.to,name:b.nome,subject:b.subject,message:b.message,type:'resposta_manual'});
+      return sent ? json(res,200,{ok:true}) : json(res,503,{ok:false,error:'Falha no envio do e-mail.'});
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/migrate') {
+      if (!MIGRATION_KEY || req.headers['x-migration-key'] !== MIGRATION_KEY) return json(res,403,{ok:false,error:'Migração não autorizada.'});
+      const b=await body(req); if(!Array.isArray(b.users)) return json(res,400,{ok:false,error:'Lista de usuários inválida.'});
+      const map = new Map(users.map(u=>[u.email.toLowerCase(),u]));
+      for (const x of b.users) {
+        if (!x.email || !x.senha) continue;
+        const u = map.get(x.email.toLowerCase()) || {id:x.id||'user_'+crypto.randomUUID(),nome:x.nome||'Usuário',email:x.email.toLowerCase(),usuario:x.usuario||nextUsername(),perfil:x.perfil||'Usuário'};
+        Object.assign(u,{nome:x.nome||u.nome,email:x.email.toLowerCase(),usuario:x.usuario||u.usuario,perfil:x.perfil||u.perfil,status:x.status||'aprovado',passwordHash:hashPassword(x.senha)});
+        const idx=users.findIndex(y=>y.id===u.id); if(idx>=0) users[idx]=u; else users.push(u);
+      }
+      writeJson(USERS_FILE,users); return json(res,200,{ok:true,migrated:users.length});
+    }
+
+    return json(res,404,{ok:false,error:'Rota não encontrada.'});
+  } catch(e) { console.error(e); return json(res,500,{ok:false,error:'Erro interno do servidor.'}); }
 }
 
-const server = http.createServer(async (req,res)=>{
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  if (req.method === 'OPTIONS') { res.writeHead(204, {'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,PUT,OPTIONS','Access-Control-Allow-Headers':'Content-Type','Access-Control-Allow-Credentials':'true'}); return res.end(); }
-
-  if (url.pathname === '/api/public-config' && req.method === 'GET') {
-    const {state} = ensureState();
-    return sendJSON(res,200,{config:{...state.config, senhaMaster:undefined, emailjs:undefined}});
-  }
-  if (url.pathname === '/api/login' && req.method === 'POST') {
-    try {
-      const body = await readBody(req); const login = String(body.login || '').trim().toLowerCase(); const senha = String(body.senha || '');
-      const {state} = ensureState();
-      const user = state.usuarios.find(u => String(u.usuario||'').toLowerCase() === login || String(u.email||'').toLowerCase() === login);
-      if (!user || !verifyPassword(senha, user.senhaHash)) return sendJSON(res,401,{error:'Usuário ou senha inválidos'});
-      const sid = crypto.randomBytes(32).toString('hex'); sessions.set(sid,{userId:user.id,expires:Date.now()+SESSION_TTL_MS});
-      res.setHeader('Set-Cookie',`vila_real_sid=${sid}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_MS/1000}`);
-      return sendJSON(res,200,{ok:true,user:publicUser(user),data:sanitizeState(state)});
-    } catch { return sendJSON(res,400,{error:'Requisição inválida'}); }
-  }
-  if (url.pathname === '/api/logout' && req.method === 'POST') {
-    const sid = parseCookies(req).vila_real_sid; if (sid) sessions.delete(sid);
-    res.setHeader('Set-Cookie','vila_real_sid=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
-    return sendJSON(res,200,{ok:true});
-  }
-  if (url.pathname === '/api/state' && req.method === 'GET') {
-    const user = requireAuth(req,res); if (!user) return;
-    const {state} = ensureState(); return sendJSON(res,200,{data:sanitizeState(state),initialized:true,user:publicUser(user)});
-  }
-  if (url.pathname === '/api/state' && req.method === 'PUT') {
-    const user = requireAuth(req,res); if (!user) return;
-    try {
-      const incoming = await readBody(req); if (!incoming || typeof incoming !== 'object' || !Array.isArray(incoming.usuarios)) return sendJSON(res,400,{error:'Estado inválido'});
-      const existing = ensureState().state; const next = aplicarEstadoConformePermissao(incoming, existing, user); writeState(next); broadcast(next);
-      return sendJSON(res,200,{ok:true,data:sanitizeState(next)});
-    } catch(e) { return sendJSON(res,400,{error:'JSON inválido'}); }
-  }
-  if (url.pathname === '/api/events' && req.method === 'GET') {
-    const user = requireAuth(req,res); if (!user) return;
-    res.writeHead(200, {'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','Access-Control-Allow-Origin':'*','Access-Control-Allow-Credentials':'true'});
-    res.write(`retry: 2000\n\n`); clients.add(res);
-    const heartbeat=setInterval(()=>{ try{res.write(': heartbeat\n\n');}catch{clearInterval(heartbeat);clients.delete(res);} },15000);
-    req.on('close',()=>{clearInterval(heartbeat);clients.delete(res);}); return;
-  }
-  if (url.pathname === '/' || url.pathname === '/index.html') {
-    if (!fs.existsSync(INDEX_FILE)) return sendJSON(res,404,{error:'index_corrigido.html não encontrado'});
-    res.writeHead(200, {'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}); return fs.createReadStream(INDEX_FILE).pipe(res);
-  }
-  const safe = path.normalize(url.pathname).replace(/^([.][.][\\/])+/, ''); const file = path.join(ROOT,safe);
-  if (file.startsWith(ROOT) && fs.existsSync(file) && fs.statSync(file).isFile()) return fs.createReadStream(file).pipe(res);
-  sendJSON(res,404,{error:'Não encontrado'});
+const server=http.createServer(async (req,res)=>{
+  const url=new URL(req.url,`http://${req.headers.host||'localhost'}`);
+  if(url.pathname.startsWith('/api/')) return api(req,res,url.pathname);
+  if(req.method==='GET' && (url.pathname==='/' || url.pathname==='/index_corrigido(5).html')) { res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'}); return fs.createReadStream(HTML_FILE).pipe(res); }
+  if(req.method==='GET' && url.pathname==='/health') { res.writeHead(200,{'Content-Type':'text/plain'}); return res.end('OK'); }
+  res.writeHead(404); res.end('Not found');
 });
-
-ensureState();
-server.listen(PORT,()=>console.log(`Vila Real Futsal: http://localhost:${PORT}`));
+server.listen(PORT,HOST,()=>console.log(`Vila Real Futsal: http://${HOST}:${PORT}`));

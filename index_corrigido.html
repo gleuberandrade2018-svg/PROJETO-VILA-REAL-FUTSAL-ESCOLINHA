@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Vila Real Futsal - Gestão</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">        async function enviarRespostaEmail(){if(!isAdmin()){showToast('❌ Apenas administradores.','error');return;}const to=document.getElementById('emailRespostaDestino')?.value.trim(),subject=document.getElementById('emailRespostaAssunto')?.value.trim(),message=document.getElementById('emailRespostaMensagem')?.value.trim(),status=document.getElementById('emailRespostaStatus');if(!to||!subject||!message){if(status){status.textContent='❌ Preencha destinatário, assunto e mensagem.';status.style.display='block';}return;}try{await authApi('/api/email/send',{method:'POST',body:JSON.stringify({to,subject,message})});if(status){status.textContent='✅ Resposta enviada com sucesso.';status.style.display='block';}showToast('✅ E-mail enviado!');}catch(e){if(status){status.textContent='❌ '+e.message;status.style.display='block';}showToast('❌ '+e.message,'error');}}
+        async function migrarUsuariosParaServidor(){if(!isAdmin()){showToast('❌ Apenas administradores.','error');return;}const key=prompt('Digite a MIGRATION_KEY configurada no servidor:');if(!key)return;const users=data.usuarios.filter(u=>u&&u.email&&u.senha).map(u=>({id:u.id,nome:u.nome,email:u.email,usuario:u.usuario,perfil:u.perfil,status:u.status||'aprovado',senha:u.senha}));try{const response=await fetch(AUTH_API_BASE+'/api/auth/migrate',{method:'POST',headers:{'Content-Type':'application/json','X-Migration-Key':key},body:JSON.stringify({users})});const b=await response.json();if(!response.ok)throw new Error(b.error||'Falha na migração');data.usuarios.forEach(u=>delete u.senha);saveData();showToast('✅ Usuários migrados. Remova a MIGRATION_KEY do servidor.');}catch(e){showToast('❌ '+e.message,'error');}}
+</script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
@@ -2428,6 +2430,7 @@
                 </div>
                 <div id="recuperarError" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none;"></div>
                 <div id="recuperarSuccess" style="color:#22c55e;font-size:13px;margin-bottom:12px;display:none;"></div>
+                <button type="button" class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px;" id="btnSolicitarCodigo" onclick="solicitarCodigoRecuperacao()"><i class="fas fa-envelope"></i> Enviar Código de Recuperação</button>
                 <button type="submit" class="btn btn-secondary" style="width:100%;justify-content:center;" id="btnRecuperar">
                     <i class="fas fa-paper-plane"></i> Enviar Nova Senha
                 </button>
@@ -2886,7 +2889,7 @@
                                     <i class="fas fa-paper-plane"></i> Testar Envio de E-mail
                                 </button>
                             </div>
-                            <div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
+                            <div style="margin-top:16px;border-top:1px solid #e5e7eb;padding-top:16px;"><h4 style="font-size:15px;color:var(--primary);margin-bottom:12px;"><i class="fas fa-reply"></i> Responder por E-mail</h4><input id="emailRespostaDestino" type="email" placeholder="destinatario@email.com" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"><input id="emailRespostaAssunto" type="text" placeholder="Assunto" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"><textarea id="emailRespostaMensagem" placeholder="Mensagem" rows="5" style="width:100%;padding:8px;margin-bottom:8px;border:2px solid #e5e7eb;border-radius:6px;"></textarea><button class="btn btn-secondary btn-sm" onclick="enviarRespostaEmail()"><i class="fas fa-paper-plane"></i> Enviar Resposta</button><div id="emailRespostaStatus" style="display:none;margin-top:8px;padding:8px;border-radius:8px;"></div></div><div id="emailTestResult" style="margin-top:8px;padding:8px 12px;border-radius:8px;display:none;font-size:13px;"></div>
                         </div>
 
                         <button class="btn btn-primary btn-sm" onclick="salvarConfiguracoes()" style="margin-top:12px;width:100%;">
@@ -3406,6 +3409,9 @@
         // ============================================================
         const STORAGE_KEY = 'vilaRealFutsalData_v33';
         const SESSION_KEY = 'vilaRealFutsalSession';
+        const AUTH_API_BASE = window.VILA_REAL_API_BASE_URL || '';
+        const AUTH_TOKEN_KEY = 'vilaRealAuthToken';
+        async function authApi(path, options = {}) { const headers={'Content-Type':'application/json',...(options.headers||{})}; const token=localStorage.getItem(AUTH_TOKEN_KEY); if(token) headers.Authorization='Bearer '+token; const response=await fetch(AUTH_API_BASE+path,{...options,headers}); let payload={}; try{payload=await response.json()}catch(_){} if(!response.ok) throw new Error(payload.error||'Erro de comunicação com o servidor.'); return payload; }
 
         const ADMIN_DATA = {
             id: 'admin',
@@ -3751,16 +3757,17 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
+            let backendUser; try { const r=await authApi('/api/auth/register',{method:'POST',body:JSON.stringify({nome,email,perfil,senha})}); backendUser=r.user; } catch(error){errorDiv.textContent=error.message;errorDiv.style.display='block';btn.disabled=false;return false;}
+
             const numero = String(data.proximoNumeroUsuario++).padStart(4, '0');
-            const usuarioGerado = 'user' + numero;
+            const usuarioGerado = backendUser.usuario;
 
             const novoUsuario = {
-                id: 'user_' + Date.now(),
+                id: backendUser.id,
                 nome: nome,
                 email: email,
                 perfil: perfil,
                 usuario: usuarioGerado,
-                senha: senha,
                 status: 'pendente',
                 permissoes: {
                     alunos: perfil === 'Pai' ? false : true,
@@ -3921,7 +3928,7 @@
         // ============================================================
         //  APROVAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
-        function aprovarUsuario(userId) {
+        async function aprovarUsuario(userId) {
             console.log('📋 Aprovando usuário:', userId);
 
             if (!isAdmin()) {
@@ -3940,8 +3947,9 @@
                 return;
             }
 
+            try { await authApi('/api/auth/approve',{method:'POST',body:JSON.stringify({userId})}); } catch(error){showToast('❌ '+error.message,'error');return;}
             // Atualizar status
-            user.status = 'aprovado';
+            user.status='aprovado'; delete user.senha;
             user.primeiroAcesso = true;
 
             // Gerar senha se não tiver
@@ -3992,7 +4000,7 @@
         // ============================================================
         //  REJEITAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
-        function rejeitarUsuario(userId) {
+        async function rejeitarUsuario(userId) {
             console.log('📋 Rejeitando usuário:', userId);
 
             if (!isAdmin()) {
@@ -4008,7 +4016,8 @@
 
             if (!confirm(`Tem certeza que deseja rejeitar o usuário ${user.nome}?`)) return;
 
-            user.status = 'rejeitado';
+            try { await authApi('/api/auth/reject',{method:'POST',body:JSON.stringify({userId})}); } catch(error){showToast('❌ '+error.message,'error');return;}
+            user.status='rejeitado'; delete user.senha;
 
             // Remover da lista de pendentes
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
@@ -4061,97 +4070,10 @@
         // ============================================================
         //  HANDLE LOGIN
         // ============================================================
-        function handleLogin(e) {
-            e.preventDefault();
-
-            const loginUser = document.getElementById('loginUser').value.trim();
-            const loginPass = document.getElementById('loginPassword').value.trim();
-            const errorDiv = document.getElementById('loginError');
-
-            errorDiv.style.display = 'none';
-
-            if (!loginUser || !loginPass) {
-                errorDiv.textContent = 'Preencha todos os campos';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            const user = data.usuarios.find(u =>
-                u.usuario.toLowerCase() === loginUser.toLowerCase() ||
-                u.email.toLowerCase() === loginUser.toLowerCase()
-            );
-
-            if (!user) {
-                errorDiv.textContent = 'Usuário não encontrado';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (user.status === 'pendente') {
-                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (user.status === 'rejeitado') {
-                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (user.senha !== loginPass) {
-                errorDiv.textContent = 'Senha incorreta';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            currentUser = user;
-
-            if (user.primeiroAcesso) {
-                user.primeiroAcesso = false;
-                saveData();
-            }
-
-            salvarSessao();
-
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('mainContent').style.display = 'block';
-
-            document.getElementById('userName').textContent = user.nome;
-            document.getElementById('userRole').textContent = user.perfil;
-            document.getElementById('userAvatar').textContent = user.nome.charAt(0).toUpperCase();
-
-            document.getElementById('whatsappFloat').style.display = 'flex';
-            atualizarWhatsAppBadge();
-
-            const securityBadge = document.getElementById('securityBadge');
-            securityBadge.style.display = isAdmin() ? 'inline-flex' : 'none';
-
-            atualizarBotoesPorPerfil();
-
-            initEmailJS();
-
-            if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
-                setTimeout(() => {
-                    showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`, 'info');
-                    atualizarBadgeSolicitacoes();
-                }, 1500);
-            }
-
-            renderizarMenu();
-            initSystem();
-
-            aplicarPersonalizacaoCompleta();
-
-            closeSidebar();
-
-            showToast(`✅ Bem-vindo, ${user.nome}!`);
-            return false;
-        }
+        async function handleLogin(e){e.preventDefault();const loginUser=document.getElementById('loginUser').value.trim(),loginPass=document.getElementById('loginPassword').value,err=document.getElementById('loginError');err.style.display='none';if(!loginUser||!loginPass){err.textContent='Preencha todos os campos';err.style.display='block';return false;}try{const r=await authApi('/api/auth/login',{method:'POST',body:JSON.stringify({login:loginUser,senha:loginPass})});localStorage.setItem(AUTH_TOKEN_KEY,r.token);const lu=data.usuarios.find(u=>u.id===r.user.id||(u.email||'').toLowerCase()===r.user.email.toLowerCase());currentUser=lu?{...lu,...r.user,senha:undefined}:r.user;salvarSessao();document.getElementById('loginContainer').style.display='none';document.getElementById('sidebar').style.display='flex';renderizarMenu();initSystem();}catch(e){err.textContent=e.message;err.style.display='block';}return false;}
 
         // ============================================================
-        //  ATUALIZAR BOTÕES POR PERFIL
+        //  ATUALIZAR BOTÕES POR PERFIL POR PERFIL
         // ============================================================
         function atualizarBotoesPorPerfil() {
             const isAdminUser = isAdmin();
@@ -6750,83 +6672,8 @@
         // ============================================================
         //  RECUPERAR SENHA
         // ============================================================
-        async function handleRecuperarSenha(e) {
-            e.preventDefault();
-            const email = document.getElementById('recuperarEmail').value.trim();
-            const errorDiv = document.getElementById('recuperarError');
-            const successDiv = document.getElementById('recuperarSuccess');
-
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            if (!email) {
-                errorDiv.textContent = 'Digite seu e-mail';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            const user = data.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
-            if (!user) {
-                errorDiv.textContent = 'E-mail não encontrado no sistema';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (user.status === 'pendente') {
-                errorDiv.textContent = '⏳ Seu cadastro está aguardando aprovação do administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            if (user.status === 'rejeitado') {
-                errorDiv.textContent = '❌ Seu cadastro foi rejeitado. Entre em contato com o administrador.';
-                errorDiv.style.display = 'block';
-                return false;
-            }
-
-            const novaSenha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
-                .toUpperCase();
-            user.senha = novaSenha;
-            if (user.id === 'admin') data.config.senhaMaster = novaSenha;
-            saveData();
-
-            const config = data.config.emailjs || {};
-            const emailEnviado = await enviarEmailRecuperacao(email, user.nome, novaSenha);
-
-            if (emailEnviado) {
-                successDiv.innerHTML =
-                    `✅ <strong>Nova senha enviada para o e-mail!</strong><br><span style="font-size:12px;color:var(--gray-dark);">Verifique sua caixa de entrada (ou spam).</span><br><br><small style="color:var(--gray-dark);">Sua nova senha foi enviada para <strong>${email}</strong></small>`;
-                successDiv.style.display = 'block';
-                showToast('✅ Nova senha enviada para o e-mail!');
-                document.getElementById('recuperarEmail').value = '';
-            } else {
-                successDiv.innerHTML =
-                    `⚠️ <strong>Não foi possível enviar o e-mail.</strong><br><span style="font-size:12px;color:var(--gray-dark);">Configure o EmailJS ou copie a nova senha abaixo:</span><br><br><div style="background:#f0f2f5;padding:12px;border-radius:8px;font-size:18px;font-weight:700;color:var(--primary);letter-spacing:2px;">${novaSenha}</div><br><small style="color:var(--gray-dark);">Copie a senha acima e faça login.</small>`;
-                successDiv.style.display = 'block';
-                showToast('⚠️ E-mail não configurado. Verifique as configurações.', 'error');
-            }
-            return false;
-        }
-
-        async function enviarEmailRecuperacao(email, nome, novaSenha) {
-            const config = data.config.emailjs || {};
-            if (!config.serviceId || !config.templateId || !config.publicKey) return false;
-            try {
-                if (emailjs && typeof emailjs.init === 'function') emailjs.init(config.publicKey);
-                const templateParams = {
-                    to_email: email,
-                    to_name: nome || 'Usuário',
-                    nova_senha: novaSenha,
-                    sistema: 'Vila Real Futsal',
-                    mensagem: 'Sua nova senha foi gerada com sucesso. Utilize-a para acessar o sistema.'
-                };
-                await emailjs.send(config.serviceId, config.templateId, templateParams, config.publicKey);
-                return true;
-            } catch (error) {
-                console.error('❌ Erro ao enviar e-mail:', error);
-                return false;
-            }
-        }
+        async function solicitarCodigoRecuperacao(){const email=document.getElementById('recuperarEmail').value.trim(),err=document.getElementById('recuperarError'),ok=document.getElementById('recuperarSuccess'),btn=document.getElementById('btnSolicitarCodigo');err.style.display='none';ok.style.display='none';if(!email){err.textContent='Digite seu e-mail';err.style.display='block';return;}btn.disabled=true;try{const r=await authApi('/api/auth/recovery/request',{method:'POST',body:JSON.stringify({email})});ok.textContent='✅ '+r.message;ok.style.display='block';document.getElementById('recuperarCodigo').focus();}catch(e){err.textContent=e.message;err.style.display='block';}finally{btn.disabled=false;}}
+        async function handleRecuperarSenha(e){e.preventDefault();const email=document.getElementById('recuperarEmail').value.trim(),codigo=document.getElementById('recuperarCodigo').value.trim(),novaSenha=document.getElementById('recuperarNovaSenha').value,conf=document.getElementById('recuperarConfirmarSenha').value,err=document.getElementById('recuperarError'),ok=document.getElementById('recuperarSuccess'),btn=document.getElementById('btnRecuperar');err.style.display='none';ok.style.display='none';if(!email||!codigo){err.textContent='Informe o e-mail e o código recebido.';err.style.display='block';return false;}if(!validarSenha(novaSenha)){err.textContent='A nova senha deve ter mínimo 6 caracteres, letra, número e caractere especial.';err.style.display='block';return false;}if(novaSenha!==conf){err.textContent='As senhas não coincidem.';err.style.display='block';return false;}btn.disabled=true;try{const r=await authApi('/api/auth/recovery/reset',{method:'POST',body:JSON.stringify({email,codigo,novaSenha})});ok.textContent='✅ '+r.message;ok.style.display='block';document.getElementById('recuperarCodigo').value='';document.getElementById('recuperarNovaSenha').value='';document.getElementById('recuperarConfirmarSenha').value='';showToast('✅ Senha alterada com segurança!');}catch(e){err.textContent=e.message;err.style.display='block';}finally{btn.disabled=false;}return false;}
 
         // ============================================================
         //  INICIALIZAÇÃO
