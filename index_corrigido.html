@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS ===== */
+        /* ===== TODOS OS ESTILOS (mantidos) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -2254,6 +2254,33 @@
             font-size: 15px;
             padding: 4px 0;
         }
+
+        /* Notificação com ação */
+        .notificacao-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .notificacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .notificacao-item .notif-msg {
+            font-size: 14px;
+        }
+
+        .notificacao-item .notif-actions {
+            margin-top: 6px;
+            padding-left: 28px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .notificacao-item .notif-time {
+            font-size: 11px;
+            color: var(--gray-dark);
+        }
     </style>
 </head>
 <body>
@@ -3371,13 +3398,13 @@
     </div>
 
     <!-- ============================================================
-    SCRIPT COMPLETO CORRIGIDO
+    SCRIPT COMPLETO - COM CORREÇÕES DE APROVAÇÃO E NOTIFICAÇÕES
     ============================================================ -->
     <script>
         // ============================================================
         //  DADOS DO SISTEMA
         // ============================================================
-        const STORAGE_KEY = 'vilaRealFutsalData_v32';
+        const STORAGE_KEY = 'vilaRealFutsalData_v33';
         const SESSION_KEY = 'vilaRealFutsalSession';
 
         const ADMIN_DATA = {
@@ -3471,7 +3498,7 @@
         let scannerFechadoAutomaticamente = false;
 
         // ============================================================
-        //  CARREGAR DADOS COM PERSISTÊNCIA DE SESSÃO
+        //  CARREGAR DADOS
         // ============================================================
         function loadData() {
             try {
@@ -3516,38 +3543,6 @@
                 if (!adminExists) data.usuarios.unshift(ADMIN_DATA);
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             } catch (e) { console.error('Erro ao salvar dados', e); }
-        }
-
-        // ============================================================
-        //  GERENCIAMENTO DE SESSÃO
-        // ============================================================
-        function salvarSessao() {
-            if (currentUser) {
-                try {
-                    const sessao = {
-                        userId: currentUser.id,
-                        data: new Date().toISOString()
-                    };
-                    localStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
-                } catch (e) {}
-            }
-        }
-
-        function carregarSessao() {
-            try {
-                const sessaoStr = localStorage.getItem(SESSION_KEY);
-                if (!sessaoStr) return null;
-                const sessao = JSON.parse(sessaoStr);
-                if (!sessao.userId) return null;
-                const user = data.usuarios.find(u => u.id === sessao.userId);
-                return user || null;
-            } catch (e) { return null; }
-        }
-
-        function limparSessao() {
-            try {
-                localStorage.removeItem(SESSION_KEY);
-            } catch (e) {}
         }
 
         // ============================================================
@@ -3605,6 +3600,38 @@
         }
 
         // ============================================================
+        //  GERENCIAMENTO DE SESSÃO
+        // ============================================================
+        function salvarSessao() {
+            if (currentUser) {
+                try {
+                    const sessao = {
+                        userId: currentUser.id,
+                        data: new Date().toISOString()
+                    };
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
+                } catch (e) {}
+            }
+        }
+
+        function carregarSessao() {
+            try {
+                const sessaoStr = localStorage.getItem(SESSION_KEY);
+                if (!sessaoStr) return null;
+                const sessao = JSON.parse(sessaoStr);
+                if (!sessao.userId) return null;
+                const user = data.usuarios.find(u => u.id === sessao.userId);
+                return user || null;
+            } catch (e) { return null; }
+        }
+
+        function limparSessao() {
+            try {
+                localStorage.removeItem(SESSION_KEY);
+            } catch (e) {}
+        }
+
+        // ============================================================
         //  TOAST
         // ============================================================
         function showToast(msg, type = 'success') {
@@ -3654,7 +3681,7 @@
         }
 
         // ============================================================
-        //  FUNÇÕES DE LOGIN E REGISTRO
+        //  FUNÇÕES DE LOGIN
         // ============================================================
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'flex';
@@ -3680,7 +3707,7 @@
         }
 
         // ============================================================
-        //  REGISTRO DE NOVO USUÁRIO - CORRIGIDO
+        //  REGISTRO DE NOVO USUÁRIO
         // ============================================================
         async function handleRegistroUsuario(e) {
             e.preventDefault();
@@ -3761,23 +3788,24 @@
                 data: new Date().toISOString()
             });
 
-            saveData();
-
-            // Adicionar notificação para o administrador
+            // Criar notificação para o administrador
             const admin = data.usuarios.find(u => u.perfil === 'Administrador');
             if (admin) {
                 data.notificacoes.push({
                     id: 'notif_' + Date.now(),
                     tipo: 'nova_solicitacao',
                     usuarioId: admin.id,
+                    usuarioNome: nome,
                     mensagem: `📋 Nova solicitação de cadastro: ${nome} (${email})`,
                     data: new Date().toISOString(),
                     status: 'nao_lido',
                     acao: 'aprovar_usuario',
-                    acaoId: novoUsuario.id
+                    acaoId: novoUsuario.id,
+                    acaoNome: nome
                 });
-                saveData();
             }
+
+            saveData();
 
             // Tentar enviar e-mail para o administrador
             const emailEnviado = await enviarEmailAdminNovoUsuario(nome, email, perfil, usuarioGerado);
@@ -3891,64 +3919,92 @@
         }
 
         // ============================================================
-        //  APROVAR/REJEITAR USUÁRIO - CORRIGIDO
+        //  APROVAR USUÁRIO - FUNÇÃO CORRIGIDA
         // ============================================================
         function aprovarUsuario(userId) {
+            console.log('📋 Aprovando usuário:', userId);
+
             if (!isAdmin()) {
                 showToast('Apenas administradores', 'error');
                 return;
             }
 
             const user = data.usuarios.find(u => u.id === userId);
-            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+            if (!user) {
+                showToast('Usuário não encontrado', 'error');
+                return;
+            }
 
             if (user.status === 'aprovado') {
                 showToast('Usuário já está aprovado', 'warning');
                 return;
             }
 
+            // Atualizar status
             user.status = 'aprovado';
             user.primeiroAcesso = true;
+
+            // Gerar senha se não tiver
+            if (!user.senha || user.senha === '') {
+                user.senha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
+                    .toUpperCase();
+            }
 
             // Remover da lista de pendentes
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
 
-            // Gerar nova senha se não tiver
-            if (!user.senha) {
-                user.senha = Math.random().toString(36).slice(-8).toUpperCase() + '@' + Math.random().toString(36).slice(-4)
-                    .toUpperCase();
-            }
+            // Remover notificações pendentes deste usuário
+            data.notificacoes = data.notificacoes.filter(n => !(n.acao === 'aprovar_usuario' && n.acaoId === userId));
 
             saveData();
 
             // Enviar e-mail de aprovação
             enviarEmailUsuarioAprovado(user.email, user.nome, user.usuario, user.senha);
 
-            // Adicionar notificação
+            // Adicionar notificação de sucesso
             data.notificacoes.push({
                 id: 'notif_' + Date.now(),
                 tipo: 'aprovacao',
                 usuarioId: user.id,
                 usuarioNome: user.nome,
-                mensagem: `✅ Usuário ${user.nome} foi aprovado!`,
+                mensagem: `✅ Usuário ${user.nome} foi aprovado com sucesso!`,
                 data: new Date().toISOString(),
                 status: 'lido'
             });
             saveData();
 
+            // Atualizar interface
             renderUsuarios();
             renderNotificacoes();
+            atualizarBadgeSolicitacoes();
+
             showToast(`✅ Usuário ${user.nome} aprovado! E-mail enviado.`);
+
+            // Recarregar a lista de usuários e notificações
+            if (currentUser && currentUser.id === 'admin') {
+                setTimeout(() => {
+                    renderUsuarios();
+                    renderNotificacoes();
+                }, 500);
+            }
         }
 
+        // ============================================================
+        //  REJEITAR USUÁRIO - FUNÇÃO CORRIGIDA
+        // ============================================================
         function rejeitarUsuario(userId) {
+            console.log('📋 Rejeitando usuário:', userId);
+
             if (!isAdmin()) {
                 showToast('Apenas administradores', 'error');
                 return;
             }
 
             const user = data.usuarios.find(u => u.id === userId);
-            if (!user) { showToast('Usuário não encontrado', 'error'); return; }
+            if (!user) {
+                showToast('Usuário não encontrado', 'error');
+                return;
+            }
 
             if (!confirm(`Tem certeza que deseja rejeitar o usuário ${user.nome}?`)) return;
 
@@ -3957,9 +4013,10 @@
             // Remover da lista de pendentes
             data.solicitacoesPendentes = data.solicitacoesPendentes.filter(s => s.usuarioId !== userId);
 
-            saveData();
+            // Remover notificações pendentes deste usuário
+            data.notificacoes = data.notificacoes.filter(n => !(n.acao === 'aprovar_usuario' && n.acaoId === userId));
 
-            // Adicionar notificação
+            // Adicionar notificação de rejeição
             data.notificacoes.push({
                 id: 'notif_' + Date.now(),
                 tipo: 'rejeicao',
@@ -3969,15 +4026,40 @@
                 data: new Date().toISOString(),
                 status: 'lido'
             });
+
             saveData();
 
             renderUsuarios();
             renderNotificacoes();
+            atualizarBadgeSolicitacoes();
+
             showToast(`❌ Usuário ${user.nome} rejeitado`);
+
+            if (currentUser && currentUser.id === 'admin') {
+                setTimeout(() => {
+                    renderUsuarios();
+                    renderNotificacoes();
+                }, 500);
+            }
         }
 
         // ============================================================
-        //  HANDLE LOGIN - COM VALIDAÇÃO DE STATUS
+        //  ATUALIZAR BADGE DE SOLICITAÇÕES
+        // ============================================================
+        function atualizarBadgeSolicitacoes() {
+            const badge = document.getElementById('solicitacoesBadge');
+            const pendentes = data.solicitacoesPendentes ? data.solicitacoesPendentes.length : 0;
+
+            if (pendentes > 0 && isAdmin()) {
+                badge.textContent = pendentes;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        //  HANDLE LOGIN
         // ============================================================
         function handleLogin(e) {
             e.preventDefault();
@@ -4050,14 +4132,10 @@
 
             initEmailJS();
 
-            // Verificar solicitações pendentes (apenas admin)
             if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
                 setTimeout(() => {
                     showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`, 'info');
-                    // Atualizar badge
-                    const badge = document.getElementById('solicitacoesBadge');
-                    badge.textContent = data.solicitacoesPendentes.length;
-                    badge.style.display = 'inline-block';
+                    atualizarBadgeSolicitacoes();
                 }, 1500);
             }
 
@@ -5229,13 +5307,7 @@
                 pagePersonalizar.classList.remove('visible');
             }
 
-            // Atualizar badge de solicitações
-            if (isAdmin() && data.solicitacoesPendentes && data.solicitacoesPendentes.length > 0) {
-                const badge = document.getElementById('solicitacoesBadge');
-                badge.textContent = data.solicitacoesPendentes.length;
-                badge.style.display = 'inline-block';
-            }
-
+            atualizarBadgeSolicitacoes();
             atualizarBotoesPorPerfil();
 
             console.log('✅ Sistema inicializado!');
@@ -5323,7 +5395,7 @@
         }
 
         // ============================================================
-        //  ALUNOS - CRUD COM CONTROLE DE PERFIL
+        //  ALUNOS - CRUD
         // ============================================================
         function renderAlunos() {
             const container = document.getElementById('alunosList');
@@ -5563,7 +5635,7 @@
         }
 
         // ============================================================
-        //  PRESENÇAS - APENAS ADMIN E PROFESSOR
+        //  PRESENÇAS
         // ============================================================
         function confirmarPresenca(alunoId, enviarNotif = true) {
             if (isPai()) {
@@ -5622,46 +5694,45 @@
         }
 
         // ============================================================
-        //  NOTIFICAÇÕES
+        //  NOTIFICAÇÕES - CORRIGIDO
         // ============================================================
         function renderNotificacoes() {
             const container = document.getElementById('listaNotificacoes');
 
             let notificacoes = data.notificacoes;
             if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
-                notificacoes = notificacoes.filter(n => currentUser.alunosVinculados.includes(n.alunoId));
+                notificacoes = notificacoes.filter(n => {
+                    if (n.tipo === 'nova_solicitacao' || n.tipo === 'aprovacao' || n.tipo === 'rejeicao') return false;
+                    return currentUser.alunosVinculados.includes(n.alunoId);
+                });
             }
 
-            if (notificacoes.length === 0) {
+            // Para admin, mostrar todas as notificações
+            if (isAdmin()) {
+                // Já temos todas
+            }
+
+            if (!notificacoes || notificacoes.length === 0) {
                 container.innerHTML =
                     `<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>Nenhuma notificação</h3></div>`;
                 return;
             }
+
             const notifs = [...notificacoes].reverse();
             container.innerHTML = notifs.slice(0, 50).map(n => {
                 let icon = 'fas fa-envelope';
                 let color = '#ea4335';
+                let acaoHtml = '';
+
                 if (n.canal === 'whatsapp') { icon = 'fab fa-whatsapp';
                     color = '#25D366'; }
-                if (n.tipo === 'nova_solicitacao') { icon = 'fas fa-user-plus';
-                    color = '#1d4ed8'; }
-                if (n.tipo === 'aprovacao') { icon = 'fas fa-check-circle';
-                    color = '#22c55e'; }
-                if (n.tipo === 'rejeicao') { icon = 'fas fa-times-circle';
-                    color = '#ef4444'; }
-
-                return `
-                    <div class="notificacao-item" style="padding:8px 0;border-bottom:1px solid #f0f2f5;">
-                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                            <div class="notif-msg">
-                                <i class="${icon}" style="color:${color};"></i> 
-                                <strong>${n.alunoNome || n.usuarioNome || 'Sistema'}</strong> 
-                                - ${n.mensagem}
-                            </div>
-                            <span class="notif-time" style="font-size:12px;color:var(--gray-dark);">${new Date(n.data).toLocaleString('pt-BR')}</span>
-                        </div>
-                        ${n.acao === 'aprovar_usuario' && n.acaoId ? `
-                            <div style="margin-top:4px;padding-left:24px;display:flex;gap:8px;flex-wrap:wrap;">
+                if (n.tipo === 'nova_solicitacao') {
+                    icon = 'fas fa-user-plus';
+                    color = '#1d4ed8';
+                    // Botões de aprovação dentro da notificação
+                    if (isAdmin() && n.acao === 'aprovar_usuario' && n.acaoId) {
+                        acaoHtml = `
+                            <div class="notif-actions">
                                 <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${n.acaoId}')">
                                     <i class="fas fa-check"></i> Aprovar
                                 </button>
@@ -5669,7 +5740,25 @@
                                     <i class="fas fa-times"></i> Rejeitar
                                 </button>
                             </div>
-                        ` : ''}
+                        `;
+                    }
+                }
+                if (n.tipo === 'aprovacao') { icon = 'fas fa-check-circle';
+                    color = '#22c55e'; }
+                if (n.tipo === 'rejeicao') { icon = 'fas fa-times-circle';
+                    color = '#ef4444'; }
+
+                return `
+                    <div class="notificacao-item">
+                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                            <div class="notif-msg">
+                                <i class="${icon}" style="color:${color};"></i> 
+                                <strong>${n.usuarioNome || 'Sistema'}</strong> 
+                                - ${n.mensagem}
+                            </div>
+                            <span class="notif-time">${new Date(n.data).toLocaleString('pt-BR')}</span>
+                        </div>
+                        ${acaoHtml}
                     </div>
                 `;
             }).join('');
@@ -5679,7 +5768,14 @@
             if (!confirm('Limpar histórico?')) return;
 
             if (isPai() && currentUser.alunosVinculados && currentUser.alunosVinculados.length > 0) {
-                data.notificacoes = data.notificacoes.filter(n => !currentUser.alunosVinculados.includes(n.alunoId));
+                data.notificacoes = data.notificacoes.filter(n => {
+                    if (n.tipo === 'nova_solicitacao' || n.tipo === 'aprovacao' || n.tipo === 'rejeicao') return false;
+                    return !currentUser.alunosVinculados.includes(n.alunoId);
+                });
+            } else if (isAdmin()) {
+                // Admin pode limpar todas, mas mantém as pendentes
+                data.notificacoes = data.notificacoes.filter(n => n.tipo === 'nova_solicitacao' && n.acao ===
+                    'aprovar_usuario');
             } else {
                 data.notificacoes = [];
             }
@@ -5787,7 +5883,7 @@
         }
 
         // ============================================================
-        //  BACKUP - APENAS ADMIN
+        //  BACKUP
         // ============================================================
         function exportarBackup() {
             if (!isAdmin()) {
@@ -5873,7 +5969,7 @@
         }
 
         // ============================================================
-        //  IMPORTAR ALUNOS CSV - APENAS ADMIN
+        //  IMPORTAR ALUNOS CSV
         // ============================================================
         function importarAlunosCSV(event) {
             if (!isAdmin()) {
@@ -5957,7 +6053,7 @@
         }
 
         // ============================================================
-        //  CONFIGURAÇÕES - APENAS ADMIN
+        //  CONFIGURAÇÕES
         // ============================================================
         function renderConfiguracoes() {
             if (!isAdmin()) {
@@ -6096,7 +6192,7 @@
         }
 
         // ============================================================
-        //  TESTAR ENVIO DE E-MAIL - CORRIGIDO
+        //  TESTAR ENVIO DE E-MAIL
         // ============================================================
         async function testarEmailJS() {
             const config = data.config.emailjs || {};
@@ -6154,7 +6250,7 @@
         }
 
         // ============================================================
-        //  USUÁRIOS - APENAS ADMIN
+        //  USUÁRIOS - CORRIGIDO
         // ============================================================
         function renderUsuarios() {
             const container = document.getElementById('listaUsuarios');
@@ -6171,44 +6267,50 @@
                 return;
             }
 
-            const pendentes = data.usuarios.filter(u => u.status === 'pendente');
-            const aprovados = data.usuarios.filter(u => u.status !== 'pendente');
+            // Solicitações pendentes com destaque
+            const pendentes = data.solicitacoesPendentes || [];
 
             let html = '';
 
-            // Solicitações pendentes com destaque
             if (pendentes.length > 0) {
                 html += `
                     <div style="background:#dbeafe;border-radius:12px;padding:16px;margin-bottom:16px;border-left:4px solid #1d4ed8;">
                         <h4 style="color:#1d4ed8;margin-bottom:12px;">
                             <i class="fas fa-clock"></i> Solicitações Pendentes (${pendentes.length})
+                            <span style="font-size:12px;font-weight:400;color:var(--gray-dark);margin-left:8px;">
+                                <i class="fas fa-info-circle"></i> Clique em "Aprovar" para liberar o acesso
+                            </span>
                         </h4>
-                        ${pendentes.map(u => `
+                        ${pendentes.map(s => {
+                            const user = data.usuarios.find(u => u.id === s.usuarioId);
+                            if (!user) return '';
+                            return `
                             <div class="solicitacao-item">
                                 <div class="solicitacao-info">
-                                    <div class="avatar">${u.nome.charAt(0).toUpperCase()}</div>
+                                    <div class="avatar">${user.nome.charAt(0).toUpperCase()}</div>
                                     <div class="dados">
-                                        <div class="nome">${u.nome}</div>
-                                        <div class="email">${u.email} • ${u.usuario || u.email}</div>
-                                        <div class="perfil">${u.perfil}</div>
+                                        <div class="nome">${user.nome}</div>
+                                        <div class="email">${user.email} • ${user.usuario || user.email}</div>
+                                        <div class="perfil">${user.perfil}</div>
                                     </div>
                                 </div>
                                 <div class="solicitacao-badge">⏳ Aguardando</div>
                                 <div class="solicitacao-actions">
-                                    <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${u.id}')">
+                                    <button class="btn btn-success btn-sm" onclick="aprovarUsuario('${user.id}')">
                                         <i class="fas fa-check"></i> Aprovar
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${u.id}')">
+                                    <button class="btn btn-danger btn-sm" onclick="rejeitarUsuario('${user.id}')">
                                         <i class="fas fa-times"></i> Rejeitar
                                     </button>
                                 </div>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 `;
             }
 
             // Usuários aprovados
+            const aprovados = data.usuarios.filter(u => u.status === 'aprovado' || u.id === 'admin');
             if (aprovados.length > 0) {
                 html += `<div style="margin-top:8px;">`;
                 html += aprovados.map(u => {
@@ -6227,8 +6329,8 @@
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span class="usuario-perfil">${u.perfil}</span>
-                            <span class="usuario-status ${u.status === 'aprovado' ? 'ativo' : 'pendente'}">
-                                ${u.status === 'aprovado' ? '✅ Aprovado' : '⏳ Pendente'}
+                            <span class="usuario-status ${u.status === 'aprovado' || u.id === 'admin' ? 'ativo' : 'pendente'}">
+                                ${u.id === 'admin' ? '👑 Admin' : (u.status === 'aprovado' ? '✅ Aprovado' : '⏳ Pendente')}
                             </span>
                         </div>
                         <div class="usuario-actions">
@@ -6337,12 +6439,43 @@
             };
 
             data.usuarios.push(novoUsuario);
+
+            // Se for pendente, adicionar à lista de solicitações
+            if (status === 'pendente') {
+                data.solicitacoesPendentes.push({
+                    id: 'sol_' + Date.now(),
+                    usuarioId: novoUsuario.id,
+                    nome: nome,
+                    email: email,
+                    perfil: perfil,
+                    data: new Date().toISOString()
+                });
+
+                // Notificar admin
+                const admin = data.usuarios.find(u => u.perfil === 'Administrador');
+                if (admin) {
+                    data.notificacoes.push({
+                        id: 'notif_' + Date.now(),
+                        tipo: 'nova_solicitacao',
+                        usuarioId: admin.id,
+                        usuarioNome: nome,
+                        mensagem: `📋 Nova solicitação de cadastro: ${nome} (${email})`,
+                        data: new Date().toISOString(),
+                        status: 'nao_lido',
+                        acao: 'aprovar_usuario',
+                        acaoId: novoUsuario.id,
+                        acaoNome: nome
+                    });
+                }
+            }
+
             saveData();
             closeModal('modalUsuario');
             renderUsuarios();
+            atualizarBadgeSolicitacoes();
 
             if (status === 'pendente') {
-                showToast(`✅ Usuário criado com status PENDENTE!`);
+                showToast(`✅ Usuário criado com status PENDENTE! Aguardando aprovação.`);
             } else {
                 showToast(`✅ Usuário criado! Usuário: ${usuarioGerado} | Senha: ${senha}`);
             }
@@ -6362,6 +6495,7 @@
             data.usuarios = data.usuarios.filter(u => u.id !== id);
             saveData();
             renderUsuarios();
+            atualizarBadgeSolicitacoes();
             showToast('Usuário excluído');
         }
 
@@ -6492,7 +6626,6 @@
             }
 
             saveData();
-
             renderUsuarios();
 
             const modal = document.querySelector('div[style*="position:fixed"][style*="background:rgba(0,0,0,0.7)"]');
@@ -6790,6 +6923,7 @@
                         setTimeout(() => {
                             showToast(`📋 ${data.solicitacoesPendentes.length} solicitação(ões) de cadastro aguardando aprovação`,
                                 'info');
+                            atualizarBadgeSolicitacoes();
                         }, 1500);
                     }
                 } else {
@@ -6816,6 +6950,7 @@
             console.log('👨‍👦 Perfil Pai com vínculo a múltiplos alunos!');
             console.log('🔄 Sessão persistente - não volta ao login ao atualizar a página!');
             console.log('📋 Cadastro com aprovação do administrador e notificações por e-mail!');
+            console.log('✅ Sistema de aprovação de usuários totalmente funcional!');
         });
     </script>
 
